@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily - 設定画面</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_EDFE8FC895C2.css" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2e22",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased selection:bg-primary/30">
+<div class="relative flex h-full min-h-screen w-full flex-col mx-auto max-w-[1024px] pb-24">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-200 dark:border-gray-800">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
+                Medily
+            </h2>
+<div class="flex items-center justify-end">
+<button class="flex items-center justify-center rounded-full size-10 bg-transparent text-slate-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-4 pt-6">
+<!-- Page Title -->
+<h1 class="text-slate-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight text-left pb-6">設定</h1>
+<!-- Section 1: Account -->
+<div class="mb-6">
+<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 pl-2">アカウント</h3>
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+<!-- ListItem: Profile -->
+<a class="flex items-center gap-4 px-4 min-h-[64px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal flex-1 truncate">プロフィール編集</p>
+</div>
+<div class="shrink-0 text-gray-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+<div class="h-px w-full bg-gray-100 dark:bg-gray-700 pl-[68px]"></div>
+<!-- ListItem: Notifications -->
+<a class="flex items-center gap-4 px-4 min-h-[64px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal flex-1 truncate">通知設定</p>
+</div>
+<div class="shrink-0 text-gray-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Section 2: Legal & Info -->
+<div class="mb-6">
+<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 pl-2">サポート・規約</h3>
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+<!-- ListItem: Terms -->
+<a class="flex items-center gap-4 px-4 min-h-[64px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">description</span>
+</div>
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal flex-1 truncate">利用規約</p>
+</div>
+<div class="shrink-0 text-gray-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+<div class="h-px w-full bg-gray-100 dark:bg-gray-700 pl-[68px]"></div>
+<!-- ListItem: Privacy -->
+<a class="flex items-center gap-4 px-4 min-h-[64px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">security</span>
+</div>
+<p class="text-slate-900 dark:text-white text-base font-medium leading-normal flex-1 truncate">プライバシーポリシー</p>
+</div>
+<div class="shrink-0 text-gray-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Section 3: Danger Zone -->
+<div class="mb-8">
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+<!-- ListItem: Delete Account -->
+<a class="flex items-center gap-4 px-4 min-h-[64px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4 flex-1">
+<div class="size-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-red-500">person_remove</span>
+</div>
+<p class="text-red-500 text-base font-medium leading-normal flex-1 truncate">退会手続き</p>
+</div>
+<div class="shrink-0 text-gray-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Logout Button -->
+<div class="flex justify-center mb-10">
+<button class="w-full max-w-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent py-3 px-6 text-base font-bold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-colors active:scale-95">
+                    ログアウト
+                </button>
+</div>
+</main>
+<!-- Bottom Navigation / Footer -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#1a2e22]/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 pb-safe">
+<div class="mx-auto max-w-[1024px] px-4">
+<ul class="flex justify-between items-center h-16 text-xs font-medium text-gray-500 dark:text-gray-400">
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center h-full gap-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span>ホーム</span>
+</a>
+</li>
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center h-full gap-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">search</span>
+<span>検索</span>
+</a>
+</li>
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center h-full gap-1 hover:text-primary transition-colors" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+<span class="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 ring-2 ring-white dark:ring-[#1a2e22]"></span>
+</div>
+<span>相談</span>
+</a>
+</li>
+<li class="flex-1">
+<a class="flex flex-col items-center justify-center h-full gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl fill-1">settings</span>
+<span>設定</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Safe area spacer for bottom nav -->
+<div class="h-20"></div>
+</div>
+<!-- Background Pattern Effect -->
+<div class="fixed inset-0 pointer-events-none -z-10 opacity-30 dark:opacity-10 mix-blend-multiply dark:mix-blend-screen" data-alt="Subtle dot pattern background for texture" style="background-image: radial-gradient(#13ec5b 1px, transparent 1px); background-size: 32px 32px;">
+</div>
+</body></html>

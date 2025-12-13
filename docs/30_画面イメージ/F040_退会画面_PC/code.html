@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily - 退会画面</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_A59934739491.css" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2db494",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#131f1c",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1c2b27",
+                        "danger": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans JP", "sans-serif"],
+                        "body": ["Inter", "Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#101917] dark:text-gray-100 min-h-screen flex flex-col font-display antialiased selection:bg-primary/30">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 w-full bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+<div class="flex items-center justify-between px-4 h-14 max-w-screen-md mx-auto">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[28px]">local_hospital</span>
+<span class="text-xl font-bold tracking-tight text-[#101917] dark:text-white">Medily</span>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-[#101917] dark:text-white">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 w-full max-w-screen-sm mx-auto flex flex-col px-4 pt-6 pb-20">
+<!-- Headline -->
+<div class="mb-6 text-center">
+<h1 class="text-2xl md:text-3xl font-bold text-[#101917] dark:text-white tracking-tight mb-2">退会画面</h1>
+<p class="text-sm text-gray-500 dark:text-gray-400">退会手続きを行います</p>
+</div>
+<!-- Warning Card -->
+<div class="mb-8 group">
+<div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded-xl p-5 shadow-sm transition-all duration-300">
+<div class="flex items-start gap-4">
+<div class="shrink-0 text-red-600 dark:text-red-400 mt-1 bg-red-100 dark:bg-red-900/50 p-2 rounded-full">
+<span class="material-symbols-outlined text-[24px]">warning</span>
+</div>
+<div class="flex-1">
+<h3 class="text-red-700 dark:text-red-300 text-base font-bold leading-tight mb-2">重要：退会のご注意</h3>
+<p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                            退会すると、これまでの<span class="font-bold">相談履歴やメッセージはすべて削除</span>され、復元できません。現在進行中の相談がある場合も相手に通知されず、アクセスできなくなります。
+                        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Section -->
+<div class="flex flex-col gap-6">
+<!-- Reason Select -->
+<div class="relative">
+<label class="block text-sm font-bold text-[#101917] dark:text-gray-200 mb-2">
+                    退会理由 <span class="text-gray-400 font-normal ml-1">（任意）</span>
+</label>
+<div class="relative">
+<select class="w-full h-14 pl-4 pr-10 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl text-base text-[#101917] dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-shadow cursor-pointer">
+<option disabled="" selected="" value="">理由を選択してください</option>
+<option value="solved">悩みが解決したため</option>
+<option value="usability">使い方がわからなかったため</option>
+<option value="frequency">利用頻度が低いため</option>
+<option value="other">その他</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500 dark:text-gray-400">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Confirmation Checkbox -->
+<div class="bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-colors hover:border-primary/30">
+<label class="flex items-center gap-3 cursor-pointer group/checkbox">
+<div class="relative flex items-center">
+<input class="peer h-6 w-6 rounded border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/20 focus:ring-offset-0 bg-transparent transition-all checked:bg-primary checked:border-primary cursor-pointer" type="checkbox"/>
+<!-- Custom check icon simulation for stricter control if needed, but Tailwind forms plugin handles basic svg check -->
+</div>
+<span class="text-[#101917] dark:text-white text-base font-medium select-none group-hover/checkbox:text-primary transition-colors">
+                        注意事項を確認しました
+                    </span>
+</label>
+</div>
+<!-- Actions -->
+<div class="mt-4 flex flex-col gap-3">
+<!-- Danger Button (Visual state: Disabled style for demonstration, would be toggled by JS) -->
+<button aria-disabled="true" class="w-full h-14 rounded-xl bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed transition-all" title="注意事項を確認してください">
+<span class="material-symbols-outlined">delete_forever</span>
+                    退会実行
+                </button>
+<!-- Active Danger Button State (Hidden by default in this static mockup, but showing how it would look if active) -->
+<!-- 
+                <button class="w-full h-14 rounded-xl bg-danger text-white font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-red-500/30 hover:bg-red-600 transition-all active:scale-[0.98]">
+                    <span class="material-symbols-outlined">delete_forever</span>
+                    退会実行
+                </button> 
+                -->
+<button class="w-full h-14 rounded-xl bg-transparent border-2 border-primary text-primary dark:text-primary font-bold text-lg hover:bg-primary/5 active:bg-primary/10 transition-colors">
+                    キャンセル
+                </button>
+</div>
+</div>
+<!-- Decorative Image/Illustration area (Optional for context) -->
+<div class="mt-12 flex justify-center opacity-50 grayscale">
+<div class="w-full max-w-[200px] h-32 bg-center bg-contain bg-no-repeat rounded-lg" data-alt="Abstract medical plus signs pattern representing health context" style="background-image: url('data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M40 10 h20 v30 h30 v20 h-30 v30 h-20 v-30 h-30 v-20 h30 z\' fill=\'%23d3e4e0\' opacity=\'0.4\'/%3E%3C/svg%3E');">
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-background-light dark:bg-background-dark py-6 border-t border-gray-200 dark:border-gray-800 text-center">
+<div class="flex justify-center gap-6 mb-4 text-xs font-medium text-gray-500 dark:text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">利用規約</a>
+<a class="hover:text-primary transition-colors" href="#">プライバシーポリシー</a>
+<a class="hover:text-primary transition-colors" href="#">ヘルプ</a>
+</div>
+<p class="text-xs text-gray-400 dark:text-gray-600">© 2024 Medily Inc.</p>
+</footer>
+</body></html>

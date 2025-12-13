@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>プロフィール編集 - Medily</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_EDFE8FC895C2.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0eb545",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2e22",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "sans": ["Lexend", "Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        /* Hide scrollbar for select elements styling */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-50 font-display min-h-screen flex flex-col antialiased selection:bg-primary selection:text-slate-900">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+<div class="max-w-[1024px] mx-auto px-4 h-16 flex items-center justify-between">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-white">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<!-- Simple Logo Placeholder -->
+<div class="size-6 bg-primary rounded-full flex items-center justify-center text-background-dark font-bold text-xs">M</div>
+<h1 class="text-lg font-bold tracking-tight">Medily</h1>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-white">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full max-w-[1024px] mx-auto px-4 py-6 flex flex-col gap-6">
+<!-- Page Header -->
+<section class="space-y-2">
+<h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">プロフィール編集</h2>
+<p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed max-w-2xl">
+                正確な情報を入力することで、より適切な医療相談や病院とのマッチングが可能になります。
+            </p>
+</section>
+<!-- Avatar Section -->
+<section class="flex flex-col items-center justify-center py-4">
+<div class="relative group cursor-pointer">
+<div class="size-24 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark">
+<img alt="Smiling person avatar placeholder with soft lighting" class="w-full h-full object-cover transition-opacity group-hover:opacity-75" data-alt="User profile avatar placeholder" src="res_C3552C97DC0B.png"/>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white drop-shadow-md">photo_camera</span>
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1.5 shadow-lg border-2 border-background-light dark:border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</div>
+</div>
+<button class="mt-3 text-sm font-medium text-primary hover:text-primary-dark dark:hover:text-primary transition-colors">
+                写真を変更
+            </button>
+</section>
+<!-- Form Card -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 md:p-8">
+<form class="flex flex-col gap-8">
+<!-- Nickname -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        ニックネーム
+                        <span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">必須</span>
+</label>
+<div class="relative">
+<input class="w-full h-12 px-4 rounded-xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-400 dark:text-white" placeholder="例: メディリー太郎" type="text" value="K. Tanaka"/>
+</div>
+</div>
+<!-- Region Select -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        地域
+                        <span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">必須</span>
+</label>
+<div class="relative">
+<select class="w-full h-12 px-4 pr-10 rounded-xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none dark:text-white cursor-pointer">
+<option disabled="" value="">選択してください</option>
+<option selected="" value="tokyo">東京都</option>
+<option value="osaka">大阪府</option>
+<option value="kanagawa">神奈川県</option>
+<option value="aichi">愛知県</option>
+<option value="fukuoka">福岡県</option>
+<option value="hokkaido">北海道</option>
+</select>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Gender Radio Group (Segmented Control Style) -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        性別
+                        <span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">必須</span>
+</label>
+<div class="flex flex-wrap sm:flex-nowrap gap-3">
+<!-- Male -->
+<label class="flex-1 min-w-[100px] cursor-pointer group">
+<input checked="" class="peer sr-only" name="gender" type="radio" value="male"/>
+<div class="flex items-center justify-center gap-2 h-12 rounded-xl border border-slate-200 dark:border-slate-700 bg-background-light dark:bg-background-dark peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-slate-900 dark:peer-checked:text-white transition-all">
+<span class="material-symbols-outlined text-lg opacity-50 peer-checked:opacity-100 peer-checked:text-primary-dark dark:peer-checked:text-primary">male</span>
+<span class="text-sm font-medium">男性</span>
+</div>
+</label>
+<!-- Female -->
+<label class="flex-1 min-w-[100px] cursor-pointer group">
+<input class="peer sr-only" name="gender" type="radio" value="female"/>
+<div class="flex items-center justify-center gap-2 h-12 rounded-xl border border-slate-200 dark:border-slate-700 bg-background-light dark:bg-background-dark peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-slate-900 dark:peer-checked:text-white transition-all">
+<span class="material-symbols-outlined text-lg opacity-50 peer-checked:opacity-100 peer-checked:text-primary-dark dark:peer-checked:text-primary">female</span>
+<span class="text-sm font-medium">女性</span>
+</div>
+</label>
+<!-- Other -->
+<label class="flex-1 min-w-[100px] cursor-pointer group">
+<input class="peer sr-only" name="gender" type="radio" value="other"/>
+<div class="flex items-center justify-center gap-2 h-12 rounded-xl border border-slate-200 dark:border-slate-700 bg-background-light dark:bg-background-dark peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-slate-900 dark:peer-checked:text-white transition-all">
+<span class="material-symbols-outlined text-lg opacity-50 peer-checked:opacity-100 peer-checked:text-primary-dark dark:peer-checked:text-primary">person</span>
+<span class="text-sm font-medium">その他</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Age Group Select -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                        年齢層
+                        <span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">必須</span>
+</label>
+<div class="relative">
+<select class="w-full h-12 px-4 pr-10 rounded-xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none dark:text-white cursor-pointer">
+<option disabled="" value="">選択してください</option>
+<option value="10s">10代</option>
+<option value="20s">20代</option>
+<option selected="" value="30s">30代</option>
+<option value="40s">40代</option>
+<option value="50s">50代</option>
+<option value="60plus">60代以上</option>
+</select>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<hr class="border-slate-100 dark:border-slate-800 my-2"/>
+<!-- Notifications Toggle -->
+<div class="flex items-center justify-between gap-4 py-2">
+<div class="flex flex-col">
+<span class="text-base font-bold text-slate-900 dark:text-slate-100">通知受信設定</span>
+<span class="text-sm text-slate-500 dark:text-slate-400">重要なお知らせをメールで受け取る</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</form>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col-reverse sm:flex-row gap-4 pt-4 pb-8">
+<button class="flex-1 h-14 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                キャンセル
+            </button>
+<button class="flex-1 h-14 rounded-xl bg-primary text-slate-900 font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary-dark hover:text-white transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                変更を保存
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 py-6 mt-auto">
+<div class="max-w-[1024px] mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">利用規約</a>
+<a class="hover:text-primary transition-colors" href="#">プライバシーポリシー</a>
+<a class="hover:text-primary transition-colors" href="#">ヘルプ</a>
+</div>
+<p>© 2024 Medily Inc.</p>
+</div>
+</footer>
+</body></html>

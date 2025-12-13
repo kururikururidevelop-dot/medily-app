@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>通知設定 - Medily</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_EDFE8FC895C2.css" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "text-dark": "#0d1b12",
+                        "text-light": "#f8fcf9",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2c20",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom toggle switch style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #13ec5b;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #13ec5b;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-dark dark:text-text-light font-display antialiased min-h-screen flex flex-col items-center">
+<!-- Main Container -->
+<div class="w-full max-w-[1024px] flex flex-col min-h-screen relative bg-background-light dark:bg-background-dark shadow-xl overflow-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between transition-colors">
+<div class="flex items-center gap-2">
+<button aria-label="戻る" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-text-dark dark:text-text-light transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+</div>
+<h1 class="text-lg font-bold text-text-dark dark:text-text-light absolute left-1/2 -translate-x-1/2 pointer-events-none">
+                通知設定
+            </h1>
+<div class="flex items-center gap-2">
+<button aria-label="メニュー" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-text-dark dark:text-text-light transition-colors">
+<span class="material-symbols-outlined text-2xl">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 px-4 py-6 w-full max-w-2xl mx-auto pb-32">
+<!-- Page Title -->
+<div class="mb-8 animate-fade-in-up">
+<h2 class="text-3xl font-bold text-text-dark dark:text-text-light tracking-tight mb-2">通知設定</h2>
+<p class="text-gray-500 dark:text-gray-400 text-sm">アプリ内および外部連携の通知設定を管理します。</p>
+</div>
+<!-- Section 1: In-App Notifications -->
+<section class="mb-8">
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 px-2">
+                    アプリ内通知
+                </h3>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden divide-y divide-gray-100 dark:divide-gray-800">
+<!-- Item: Question Notification -->
+<div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+<div class="flex items-center gap-4 flex-1 overflow-hidden">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined text-[24px]">help</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-base font-bold text-text-dark dark:text-text-light truncate">質問通知設定</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 truncate">新しい質問が投稿された時に通知</span>
+</div>
+</div>
+<div class="shrink-0 ml-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Item: Answer Notification -->
+<div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+<div class="flex items-center gap-4 flex-1 overflow-hidden">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined text-[24px]">medical_services</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-base font-bold text-text-dark dark:text-text-light truncate">回答通知設定</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 truncate">医師からの回答があった時に通知</span>
+</div>
+</div>
+<div class="shrink-0 ml-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Item: Re-question Notification -->
+<div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+<div class="flex items-center gap-4 flex-1 overflow-hidden">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined text-[24px]">forum</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-base font-bold text-text-dark dark:text-text-light truncate">再質問通知設定</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 truncate">追加の質問や返信があった時に通知</span>
+</div>
+</div>
+<div class="shrink-0 ml-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 dark:peer-focus:ring-primary/40 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: External Integration -->
+<section>
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 px-2">
+                    外部連携
+                </h3>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+<!-- Item: LINE Notification -->
+<label class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4 flex-1 overflow-hidden">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-xl bg-[#06C755]/10 text-[#06C755]">
+<span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-base font-bold text-text-dark dark:text-text-light truncate">LINE通知許可</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 truncate">重要な通知をLINEでも受け取る</span>
+</div>
+</div>
+<div class="shrink-0 ml-4">
+<!-- Custom Styled Checkbox -->
+<input class="w-6 h-6 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-pointer" type="checkbox"/>
+</div>
+</label>
+</div>
+<p class="mt-2 text-xs text-gray-400 px-2">
+                    ※ LINE連携の設定が別途必要になる場合があります。
+                </p>
+</section>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 w-full max-w-[1024px] z-20 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 p-4 safe-area-pb">
+<div class="max-w-2xl mx-auto flex flex-col gap-3">
+<button class="w-full h-12 flex items-center justify-center rounded-xl bg-primary text-background-dark font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all">
+                    設定保存
+                </button>
+<button class="w-full h-12 flex items-center justify-center rounded-xl bg-transparent text-gray-500 dark:text-gray-400 font-bold text-base hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+                    キャンセル
+                </button>
+</div>
+</div>
+</div>
+<!-- Background Decoration (Abstract Medical Theme) -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-blue-400/5 blur-[80px]"></div>
+</div>
+</body></html>

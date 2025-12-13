@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily - アカウント連携</title>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_EDFE8FC895C2.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#13ec5b",
+              "background-light": "#f6f8f6",
+              "background-dark": "#102216",
+              "line": "#06C755", 
+              "surface-light": "#ffffff",
+              "surface-dark": "#1a2e22",
+            },
+            fontFamily: {
+              "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+              "body": ["Noto Sans JP", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', 'Noto Sans JP', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d1b12] dark:text-gray-100 min-h-screen flex flex-col items-center justify-center font-display overflow-x-hidden">
+<div class="relative flex h-full min-h-screen w-full max-w-[480px] flex-col bg-background-light dark:bg-background-dark shadow-xl mx-auto overflow-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<!-- Close Icon (Optional context for modal/flow) -->
+<button class="text-[#0d1b12] dark:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h2 class="text-[#0d1b12] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">アカウント連携</h2>
+</div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 flex flex-col items-center pt-8 px-6">
+<!-- Logo Section -->
+<div class="mb-8 flex flex-col items-center">
+<div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4 shadow-sm border border-primary/10">
+<!-- Representing Medily Logo -->
+<span class="material-symbols-outlined text-primary text-[48px]" data-icon="medical_services">medical_services</span>
+</div>
+<h1 class="text-2xl font-bold text-center text-[#0d1b12] dark:text-white tracking-tight">Medily</h1>
+</div>
+<!-- Headline -->
+<h2 class="text-[#0d1b12] dark:text-white tracking-tight text-[24px] font-bold leading-tight text-center mb-6">
+                LINE連携で、より便利に。
+            </h2>
+<!-- Benefits List -->
+<div class="w-full bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
+<ul class="space-y-5">
+<li class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+<span class="material-symbols-outlined text-primary text-[20px] font-bold">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[#0d1b12] dark:text-white text-base">ワンタップでログイン</span>
+<span class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">IDやパスワード入力の手間がありません</span>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+<span class="material-symbols-outlined text-primary text-[20px] font-bold">notifications_active</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-[#0d1b12] dark:text-white text-base">相談の回答をすぐに通知</span>
+<span class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">医師からの回答を見逃さず確認できます</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Spacer to push content up slightly -->
+<div class="flex-1"></div>
+<!-- Action Area -->
+<div class="w-full flex flex-col gap-4 pb-4">
+<!-- LINE Button -->
+<button class="w-full cursor-pointer flex items-center justify-center rounded-xl h-14 px-5 bg-[#06C755] hover:bg-[#05b34c] transition-colors text-white gap-3 shadow-md relative group">
+<!-- LINE Logo Simulation using Chat Bubble -->
+<span class="material-symbols-outlined text-white text-[28px] absolute left-6">chat_bubble</span>
+<span class="text-lg font-bold tracking-wide">LINEでログイン</span>
+</button>
+<!-- Email Fallback -->
+<button class="w-full cursor-pointer flex items-center justify-center rounded-xl h-12 px-5 bg-transparent border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span class="text-base font-medium">メールアドレスで続ける</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+<div class="p-6 bg-background-light dark:bg-background-dark">
+<p class="text-xs text-center text-gray-400 dark:text-gray-500 leading-relaxed">
+                ログインすることで、<a class="underline hover:text-primary transition-colors" href="#">利用規約</a> および <a class="underline hover:text-primary transition-colors" href="#">プライバシーポリシー</a> に同意したものとみなされます。
+            </p>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily - 公開質問一覧</title>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_BAECF6B1F8F9.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                        "sans": ["Plus Jakarta Sans", "Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+        }
+        /* Custom scrollbar hide for horizontal scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d1b12] dark:text-gray-100 transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden pb-[80px]">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm p-4 pb-2 justify-between border-b border-gray-100 dark:border-gray-800">
+<div class="flex items-center gap-2">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[24px]">local_hospital</span>
+</div>
+<h2 class="text-neutral-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Medily</h2>
+</div>
+<div class="flex items-center justify-end">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-neutral-900 dark:text-white">notifications</span>
+</button>
+</div>
+</header>
+<!-- Page Title -->
+<div class="px-4 pt-6 pb-2">
+<h1 class="text-neutral-900 dark:text-white tracking-tight text-[28px] font-bold leading-tight text-left">公開質問一覧</h1>
+<p class="text-neutral-500 dark:text-neutral-400 text-sm mt-1">未回答の質問に答えて、患者さんの不安を解消しましょう。</p>
+</div>
+<!-- Filter Chips -->
+<div class="sticky top-[65px] z-40 bg-background-light dark:bg-background-dark pt-2 pb-4">
+<div class="flex gap-3 px-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-4 pr-3 shadow-sm hover:border-primary transition-colors">
+<p class="text-neutral-700 dark:text-neutral-200 text-sm font-medium leading-normal">地域</p>
+<span class="material-symbols-outlined text-neutral-500 dark:text-neutral-400 text-[20px]">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-4 pr-3 shadow-sm hover:border-primary transition-colors">
+<p class="text-neutral-700 dark:text-neutral-200 text-sm font-medium leading-normal">カテゴリ</p>
+<span class="material-symbols-outlined text-neutral-500 dark:text-neutral-400 text-[20px]">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-4 pr-3 shadow-sm hover:border-primary transition-colors">
+<p class="text-neutral-700 dark:text-neutral-200 text-sm font-medium leading-normal">並び順</p>
+<span class="material-symbols-outlined text-neutral-500 dark:text-neutral-400 text-[20px]">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Question List -->
+<main class="flex flex-col gap-4 px-4 pb-4">
+<!-- Card 1 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-[#1a2e22] p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-start gap-3">
+<div class="flex gap-3 items-start flex-1">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-[48px] w-[48px] shrink-0 bg-gray-200 dark:bg-gray-700" data-alt="Abstract soft green gradient avatar placeholder" style='background-image: url("res_3EC5E83D0E62.png");'></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">小児科</span>
+<span class="text-xs text-neutral-400 dark:text-neutral-500">10分前</span>
+</div>
+<h3 class="text-neutral-900 dark:text-white text-base font-bold leading-snug line-clamp-2">子供が38度の熱を出していて、座薬を使うべきか悩んでいます...</h3>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+<div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 text-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>東京都 世田谷区</span>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-9 px-5 bg-primary hover:bg-primary/90 text-[#0d1b12] text-sm font-bold leading-normal transition-colors shadow-sm shadow-primary/20">
+<span class="truncate">回答する</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-[#1a2e22] p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-start gap-3">
+<div class="flex gap-3 items-start flex-1">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-[48px] w-[48px] shrink-0 bg-gray-200 dark:bg-gray-700" data-alt="Abstract soft blue gradient avatar placeholder" style='background-image: url("res_3620D3A4061B.png");'></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">皮膚科</span>
+<span class="text-xs text-neutral-400 dark:text-neutral-500">1時間前</span>
+</div>
+<h3 class="text-neutral-900 dark:text-white text-base font-bold leading-snug line-clamp-2">渋谷周辺で評判の良い皮膚科を探しています。アトピー性皮膚炎で...</h3>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+<div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 text-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>東京都 渋谷区</span>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-9 px-5 bg-primary hover:bg-primary/90 text-[#0d1b12] text-sm font-bold leading-normal transition-colors shadow-sm shadow-primary/20">
+<span class="truncate">回答する</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-[#1a2e22] p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-start gap-3">
+<div class="flex gap-3 items-start flex-1">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-[48px] w-[48px] shrink-0 bg-gray-200 dark:bg-gray-700" data-alt="Abstract soft yellow gradient avatar placeholder" style='background-image: url("res_87E81BEF1922.png");'></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">内科</span>
+<span class="text-xs text-neutral-400 dark:text-neutral-500">3時間前</span>
+</div>
+<h3 class="text-neutral-900 dark:text-white text-base font-bold leading-snug line-clamp-2">インフルエンザの予防接種について質問です。妊娠中でも...</h3>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+<div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 text-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>大阪府 大阪市</span>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-9 px-5 bg-primary hover:bg-primary/90 text-[#0d1b12] text-sm font-bold leading-normal transition-colors shadow-sm shadow-primary/20">
+<span class="truncate">回答する</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="flex flex-col gap-3 rounded-xl bg-white dark:bg-[#1a2e22] p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex justify-between items-start gap-3">
+<div class="flex gap-3 items-start flex-1">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-[48px] w-[48px] shrink-0 bg-gray-200 dark:bg-gray-700" data-alt="Abstract soft pink gradient avatar placeholder" style='background-image: url("res_7ABA8D74A043.png");'></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">整形外科</span>
+<span class="text-xs text-neutral-400 dark:text-neutral-500">5時間前</span>
+</div>
+<h3 class="text-neutral-900 dark:text-white text-base font-bold leading-snug line-clamp-2">ランニング中に膝に痛みを感じるようになりました。サポーターは...</h3>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+<div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400 text-xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>全国</span>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-9 px-5 bg-primary hover:bg-primary/90 text-[#0d1b12] text-sm font-bold leading-normal transition-colors shadow-sm shadow-primary/20">
+<span class="truncate">回答する</span>
+</button>
+</div>
+</div>
+<!-- Load More Button -->
+<div class="pt-2 pb-6 flex flex-col items-center gap-3">
+<button class="w-full py-3 text-primary font-bold text-sm bg-white dark:bg-gray-800 border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
+                    もっと見る
+                </button>
+<div class="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 py-2 px-4 rounded-full">
+<span class="material-symbols-outlined text-green-600 dark:text-primary text-[18px]">chat_bubble_outline</span>
+<p class="text-xs font-medium text-neutral-600 dark:text-neutral-300">回答するにはLINEで登録が必要です</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full bg-white dark:bg-[#0d1b12] border-t border-gray-100 dark:border-gray-800 pb-safe z-50">
+<div class="flex justify-between items-center px-6 h-16">
+<button class="flex flex-col items-center justify-center gap-1 w-14 text-neutral-400 dark:text-neutral-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">ホーム</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 w-14 text-primary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px] fill-current">forum</span>
+<span class="text-[10px] font-medium">質問一覧</span>
+</button>
+<!-- Center Action Button (Optional for emphasis, but sticking to standard nav for this request) -->
+<!-- 
+                <div class="relative -top-5">
+                    <button class="flex items-center justify-center size-14 rounded-full bg-primary shadow-lg shadow-primary/30 text-[#0d1b12]">
+                        <span class="material-symbols-outlined text-[28px]">add</span>
+                    </button>
+                </div> 
+                -->
+<button class="flex flex-col items-center justify-center gap-1 w-14 text-neutral-400 dark:text-neutral-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">edit_note</span>
+<span class="text-[10px] font-medium">回答</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 w-14 text-neutral-400 dark:text-neutral-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">マイページ</span>
+</button>
+</div>
+<!-- iOS Home Indicator Placeholder -->
+<div class="h-1 w-full bg-transparent"></div>
+</nav>
+</div>
+</body></html>

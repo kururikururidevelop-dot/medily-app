@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily - Home</title>
+<!-- Material Symbols -->
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Google Fonts: Lexend -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_7FF9D6FF41BE.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Tailwind CSS with Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0eb545",
+                        "background-light": "#f8fcf9",
+                        "background-dark": "#102216",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a3322",
+                        "text-main-light": "#0d1b12",
+                        "text-main-dark": "#e0ece4",
+                        "text-sub-light": "#4c9a66",
+                        "text-sub-dark": "#8fbca0",
+                        "border-light": "#cfe7d7",
+                        "border-dark": "#2a4a35",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding for cleaner mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-display transition-colors duration-200">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-[90px]"> <!-- Padding bottom for Nav Bar -->
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-2">
+<div class="flex items-center justify-center size-8 rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[24px]">local_hospital</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Medily</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 rounded-full bg-red-500 border border-background-light dark:border-background-dark"></span>
+</button>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</button>
+</div>
+</header>
+<!-- Greeting Section -->
+<section class="px-4 pt-6 pb-2">
+<p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark mb-1">2023年10月24日 (火)</p>
+<h2 class="text-2xl font-bold leading-tight text-text-main-light dark:text-text-main-dark">
+                こんにちは、<br/>田中さん 👋
+            </h2>
+</section>
+<!-- Primary Action Button -->
+<section class="px-4 py-4">
+<button class="group relative w-full overflow-hidden rounded-2xl bg-primary hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 p-1">
+<div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex h-14 items-center justify-center gap-3 px-6">
+<span class="material-symbols-outlined text-[#0d1b12] text-[28px]">add_circle</span>
+<span class="text-lg font-bold text-[#0d1b12] tracking-wide">質問を投稿する</span>
+</div>
+</button>
+</section>
+<!-- Stats / Dashboard Links -->
+<section class="px-4 py-2">
+<div class="grid grid-cols-2 gap-3">
+<!-- My Questions Stats -->
+<a class="flex flex-col gap-3 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-5 shadow-sm hover:shadow-md transition-shadow group" href="#">
+<div class="flex items-center justify-between">
+<div class="flex items-center justify-center size-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">help</span>
+</div>
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary transition-colors text-sm">arrow_forward_ios</span>
+</div>
+<div>
+<p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">自分の質問</p>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-3xl font-bold text-text-main-light dark:text-text-main-dark tracking-tight">3</span>
+<span class="text-sm font-bold text-primary">+1件</span>
+</div>
+</div>
+</a>
+<!-- My Answers Stats -->
+<a class="flex flex-col gap-3 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-5 shadow-sm hover:shadow-md transition-shadow group" href="#">
+<div class="flex items-center justify-between">
+<div class="flex items-center justify-center size-10 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary transition-colors text-sm">arrow_forward_ios</span>
+</div>
+<div>
+<p class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark">自分の回答</p>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-3xl font-bold text-text-main-light dark:text-text-main-dark tracking-tight">12</span>
+<span class="text-sm font-bold text-primary">+2件</span>
+</div>
+</div>
+</a>
+</div>
+</section>
+<!-- Recent Activity List -->
+<section class="px-4 py-4 mt-2">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">最近のアクティビティ</h3>
+<a class="text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center gap-1" href="#">
+                    すべて見る
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Card 1: Answered -->
+<div class="flex flex-col gap-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-4 shadow-sm active:scale-[0.99] transition-transform cursor-pointer">
+<div class="flex justify-between items-start gap-3">
+<h4 class="font-bold text-text-main-light dark:text-text-main-dark leading-snug line-clamp-2">
+                            3日前から続く頭痛について相談です。市販薬を飲んでも改善しません。
+                        </h4>
+<span class="shrink-0 inline-flex items-center rounded-md bg-primary/20 px-2 py-1 text-xs font-bold text-primary-dark dark:text-primary ring-1 ring-inset ring-primary/30">
+                            回答あり
+                        </span>
+</div>
+<div class="flex items-center justify-between text-xs text-text-sub-light dark:text-text-sub-dark mt-1">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                2023/10/22
+                            </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">chat_bubble</span>
+                                2
+                            </span>
+</div>
+<span class="font-medium text-text-main-light dark:text-text-main-dark">内科</span>
+</div>
+</div>
+<!-- Card 2: Matching -->
+<div class="flex flex-col gap-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-4 shadow-sm active:scale-[0.99] transition-transform cursor-pointer">
+<div class="flex justify-between items-start gap-3">
+<h4 class="font-bold text-text-main-light dark:text-text-main-dark leading-snug line-clamp-2">
+                            渋谷区周辺で、アトピー治療に評判の良い皮膚科を探しています。
+                        </h4>
+<span class="shrink-0 inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/20 px-2 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20">
+                            マッチング中
+                        </span>
+</div>
+<div class="flex items-center justify-between text-xs text-text-sub-light dark:text-text-sub-dark mt-1">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                2023/10/24
+                            </span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">chat_bubble</span>
+                                0
+                            </span>
+</div>
+<span class="font-medium text-text-main-light dark:text-text-main-dark">皮膚科</span>
+</div>
+</div>
+<!-- Card 3: Resolved (Closed) -->
+<div class="flex flex-col gap-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-4 shadow-sm active:scale-[0.99] transition-transform cursor-pointer opacity-70">
+<div class="flex justify-between items-start gap-3">
+<h4 class="font-bold text-text-main-light dark:text-text-main-dark leading-snug line-clamp-2">
+                            インフルエンザ予防接種の時期について
+                        </h4>
+<span class="shrink-0 inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-bold text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-500/10 dark:ring-gray-400/20">
+                            解決済み
+                        </span>
+</div>
+<div class="flex items-center justify-between text-xs text-text-sub-light dark:text-text-sub-dark mt-1">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                2023/10/10
+                            </span>
+</div>
+<span class="font-medium text-text-main-light dark:text-text-main-dark">一般</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark pb-safe">
+<div class="flex items-center justify-around h-[80px] pb-4">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-primary">
+<span class="material-symbols-outlined filled text-[26px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-bold">ホーム</span>
+</button>
+<!-- Questions -->
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-text-main-light dark:hover:text-text-main-dark transition-colors">
+<span class="material-symbols-outlined text-[26px]">chat_bubble_outline</span>
+<span class="text-[10px] font-medium">質問</span>
+</button>
+<!-- Answers -->
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-text-main-light dark:hover:text-text-main-dark transition-colors">
+<span class="material-symbols-outlined text-[26px]">check_circle_outline</span>
+<span class="text-[10px] font-medium">回答</span>
+</button>
+<!-- My Page -->
+<button class="flex flex-col items-center justify-center w-full h-full gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-text-main-light dark:hover:text-text-main-dark transition-colors">
+<span class="material-symbols-outlined text-[26px]">person_outline</span>
+<span class="text-[10px] font-medium">マイページ</span>
+</button>
+</div>
+</nav>
+<!-- Safe area padding fix for iOS bottom bar -->
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+    </style>
+</body></html>

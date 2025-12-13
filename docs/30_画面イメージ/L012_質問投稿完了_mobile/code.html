@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>質問投稿完了 | Medily</title>
+<link href="res_1150D406235E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0eb545",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "text-main": "#0d1b12",
+                        "text-sub": "#4a5d50",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "body": ["Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', 'Noto Sans JP', sans-serif;
+        }
+        /* Custom animation for success checkmark */
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-in {
+            animation: scaleIn 0.5s ease-out forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+<div class="flex items-center justify-center p-4 h-16 relative">
+<h1 class="text-lg font-bold tracking-tight text-center">質問投稿完了</h1>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 pb-20 w-full max-w-md mx-auto">
+<!-- Success Icon -->
+<div class="mb-8 relative animate-scale-in">
+<div class="absolute inset-0 bg-primary/20 dark:bg-primary/10 rounded-full blur-xl transform scale-150"></div>
+<div class="relative flex items-center justify-center w-24 h-24 rounded-full bg-primary text-white shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-[48px] font-bold">check</span>
+</div>
+</div>
+<!-- Headline -->
+<div class="text-center mb-2">
+<h2 class="text-2xl font-bold leading-tight tracking-tight text-text-main dark:text-white">
+                質問の投稿が<br/>完了しました！
+            </h2>
+</div>
+<!-- Body Text -->
+<div class="text-center mb-10 px-4">
+<p class="text-text-sub dark:text-gray-400 text-sm leading-relaxed">
+                回答が届くまでしばらくお待ちください。<br/>
+                通常24時間以内に専門家から回答が届きます。
+            </p>
+</div>
+<!-- Stats / Info Card -->
+<div class="w-full bg-white dark:bg-white/5 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-white/10 mb-8 relative overflow-hidden group">
+<!-- Decorative background pattern -->
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+<div class="flex flex-col items-center justify-center gap-1 relative z-10">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-lg">tag</span>
+<p class="text-sm font-medium text-text-sub dark:text-gray-400 uppercase tracking-wider">質問ID</p>
+</div>
+<p class="text-3xl font-bold text-text-main dark:text-white tracking-tight font-display text-primary">8829102</p>
+<div class="mt-4 flex items-center gap-1.5 px-3 py-1 bg-gray-50 dark:bg-white/5 rounded-full border border-gray-100 dark:border-white/10">
+<span class="material-symbols-outlined text-gray-400 text-xs">lock</span>
+<span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium">この質問は非公開で管理されます</span>
+</div>
+</div>
+</div>
+<!-- Recommended Action / Next Steps (Optional visual filler) -->
+<div class="w-full mb-8">
+<div class="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+<div class="w-12 h-12 rounded-lg bg-cover bg-center shrink-0" data-alt="Abstract soft green gradient representing medical care" style="background-image: url('res_8079D6786155.png');">
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold text-text-main dark:text-white truncate">通知設定を確認する</p>
+<p class="text-[10px] text-text-sub dark:text-gray-400 line-clamp-2">回答を見逃さないようにプッシュ通知をオンにしましょう。</p>
+</div>
+<button class="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-primary hover:bg-gray-50 dark:hover:bg-white/20 transition-colors">
+<span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full bg-background-light dark:bg-background-dark p-4 pb-8 backdrop-blur-md bg-opacity-90 dark:bg-opacity-90 border-t border-gray-100 dark:border-white/5 z-40">
+<div class="max-w-md mx-auto w-full">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+<span>ホームへ戻る</span>
+</button>
+</div>
+</footer>
+</body></html>

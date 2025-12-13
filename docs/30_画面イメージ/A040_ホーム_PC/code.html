@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medily Home</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_EDFE8FC895C2.css" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1a3322",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans JP", "sans-serif"],
+                        "sans": ["Noto Sans JP", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings:
+            'FILL' 1,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-hidden pb-24">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between bg-background-light/90 dark:bg-background-dark/90 px-4 py-3 backdrop-blur-md">
+<div class="flex items-center gap-2">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-black">
+<span class="material-symbols-outlined text-2xl">local_hospital</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Medily</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 relative">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-200">notifications</span>
+<span class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-background-light dark:border-background-dark"></span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-200">settings</span>
+</button>
+</div>
+</header>
+<!-- Greeting Section -->
+<section class="px-5 pt-6 pb-4">
+<h2 class="text-2xl font-bold leading-tight text-gray-900 dark:text-white">
+                こんにちは、<br/>田中さん
+            </h2>
+</section>
+<!-- Primary Action Button -->
+<section class="px-5 pb-8">
+<button class="group relative w-full overflow-hidden rounded-2xl bg-primary p-4 shadow-[0_8px_20px_-6px_rgba(19,236,91,0.5)] transition-transform active:scale-[0.98]">
+<div class="relative z-10 flex items-center justify-center gap-3">
+<span class="material-symbols-outlined text-3xl text-black">add_circle</span>
+<span class="text-lg font-bold text-black">質問を投稿する</span>
+</div>
+<!-- Subtle gradient overlay for depth -->
+<div class="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
+</button>
+</section>
+<!-- Tabs / Links -->
+<section class="px-5">
+<div class="flex w-full items-center border-b border-gray-200 dark:border-gray-700">
+<button class="relative flex-1 py-3 text-center">
+<span class="block text-sm font-bold text-gray-900 dark:text-white">自分の質問</span>
+<span class="absolute bottom-0 left-0 h-[3px] w-full rounded-t-full bg-primary"></span>
+</button>
+<button class="relative flex-1 py-3 text-center">
+<span class="block text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">自分の回答</span>
+<span class="absolute bottom-0 left-0 h-[3px] w-full rounded-t-full bg-transparent"></span>
+</button>
+</div>
+</section>
+<!-- Question Cards List -->
+<section class="flex flex-col gap-4 px-4 py-6">
+<!-- Card 1: Matching (With Image) -->
+<article class="group relative overflow-hidden rounded-2xl bg-card-light dark:bg-card-dark shadow-sm ring-1 ring-black/5 dark:ring-white/10 transition-all hover:shadow-md">
+<div class="relative h-32 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
+<img alt="Medical pills and thermometer on a table" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="res_64E99AF3DD9F.png"/>
+<div class="absolute bottom-3 left-4 right-4 z-20 flex justify-between items-end">
+<span class="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-black shadow-sm">
+                            マッチング中
+                        </span>
+<span class="text-xs font-medium text-white/90">10/24</span>
+</div>
+</div>
+<div class="p-4">
+<h3 class="mb-1 text-lg font-bold leading-tight text-gray-900 dark:text-white line-clamp-2">
+                        頭痛の症状が続いています。市販薬で様子を見ても良いでしょうか？
+                    </h3>
+<p class="mb-4 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        3日前から偏頭痛のような痛みが続いており、ロキソニンを服用していますが改善しません。光に敏感になっています...
+                    </p>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
+<div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span>閲覧 12</span>
+</div>
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+                            詳細を見る
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Card 2: Waiting for Answer (Text Only) -->
+<article class="group relative flex flex-col rounded-2xl bg-card-light dark:bg-card-dark shadow-sm ring-1 ring-black/5 dark:ring-white/10 p-4 transition-all hover:shadow-md">
+<div class="flex items-center justify-between mb-3">
+<span class="inline-flex items-center rounded-full bg-orange-100 dark:bg-orange-900/30 px-2.5 py-0.5 text-xs font-bold text-orange-700 dark:text-orange-300">
+                        回答待ち
+                    </span>
+<span class="text-xs text-gray-400">10/20</span>
+</div>
+<h3 class="mb-2 text-lg font-bold leading-tight text-gray-900 dark:text-white">
+                    皮膚科の専門医を探しています
+                </h3>
+<p class="mb-4 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                    東京都内でアトピー性皮膚炎の治療に定評のある皮膚科をご存知の方がいらっしゃれば教えてください。ステロイド以外の治療法も...
+                </p>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
+<div class="flex items-center -space-x-2">
+<!-- Avatars representing potential responders -->
+<div class="h-6 w-6 rounded-full border-2 border-white dark:border-card-dark bg-gray-200"></div>
+<div class="h-6 w-6 rounded-full border-2 border-white dark:border-card-dark bg-gray-300"></div>
+<span class="ml-3 text-xs text-gray-500 dark:text-gray-400">2名の医師が閲覧中</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Resolved (Text Only) -->
+<article class="group relative flex flex-col rounded-2xl bg-card-light dark:bg-card-dark shadow-sm ring-1 ring-black/5 dark:ring-white/10 p-4 opacity-80 hover:opacity-100 transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-bold text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        解決済み
+                    </span>
+<span class="text-xs text-gray-400">10/15</span>
+</div>
+<h3 class="mb-2 text-lg font-bold leading-tight text-gray-500 dark:text-gray-400 line-through decoration-gray-400">
+                    小児科の夜間診療について
+                </h3>
+<p class="mb-4 text-sm text-gray-400 dark:text-gray-500 line-clamp-1">
+                    夜間に子供が高熱を出した場合の対応について相談です...
+                </p>
+<div class="flex items-center justify-end border-t border-gray-100 dark:border-gray-700 pt-3">
+<button class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        履歴を見る
+                    </button>
+</div>
+</article>
+</section>
+<!-- Bottom Spacing for Fixed Footer -->
+<div class="h-8"></div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex h-[88px] w-full items-start justify-around bg-white/95 dark:bg-[#102216]/95 pt-3 pb-8 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+<a class="group flex flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined filled text-[28px]">home</span>
+<span class="text-[10px] font-bold">ホーム</span>
+</a>
+<a class="group flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">search</span>
+<span class="text-[10px] font-medium">検索</span>
+</a>
+<a class="group flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors relative" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-[28px]">chat_bubble</span>
+<span class="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-[#102216]"></span>
+</div>
+<span class="text-[10px] font-medium">メッセージ</span>
+</a>
+<a class="group flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">person</span>
+<span class="text-[10px] font-medium">マイページ</span>
+</a>
+</nav>
+<script>
+        // Simple dark mode toggle for demonstration (optional)
+        // Check system preference on load
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body></html>

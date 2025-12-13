@@ -1,0 +1,395 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Answers - Medily</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="res_A59934739491.css" rel="stylesheet"/>
+<link href="res_10C27CB02C3E.css" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#13ec5b",
+              "background-light": "#f6f8f6",
+              "background-dark": "#102216",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1c2e24",
+            },
+            fontFamily: {
+              "display": ["Inter", "Noto Sans JP", "sans-serif"],
+              "body": ["Inter", "Noto Sans JP", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }.hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }.safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d1b12] dark:text-gray-100 flex flex-col min-h-screen">
+<header class="sticky top-0 z-50 w-full bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+<div class="max-w-[1024px] mx-auto flex items-center justify-between px-4 h-16">
+<div class="flex items-center gap-2">
+<div class="flex items-center justify-center size-8 rounded bg-primary text-[#0d1b12]">
+<span class="material-symbols-outlined text-[20px]">medical_services</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-[#0d1b12] dark:text-white">Medily</h1>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[#0d1b12] dark:text-white text-[24px]">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1024px] mx-auto px-4 py-6 pb-24">
+<div class="mb-6">
+<h2 class="text-2xl font-bold text-[#0d1b12] dark:text-white leading-tight">自分の回答</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">過去に回答した相談の管理・確認ができます</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="relative">
+<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">ステータス</label>
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-10 appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-[#0d1b12] dark:text-white">
+<option>すべて</option>
+<option>回答済み</option>
+<option>下書き</option>
+<option>クローズ</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<div class="relative">
+<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">カテゴリ</label>
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-10 appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-[#0d1b12] dark:text-white">
+<option>すべてのカテゴリ</option>
+<option>内科</option>
+<option>外科</option>
+<option>小児科</option>
+<option>皮膚科</option>
+<option>精神科</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<div class="relative">
+<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">並び替え</label>
+<div class="relative">
+<select class="w-full h-10 pl-3 pr-10 appearance-none bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-[#0d1b12] dark:text-white">
+<option>新しい順</option>
+<option>古い順</option>
+<option>いいね数順</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+<span class="material-symbols-outlined text-[20px]">sort</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
+<div class="lg:col-span-8 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="font-bold text-[#0d1b12] dark:text-white text-base flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">monitoring</span>
+                            貢献度グラフィック
+                        </h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mt-1 pl-8">直近6ヶ月の回答アクティビティ</p>
+</div>
+<div class="hidden sm:flex items-center gap-2">
+<span class="inline-block w-2.5 h-2.5 rounded-sm bg-primary"></span>
+<span class="text-xs text-gray-500 dark:text-gray-400">回答数</span>
+</div>
+</div>
+<div class="w-full h-36 flex items-end justify-between gap-2 sm:gap-4 px-2">
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary/30 h-[40%] group-hover:bg-primary/50 transition-all duration-300 relative rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-gray-400 font-medium">5月</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary/40 h-[60%] group-hover:bg-primary/60 transition-all duration-300 relative rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-gray-400 font-medium">6月</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary/50 h-[35%] group-hover:bg-primary/70 transition-all duration-300 relative rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-gray-400 font-medium">7月</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary/90 h-[85%] group-hover:bg-primary transition-all duration-300 relative rounded-t-sm shadow-[0_0_10px_rgba(19,236,91,0.2)]">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none shadow-lg">
+                                    42件<div class="absolute bottom-[-4px] left-1/2 -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] font-bold text-[#0d1b12] dark:text-white">8月</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary/60 h-[55%] group-hover:bg-primary/80 transition-all duration-300 relative rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-gray-400 font-medium">9月</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer relative">
+<div class="w-full bg-gray-50 dark:bg-gray-800/50 rounded-t-sm h-full flex items-end overflow-hidden border-b border-gray-100 dark:border-gray-700">
+<div class="w-full bg-primary h-[70%] group-hover:brightness-110 transition-all duration-300 relative rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-gray-400 font-medium">10月</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 flex flex-col gap-4">
+<div class="flex-1 bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 flex items-center justify-between relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
+                            獲得サンキュー数
+                        </h3>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-extrabold text-[#0d1b12] dark:text-white tracking-tight">1,284</span>
+<span class="text-[10px] text-gray-400">Total</span>
+</div>
+<p class="text-[10px] text-primary font-bold mt-1 bg-primary/10 inline-block px-1.5 py-0.5 rounded">+12 今週</p>
+</div>
+<div class="size-12 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 relative z-10">
+<span class="material-symbols-outlined filled text-[28px]">volunteer_activism</span>
+</div>
+<div class="absolute -right-6 -bottom-6 text-gray-50 dark:text-white/5 pointer-events-none">
+<span class="material-symbols-outlined text-[100px] opacity-50">favorite</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-4 flex items-center justify-between">
+<span>貢献カテゴリ</span>
+<span class="bg-gray-100 dark:bg-gray-700 text-[10px] px-1.5 py-0.5 rounded text-gray-500 dark:text-gray-300">Top 3</span>
+</h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between items-center text-xs mb-1.5">
+<span class="font-bold text-[#0d1b12] dark:text-gray-200">内科</span>
+<span class="text-primary font-bold">45%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center text-xs mb-1.5">
+<span class="font-bold text-[#0d1b12] dark:text-gray-200">小児科</span>
+<span class="text-gray-500 dark:text-gray-400">30%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+<div class="bg-blue-400 h-1.5 rounded-full" style="width: 30%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center text-xs mb-1.5">
+<span class="font-bold text-[#0d1b12] dark:text-gray-200">皮膚科</span>
+<span class="text-gray-500 dark:text-gray-400">15%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+<div class="bg-orange-400 h-1.5 rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="group relative flex flex-col h-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-surface-light dark:bg-surface-dark border border-gray-100 dark:border-gray-800">
+<div class="h-40 bg-cover bg-center relative" data-alt="Abstract green medical background pattern" style='background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%), url("res_EA59D0A143BC.png");'>
+<div class="absolute top-3 left-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-[#0d1b12]">
+<span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>
+                            回答済み
+                        </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<p class="text-white text-xs opacity-90 mb-1">内科 • 2023/10/15</p>
+<h3 class="text-white text-lg font-bold leading-tight line-clamp-2 drop-shadow-sm">インフルエンザの予防接種の時期について教えてください</h3>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex-1 mb-4">
+<p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">あなたの回答:</p>
+<p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                            基本的には10月下旬頃から接種を開始することをお勧めします。抗体ができるまでに約2週間かかり、効果は約5ヶ月持続するため、流行のピーク（例年1月〜2月）に合わせるのが理想的です...
+                        </p>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+<div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">thumb_up</span> 12</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 450</span>
+</div>
+<button class="text-primary hover:text-green-400 text-sm font-bold flex items-center gap-1 transition-colors">
+                            詳細を見る <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col h-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-surface-light dark:bg-surface-dark border border-gray-100 dark:border-gray-800">
+<div class="h-40 bg-cover bg-center relative" data-alt="Blue toned abstract medical background" style='background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%), url("res_A21314A13147.png");'>
+<div class="absolute top-3 left-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-600 text-white">
+<span class="material-symbols-outlined text-[14px] mr-1">lock</span>
+                            クローズ
+                        </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<p class="text-white text-xs opacity-90 mb-1">整形外科 • 2023/09/20</p>
+<h3 class="text-white text-lg font-bold leading-tight line-clamp-2 drop-shadow-sm">デスクワークによる慢性的な腰痛におすすめのストレッチ</h3>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex-1 mb-4">
+<p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">あなたの回答:</p>
+<p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                            腰痛の種類にもよりますが、まずは無理のない範囲でハムストリングス（太もも裏）を伸ばす前屈運動をお試しください。椅子に座ったままでもできるストレッチとして...
+                        </p>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+<div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">thumb_up</span> 8</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 210</span>
+</div>
+<button class="text-primary hover:text-green-400 text-sm font-bold flex items-center gap-1 transition-colors">
+                            詳細を見る <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col h-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-surface-light dark:bg-surface-dark border border-gray-100 dark:border-gray-800">
+<div class="h-40 bg-cover bg-center relative" data-alt="Light minimalistic workspace background" style='background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%), url("res_F6956C98C644.png");'>
+<div class="absolute top-3 left-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-400 text-[#0d1b12]">
+<span class="material-symbols-outlined text-[14px] mr-1">edit</span>
+                            下書き
+                        </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<p class="text-white text-xs opacity-90 mb-1">小児科 • 2023/11/02</p>
+<h3 class="text-white text-lg font-bold leading-tight line-clamp-2 drop-shadow-sm">子供の発熱時、解熱剤を使うタイミングは何度からですか？</h3>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex-1 mb-4">
+<p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">下書き中の内容:</p>
+<p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed opacity-70">
+                            一般的には38.5℃以上で、かつ本人がぐったりしていて水分が取れない、眠れないなどの症状がある場合に使用を検討してください。ただし熱があっても元気なら...
+                        </p>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+<div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+<span>-</span>
+</div>
+<button class="text-primary hover:text-green-400 text-sm font-bold flex items-center gap-1 transition-colors">
+                            編集を再開 <span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col h-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-surface-light dark:bg-surface-dark border border-gray-100 dark:border-gray-800">
+<div class="h-40 bg-cover bg-center relative" data-alt="Dermatology related skin care products blurred background" style='background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%), url("res_F0D8DE24D828.png");'>
+<div class="absolute top-3 left-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-[#0d1b12]">
+<span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>
+                            回答済み
+                        </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<p class="text-white text-xs opacity-90 mb-1">皮膚科 • 2023/10/28</p>
+<h3 class="text-white text-lg font-bold leading-tight line-clamp-2 drop-shadow-sm">乾燥肌による冬のかゆみ対策について効果的な保湿剤は？</h3>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex-1 mb-4">
+<p class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">あなたの回答:</p>
+<p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">
+                            ヘパリン類似物質が含まれた保湿剤が高い保湿効果を期待できます。入浴後5分以内に塗布するのが最も効果的です。また、ナイロンタオルでの摩擦は避け...
+                        </p>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+<div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">thumb_up</span> 34</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">visibility</span> 890</span>
+</div>
+<button class="text-primary hover:text-green-400 text-sm font-bold flex items-center gap-1 transition-colors">
+                            詳細を見る <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-center">
+<button class="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-sm font-bold text-[#0d1b12] dark:text-white group">
+<span class="material-symbols-outlined group-hover:animate-spin">refresh</span>
+                もっと読み込む
+            </button>
+</div>
+</main>
+<footer class="fixed bottom-0 w-full bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom">
+<div class="max-w-[1024px] mx-auto flex items-center justify-around h-16 px-2">
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">ホーム</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="text-[10px] font-medium">さがす</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] filled">chat_bubble</span>
+<span class="text-[10px] font-bold">回答一覧</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="text-[10px] font-medium">通知</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">マイページ</span>
+</a>
+</div>
+</footer>
+
+</body></html>
