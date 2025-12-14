@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 const PREFECTURES = [
   '北海道',
@@ -65,6 +66,7 @@ interface ProfileData {
 
 export default function ProfileEditPage() {
   const router = useRouter();
+  useRequireAuth();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +98,7 @@ export default function ProfileEditPage() {
           bio: data.profile.bio || '',
         });
       } catch (err) {
+        console.error('[Profile Edit] Failed to fetch profile:', err);
         setError(err instanceof Error ? err.message : 'エラーが発生しました');
       } finally {
         setLoading(false);
@@ -152,6 +155,7 @@ export default function ProfileEditPage() {
 
       router.push('/profile');
     } catch (err) {
+      console.error('[Profile Edit] Failed to save profile:', err);
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
       setSaving(false);

@@ -1,8 +1,13 @@
+"use client";
+
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import ContributionCategory from '../../components/ContributionCategory';
 import ContributionGraphic from '../../components/ContributionGraphic';
 import ThankCount from '../../components/ThankCount';
 
 export default function AnswersPage() {
+  useRequireAuth();
+
   return (
     <main className="max-w-[1024px] mx-auto p-6">
       <div className="mb-6">

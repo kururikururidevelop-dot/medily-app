@@ -16,6 +16,17 @@ const firebaseConfig = {
 
 const isConfigured = Object.values(firebaseConfig).every(Boolean);
 
+if (!isConfigured) {
+  console.warn('[Firebase] Configuration incomplete. Missing environment variables:', {
+    hasApiKey: !!firebaseConfig.apiKey,
+    hasAuthDomain: !!firebaseConfig.authDomain,
+    hasProjectId: !!firebaseConfig.projectId,
+    hasStorageBucket: !!firebaseConfig.storageBucket,
+    hasMessagingSenderId: !!firebaseConfig.messagingSenderId,
+    hasAppId: !!firebaseConfig.appId,
+  });
+}
+
 const app = isConfigured
   ? getApps().length === 0
     ? initializeApp(firebaseConfig)
@@ -37,8 +48,12 @@ if (
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);
     connectAuthEmulator(auth, 'http://localhost:9099');
+    console.log('[Firebase] Connected to emulators (Firestore: 8080, Auth: 9099)');
   } catch (error) {
-    // Emulator already connected, ignore error
+    // Emulator already connected, only log if it's a different error
+    if (error instanceof Error && !error.message.includes('already')) {
+      console.error('[Firebase] Emulator connection error:', error);
+    }
   }
 }
 

@@ -10,7 +10,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#2563eb',
+        primary: {
+          DEFAULT: '#2DB596',
+          light: '#4CCAB0',
+          dark: '#1E8F75',
+          ultralight: '#E8F8F4',
+        },
         'background-light': '#f9fafb',
         'background-dark': '#111827',
         'surface-light': '#ffffff',

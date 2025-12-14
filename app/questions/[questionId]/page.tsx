@@ -50,6 +50,7 @@ export default function QuestionDetailPage() {
         setQuestion(data.question);
         setAnswers(data.answers || []);
       } catch (err) {
+        console.error('[Question Detail] Failed to fetch question:', err);
         setError(err instanceof Error ? err.message : 'エラーが発生しました');
       } finally {
         setLoading(false);
@@ -77,6 +78,7 @@ export default function QuestionDetailPage() {
       setAnswers((prev) => [newAnswer, ...prev]);
       setAnswerContent('');
     } catch (err) {
+      console.error('[Question Detail] Failed to submit answer:', err);
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
       setSubmitting(false);

@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 127.0.0.1",
-    "dev:with-firebase": "firebase emulators:start --import=./seed --export-on-exit",
+    "dev": "concurrently -n EMU,NEXT -c yellow,blue \"firebase emulators:start\" \"next dev -H 127.0.0.1\"",
+    "dev:init": "concurrently -n EMU,NEXT,SEED -c yellow,blue,green \"firebase emulators:start\" \"next dev -H 127.0.0.1\" \"wait-on tcp:8080 http-get://127.0.0.1:4000 && node scripts/seed_dev.js\"",
+    "dev:emu": "firebase emulators:start",
+    "dev:next": "next dev -H 127.0.0.1",
+    "seed": "node scripts/seed_dev.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -30,7 +33,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
+    "wait-on": "^7.2.0",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",
     "typescript": "^5"

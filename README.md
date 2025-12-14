@@ -2,6 +2,19 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### 開発起動（安定運用推奨の2ステップ）
+1) エミュレータ＋Next を起動
+```powershell
+npm run dev
+```
+2) Firestore に初期データ投入（カテゴリ＋質問デモ）
+```powershell
+npm run seed
+```
+備考:
+- `npm run seed` は Firestore エミュレータが起動済み（デフォルト: localhost:8080）を前提とします。
+- 実DBへ投入したい場合は `FIREBASE_PROJECT_ID` を対象プロジェクトIDに設定し、`FIRESTORE_EMULATOR_HOST` を未設定で実行してください。
+
 First, run the development server:
 
 ```bash

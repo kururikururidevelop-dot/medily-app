@@ -8,10 +8,9 @@ import { db } from '@/lib/firebase';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { displayName = 'Test User' } = body;
-
-    // モック LINE User ID 生成
-    const mockLineUserId = `U_mock_${Date.now()}`;
+    const displayName = body.displayName || 'デモユーザー';
+    const mockLineUserId = 'dev-mock-user';
+    const mockToken = 'dev-mock-token';
 
     if (!db) {
       return NextResponse.json(
@@ -20,18 +19,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Firestore にユーザーを保存
+    // Firestore にユーザーを保存（固定 ID）
     const userRef = doc(db, 'users', mockLineUserId);
     await setDoc(userRef, {
       lineUserId: mockLineUserId,
       displayName,
       pictureUrl: 'https://via.placeholder.com/200',
+      profileCompletedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    }, { merge: true });
 
     return NextResponse.json({
       success: true,
+      userId: mockLineUserId,
+      token: mockToken,
+      displayName,
       user: {
         lineUserId: mockLineUserId,
         displayName,

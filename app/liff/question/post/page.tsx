@@ -59,7 +59,7 @@ const PREFECTURES = [
 
 interface QuestionFormData {
   title: string;
-  content: string;
+  description: string;
   category: string;
   region: string;
 }
@@ -75,7 +75,7 @@ export default function LiffQuestionPostPage() {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<QuestionFormData>({
     title: '',
-    content: '',
+    description: '',
     category: CATEGORIES[0],
     region: '東京都',
   });
@@ -121,7 +121,7 @@ export default function LiffQuestionPostPage() {
       setError('タイトルを入力してください');
       return;
     }
-    if (!formData.content.trim()) {
+    if (!formData.description.trim()) {
       setError('質問内容を入力してください');
       return;
     }
@@ -142,7 +142,7 @@ export default function LiffQuestionPostPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: formData.title,
-          content: formData.content,
+          description: formData.description,
           category: formData.category,
           region: formData.region,
           userId,
@@ -257,8 +257,8 @@ export default function LiffQuestionPostPage() {
                 質問の詳細 *
               </label>
               <textarea
-                name="content"
-                value={formData.content}
+                name="description"
+                value={formData.description}
                 onChange={handleInputChange}
                 placeholder="詳しい状況や症状を入力してください..."
                 rows={6}
@@ -266,7 +266,7 @@ export default function LiffQuestionPostPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
               <p className="text-xs text-gray-500 mt-1">
-                {formData.content.length} / 1000
+                {formData.description.length} / 1000
               </p>
             </div>
 
@@ -334,7 +334,7 @@ export default function LiffQuestionPostPage() {
                   質問の詳細
                 </p>
                 <p className="text-gray-800 bg-gray-50 p-3 rounded whitespace-pre-wrap">
-                  {formData.content}
+                  {formData.description}
                 </p>
               </div>
             </div>

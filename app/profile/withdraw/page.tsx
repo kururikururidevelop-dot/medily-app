@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 export default function WithdrawPage() {
   const router = useRouter();
+  useRequireAuth();
   const [reason, setReason] = useState('');
   const [confirmText, setConfirmText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ export default function WithdrawPage() {
       localStorage.removeItem('userId');
       router.push('/auth/login');
     } catch (err) {
+      console.error('[Withdraw] Failed to withdraw:', err);
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
       setLoading(false);
     }

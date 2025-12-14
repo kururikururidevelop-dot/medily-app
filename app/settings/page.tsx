@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 interface ToggleSetting {
   id: string;
@@ -13,6 +14,7 @@ interface ToggleSetting {
 
 export default function SettingsPage() {
   const router = useRouter();
+  useRequireAuth();
   const [notificationSettings, setNotificationSettings] = useState<ToggleSetting[]>([
     { id: 'email', label: 'メール通知', value: true },
     { id: 'push', label: 'プッシュ通知', value: true },

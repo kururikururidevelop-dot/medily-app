@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import ContributionGraphic from '@/components/ContributionGraphic';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 
 interface UserProfile {
   id: string;
@@ -18,6 +19,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const router = useRouter();
+  useRequireAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,7 @@ export default function ProfilePage() {
         const data = await response.json();
         setProfile(data.profile);
       } catch (err) {
+        console.error('[Profile] Failed to fetch profile:', err);
         setError(err instanceof Error ? err.message : 'エラーが発生しました');
       } finally {
         setLoading(false);

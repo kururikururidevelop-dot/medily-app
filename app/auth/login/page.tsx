@@ -9,116 +9,176 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (provider: 'line' | 'google') => {
+  const handleLogin = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      if (provider === 'line') {
-        // 開発環境: モックログイン
-        if (process.env.NODE_ENV === 'development') {
-          const response = await fetch('/api/auth/mock-login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ provider: 'line' }),
-          });
+      // 開発環境: モックログイン
+      if (process.env.NODE_ENV === 'development') {
+        const response = await fetch('/api/auth/mock-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider: 'line' }),
+        });
 
-          if (!response.ok) {
-            throw new Error('ログインに失敗しました');
-          }
-
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('userId', data.userId);
-          router.push('/home');
-        } else {
-          // 本番: LINE OAuth へリダイレクト
-          // TODO: LINE OAuth URLの実装
-          window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/line`;
+        if (!response.ok) {
+          throw new Error('ログインに失敗しました');
         }
-      } else if (provider === 'google') {
-        // Google ログイン処理
-        // TODO: Google OAuth の実装
-        setError('Google ログインは準備中です');
+
+        const data = await response.json();
+        const token = data.token || 'dev-mock-token';
+        const userId = data.userId || data.user?.lineUserId || 'dev-mock-user';
+        const displayName = data.displayName || data.user?.displayName || 'デモユーザー';
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('displayName', displayName);
+        router.push('/home');
+      } else {
+        // 本番: LINE OAuth へリダイレクト
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/line`;
       }
     } catch (err) {
+      console.error('[Login] Authentication failed:', err);
       setError(err instanceof Error ? err.message : 'ログインに失敗しました');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSkip = () => {
+    // TODO: 未ログイン状態でアクセス可能な画面へ遷移（例：PRサイト）
+    router.push('/');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
-      {/* ヘッダー */}
-      <div className="pt-12 pb-8 text-center border-b border-gray-200">
-        <div className="flex justify-center mb-4">
-          <Icon name="logo" size={48} className="text-blue-600" />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-800">Medily</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-200">
+      {/* トップバー */}
+      <div className="flex items-center bg-gray-50 dark:bg-gray-900 p-4 pb-2 justify-between sticky top-0 z-10">
+        <button
+          onClick={handleSkip}
+          className="text-gray-900 dark:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="閉じる"
+        >
+          <Icon name="close" size={24} />
+        </button>
+        <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
+          アカウント連携
+        </h2>
       </div>
 
       {/* メインコンテンツ */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm">
-          {/* タイトル */}
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-            ログイン
-          </h2>
-
-          {/* 説明テキスト */}
-          <p className="text-center text-gray-600 mb-8">
-            アカウントにログインして、質問や回答を始めましょう
-          </p>
-
-          {/* エラーメッセージ */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
-
-          {/* ボタングループ */}
-          <div className="space-y-3">
-            {/* LINE ログイン */}
-            <button
-              onClick={() => handleLogin('line')}
-              disabled={loading}
-              className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <Icon name="line" size={20} className="text-white" />
-              LINE でログイン
-            </button>
-
-            {/* Google ログイン */}
-            <button
-              onClick={() => handleLogin('google')}
-              disabled={loading}
-              className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <Icon name="google" size={20} />
-              Google でログイン
-            </button>
+      <main className="flex flex-col items-center pt-8 px-6 w-full max-w-md mx-auto">
+        {/* ロゴセクション */}
+        <div className="mb-8 flex flex-col items-center">
+          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2DB596]/20 to-[#2DB596]/5 flex items-center justify-center mb-4 shadow-sm border border-[#2DB596]/10">
+            <Icon name="medical_services" size={48} className="text-[#2DB596]" />
           </div>
-
-          {/* 読み込み中表示 */}
-          {loading && (
-            <div className="mt-6 text-center">
-              <div className="inline-block">
-                <div className="animate-spin">
-                  <Icon name="loading" size={24} className="text-blue-600" />
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">ログイン処理中...</p>
-            </div>
-          )}
+          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white tracking-tight">
+            Medily
+          </h1>
         </div>
-      </div>
+
+        {/* ヘッドライン */}
+        <h2 className="text-gray-900 dark:text-white tracking-tight text-[24px] font-bold leading-tight text-center mb-6">
+          LINE連携で始めよう
+        </h2>
+
+        {/* ベネフィットリスト */}
+        <div className="w-full bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
+          <ul className="space-y-5">
+            {/* リスト項目1 */}
+            <li className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2DB596]/10 flex items-center justify-center mt-0.5">
+                <Icon name="check" size={20} className="text-[#2DB596] font-bold" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-gray-900 dark:text-white text-base">
+                  ワンタップでログイン
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  IDやパスワード入力の手間がありません
+                </span>
+              </div>
+            </li>
+
+            {/* リスト項目2 */}
+            <li className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2DB596]/10 flex items-center justify-center mt-0.5">
+                <Icon name="notifications_active" size={20} className="text-[#2DB596] font-bold" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-gray-900 dark:text-white text-base">
+                  リアルタイムな回答をすぐに通知
+                </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  欲しい回答を見逃さず確認できます
+                </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        {/* エラーメッセージ */}
+        {error && (
+          <div className="w-full mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* アクションエリア */}
+        <div className="w-full flex flex-col gap-4 mb-6">
+          {/* LINEログインボタン */}
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full cursor-pointer flex items-center justify-center rounded-xl h-14 px-5 bg-[#06C755] hover:brightness-90 transition-all text-white gap-3 shadow-md relative group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <div className="flex items-center gap-3">
+                <div className="animate-spin">
+                  <Icon name="loading" size={24} className="text-white" />
+                </div>
+                <span className="text-lg font-bold tracking-wide">ログイン処理中...</span>
+              </div>
+            ) : (
+              <>
+                {/* LINE公式アイコン（画像） */}
+                <img 
+                  src="/icons/line-logo-white@2x.png" 
+                  srcSet="/icons/line-logo-white@2x.png 2x, /icons/line-logo-white@3x.png 3x"
+                  alt="LINE" 
+                  className="absolute left-5 w-[40px] h-[40px]"
+                  style={{ imageRendering: 'crisp-edges' }}
+                />
+                <span className="text-lg font-bold tracking-wide">LINEでログイン</span>
+              </>
+            )}
+          </button>
+        </div>
+      </main>
 
       {/* フッター */}
-      <div className="py-8 text-center text-xs text-gray-500 border-t border-gray-200">
-        <p>© 2025 Medily. All rights reserved.</p>
-      </div>
+      <footer className="p-6 bg-gray-50 dark:bg-gray-900">
+        <p className="text-xs text-center text-gray-400 dark:text-gray-500 leading-relaxed">
+          ログインすることで、
+          <a
+            href="/terms"
+            className="underline hover:text-[#2DB596] transition-colors"
+          >
+            利用規約
+          </a>
+          {' '}および{' '}
+          <a
+            href="/privacy"
+            className="underline hover:text-[#2DB596] transition-colors"
+          >
+            プライバシーポリシー
+          </a>
+          {' '}に同意したものとみなされます。
+        </p>
+      </footer>
     </div>
   );
 }

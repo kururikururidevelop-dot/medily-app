@@ -20,13 +20,13 @@ export async function POST(request: NextRequest) {
     const {
       userId,
       title,
-      content,
+      description,
       region,
       category,
       tags = [],
     } = body;
 
-    if (!userId || !title || !content || !region || !category) {
+    if (!userId || !title || !description || !region || !category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const docRef = await addDoc(questionsRef, {
       userId,
       title,
-      content,
+      description,
       region,
       category,
       tags,
@@ -76,6 +76,9 @@ export async function GET(request: NextRequest) {
     const region = searchParams.get('region');
     const category = searchParams.get('category');
     const status = searchParams.get('status') || 'open';
+    const publicOnly = searchParams.get('public') === 'true';
+    const limitStr = searchParams.get('limit');
+    const limitNum = limitStr ? Number(limitStr) : undefined;
 
     if (!db) {
       return NextResponse.json(
@@ -103,16 +106,34 @@ export async function GET(request: NextRequest) {
         where('status', '==', status),
         orderBy('createdAt', 'desc')
       );
+    } else if (publicOnly) {
+      // 公開質問のみ（最新順）
+      q = query(
+        questionsRef,
+        where('public', '==', true),
+        where('status', '==', status),
+        orderBy('createdAt', 'desc')
+      );
     } else {
       // すべての質問（最新順）
       q = query(questionsRef, orderBy('createdAt', 'desc'));
     }
 
     const querySnapshot = await getDocs(q);
-    const questions = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const allQuestions = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        // Timestamp をフォーマット済み文字列に変換
+        createdAt: data.createdAt ? (data.createdAt instanceof Timestamp ? data.createdAt.toDate().toLocaleString('ja-JP') : data.createdAt) : '',
+        updatedAt: data.updatedAt ? (data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toLocaleString('ja-JP') : data.updatedAt) : '',
+      };
+    });
+
+    const questions = (typeof limitNum === 'number' && limitNum > 0)
+      ? allQuestions.slice(0, limitNum)
+      : allQuestions;
 
     return NextResponse.json({ questions });
   } catch (error) {
