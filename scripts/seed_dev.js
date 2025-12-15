@@ -35,8 +35,10 @@ const devUsers = [
     displayName: 'デモユーザー',
     region: '東京都',
     primaryCategory: '内科一般',
+    categories: ['内科一般', '皮膚科', '小児科'],
     medicalBackground: '看護師（経験3年）',
     avatar: '',
+    notificationConsent: true,
     profileCompletedAt: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -46,8 +48,10 @@ const devUsers = [
     displayName: 'サポート医師',
     region: '東京都',
     primaryCategory: '内科一般',
+    categories: ['内科一般', '検査・人間ドック'],
     medicalBackground: '内科医（指導医）',
     avatar: '',
+    notificationConsent: true,
     profileCompletedAt: Timestamp.now(),
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -109,6 +113,38 @@ const demoQuestions = [
     updatedAt: Timestamp.now(),
   },
 ];
+
+// ページネーション検証用に追加のデモ質問を量産
+const moreOpenQuestions = Array.from({ length: 12 }).map((_, idx) => ({
+  id: `demo-q-open-${idx + 1}`,
+  title: `公開質問サンプル ${idx + 1}`,
+  description: `公開のサンプル質問です (${idx + 1})。ページネーション検証用。`,
+  region: '東京都',
+  category: idx % 2 === 0 ? '内科一般' : '皮膚科',
+  authorName: 'デモユーザー',
+  userId: 'dev-mock-user',
+  public: true,
+  status: 'open',
+  answerCount: idx % 3,
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now(),
+}));
+
+const moreAnsweredQuestions = Array.from({ length: 12 }).map((_, idx) => ({
+  id: `demo-q-answered-${idx + 1}`,
+  title: `回答済みサンプル ${idx + 1}`,
+  description: `回答済みのサンプル質問です (${idx + 1})。ページネーション検証用。`,
+  region: '大阪府',
+  category: idx % 2 === 0 ? '整形外科' : '小児科',
+  authorName: idx % 2 === 0 ? 'ユーザーF' : 'ユーザーG',
+  public: true,
+  status: 'answered',
+  answerCount: (idx % 3) + 1,
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now(),
+}));
+
+demoQuestions.push(...moreOpenQuestions, ...moreAnsweredQuestions);
 
 const demoAnswers = [
   {

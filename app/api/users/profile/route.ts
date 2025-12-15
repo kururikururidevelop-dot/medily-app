@@ -12,12 +12,14 @@ export async function POST(request: NextRequest) {
       userId,
       displayName,
       region,
-      category,
+      category, // 互換用（primaryCategory）
+      categories, // 複数カテゴリ
       medicalBackground,
       avatar,
+      notificationConsent,
     } = body;
 
-    if (!userId || !displayName || !region || !category) {
+    if (!userId || !displayName || !region) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -38,9 +40,13 @@ export async function POST(request: NextRequest) {
       {
         displayName,
         region,
-        primaryCategory: category,
+        // 旧フィールドの互換保持
+        primaryCategory: category || (Array.isArray(categories) && categories.length > 0 ? categories[0] : undefined),
+        // 複数カテゴリ（新仕様）
+        categories: Array.isArray(categories) ? categories : (category ? [category] : []),
         medicalBackground: medicalBackground || '',
         avatar: avatar || '',
+        notificationConsent: typeof notificationConsent === 'boolean' ? notificationConsent : undefined,
         profileCompletedAt: new Date(),
         updatedAt: new Date(),
       },

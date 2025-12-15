@@ -73,12 +73,15 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId');
+    const answeredBy = searchParams.get('answeredBy');
     const region = searchParams.get('region');
     const category = searchParams.get('category');
-    const status = searchParams.get('status') || 'open';
+    const status = searchParams.get('status');
     const publicOnly = searchParams.get('public') === 'true';
     const limitStr = searchParams.get('limit');
+    const pageStr = searchParams.get('page');
     const limitNum = limitStr ? Number(limitStr) : undefined;
+    const pageNum = pageStr ? Math.max(1, Number(pageStr)) : 1;
 
     if (!db) {
       return NextResponse.json(
@@ -87,40 +90,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let q;
     const questionsRef = collection(db, 'questions');
-
+    // クエリは index 依存を避けるためシンプルにし、詳細フィルタはメモリで実施
+    const constraints = [] as any[];
     if (userId) {
-      // ユーザーの質問一覧
-      q = query(
-        questionsRef,
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
-      );
-    } else if (region && category) {
-      // マッチング対象（地域 + カテゴリ）
-      q = query(
-        questionsRef,
-        where('region', '==', region),
-        where('category', '==', category),
-        where('status', '==', status),
-        orderBy('createdAt', 'desc')
-      );
+      constraints.push(where('userId', '==', userId));
     } else if (publicOnly) {
-      // 公開質問のみ（最新順）
-      q = query(
-        questionsRef,
-        where('public', '==', true),
-        where('status', '==', status),
-        orderBy('createdAt', 'desc')
-      );
-    } else {
-      // すべての質問（最新順）
-      q = query(questionsRef, orderBy('createdAt', 'desc'));
+      constraints.push(where('public', '==', true));
     }
+    constraints.push(orderBy('createdAt', 'desc'));
+    const q = query(questionsRef, ...constraints);
 
     const querySnapshot = await getDocs(q);
-    const allQuestions = querySnapshot.docs.map(doc => {
+    let allQuestions = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -131,11 +113,42 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    const questions = (typeof limitNum === 'number' && limitNum > 0)
-      ? allQuestions.slice(0, limitNum)
-      : allQuestions;
+    // answeredBy が指定されている場合、その回答者が回答した質問のみに絞る
+    if (answeredBy && db) {
+      const questionIdsWithAnswers = new Set<string>();
+      for (const question of allQuestions) {
+        const answersRef = collection(db, 'questions', question.id, 'answers');
+        const answersQuery = query(answersRef, where('userId', '==', answeredBy));
+        const answersSnapshot = await getDocs(answersQuery);
+        if (!answersSnapshot.empty) {
+          questionIdsWithAnswers.add(question.id);
+        }
+      }
+      allQuestions = allQuestions.filter((q) => questionIdsWithAnswers.has(q.id));
+    }
 
-    return NextResponse.json({ questions });
+    // 追加フィルタはメモリで実施（index 不足の 500 を避ける）
+    if (region) {
+      allQuestions = allQuestions.filter((qDoc) => qDoc.region === region);
+    }
+    if (category) {
+      allQuestions = allQuestions.filter((qDoc) => qDoc.category === category);
+    }
+    if (status) {
+      allQuestions = allQuestions.filter((qDoc) => qDoc.status === status);
+    }
+
+    let paged = allQuestions;
+    if (typeof limitNum === 'number' && limitNum > 0) {
+      const offset = (pageNum - 1) * limitNum;
+      paged = allQuestions.slice(offset, offset + limitNum);
+    }
+
+    const hasMore = typeof limitNum === 'number' && limitNum > 0
+      ? allQuestions.length > (pageNum * limitNum)
+      : false;
+
+    return NextResponse.json({ questions: paged, hasMore });
   } catch (error) {
     console.error('Get questions error:', error);
     return NextResponse.json(

@@ -20,10 +20,10 @@ async function fetchPublicQuestions() {
 
 export default function Home() {
   const steps = [
-    { num: 1, title: 'ログイン', desc: 'LINE またはメールでサインイン' },
-    { num: 2, title: 'プロフィール登録', desc: '地域と関心領域を設定' },
+    { num: 1, title: 'ログイン', desc: 'LINEでサインイン' },
+    { num: 2, title: 'プロフィール登録', desc: '地域と関心ごとを設定' },
     { num: 3, title: '質問投稿', desc: '医療に関する疑問を投稿' },
-    { num: 4, title: '回答を受け取る', desc: '地域の専門家から回答' },
+    { num: 4, title: '回答を受け取る', desc: '地域の経験者から回答' },
   ];
 
   const features = [
@@ -129,8 +129,8 @@ export default function Home() {
       </div>
 
       {/* 質問事例（公開） */}
-      <div className="max-w-screen-lg mx-auto px-4 py-16 bg-white">
-        <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">こんな質問が届いています</h3>
+      <div className="max-w-screen-lg mx-auto px-4 py-16">
+        <h3 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">こんな質問が届いています</h3>
         <p className="text-center text-gray-600 text-sm mb-12">あなたの経験が必要です。回答者として参加してみませんか？</p>
         <Suspense fallback={<div className="text-center text-gray-600">読み込み中...</div>}>
           {/* Server Component内でfetchして静的カードをレンダリング */}
@@ -139,9 +139,56 @@ export default function Home() {
         </Suspense>
       </div>
 
+      {/* Medilyのしくみ */}
+      <div className="max-w-screen-lg mx-auto px-4 py-16">
+        <h3 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">Medilyのしくみ</h3>
+
+        {/* 説明 */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <p className="text-lg text-gray-700 leading-relaxed mb-6">
+            医療の悩みは非常にデリケートで、一人で抱え込んでしまいがち。Medilyは、<span className="font-bold text-primary">システムがすべての対話を安全に仲介</span>することで、お互いの連絡先を明かさず、信頼できる経験者から直接アドバイスをもらえる環境を整えています。
+          </p>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            あなたのプライバシーは守られ、相談内容は厳重に管理されます。この「守られた場所」だからこそ、本音で話し、本当に役に立つ生のアドバイスに出会えるのです。
+          </p>
+        </div>
+
+        {/* イメージ */}
+        <div className="flex justify-center">
+            <div className="bg-white p-8 rounded-2xl shadow-lg">
+              <div className="flex flex-col items-center gap-6">
+                {/* 質問者 */}
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-primary-ultralight rounded-full flex items-center justify-center mb-2">
+                    <Icon name="help" size={32} className="text-primary" />
+                  </div>
+                  <p className="text-sm font-bold text-gray-700">質問者</p>
+                </div>
+
+                {/* 矢印とMedialy */}
+                <div className="flex items-center gap-4 w-full justify-center">
+                  <div className="flex-1 h-1 bg-gradient-to-r from-transparent to-primary"></div>
+                  <div className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+                    安全に中継
+                  </div>
+                  <div className="flex-1 h-1 bg-gradient-to-l from-transparent to-primary"></div>
+                </div>
+
+                {/* 回答者 */}
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-primary-ultralight rounded-full flex items-center justify-center mb-2">
+                    <Icon name="check_circle" size={32} className="text-primary" />
+                  </div>
+                  <p className="text-sm font-bold text-gray-700">回答者</p>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
       {/* 使用方法 */}
       <div className="max-w-screen-lg mx-auto px-4 py-16 bg-white">
-        <h3 className="text-2xl font-bold text-gray-900 text-center mb-12">使い方</h3>
+        <h3 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">使い方</h3>
 
         <div className="grid md:grid-cols-4 gap-6 text-center">
           {steps.map((step) => (

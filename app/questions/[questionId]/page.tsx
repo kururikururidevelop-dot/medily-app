@@ -115,7 +115,7 @@ export default function QuestionDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin">
-            <Icon name="loading" size={40} className="text-blue-600" />
+            <Icon name="autorenew" size={40} className="text-blue-600" />
           </div>
           <p className="text-gray-600 mt-3">読み込み中...</p>
         </div>

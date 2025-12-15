@@ -9,11 +9,11 @@ export default function WithdrawPage() {
   const router = useRouter();
   useRequireAuth();
   const [reason, setReason] = useState('');
-  const [confirmText, setConfirmText] = useState('');
+  const [confirmChecked, setConfirmChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isConfirmed = confirmText === '削除する';
+  const isConfirmed = confirmChecked;
 
   const handleWithdraw = async () => {
     if (!isConfirmed) return;
@@ -36,7 +36,7 @@ export default function WithdrawPage() {
 
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
-      router.push('/auth/login');
+      router.push('/');
     } catch (err) {
       console.error('[Withdraw] Failed to withdraw:', err);
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
@@ -56,7 +56,7 @@ export default function WithdrawPage() {
             >
               <Icon name="arrow_back" size={24} />
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">アカウント削除</h1>
+            <h1 className="text-2xl font-bold text-gray-800">退会画面</h1>
           </div>
         </div>
       </div>
@@ -69,24 +69,17 @@ export default function WithdrawPage() {
             <Icon name="warning" size={32} className="text-red-600 flex-shrink-0 mt-1" />
             <div>
               <h2 className="text-lg font-bold text-red-700 mb-4">
-                警告：このアクションは取り消せません
+                ⚠️ 退会に関する重要なお知らせ
               </h2>
-              <ul className="space-y-2 text-red-700">
-                <li className="flex items-start gap-3">
-                  <Icon name="close" size={20} className="mt-0.5 flex-shrink-0" />
-                  <span>すべてのプロフィール情報が削除されます</span>
+              <ul className="space-y-3 text-red-700 text-sm leading-relaxed">
+                <li>
+                  • 退会後は、登録されたアカウント情報はすべて削除されます。一度削除されたデータは復旧できません。
                 </li>
-                <li className="flex items-start gap-3">
-                  <Icon name="close" size={20} className="mt-0.5 flex-shrink-0" />
-                  <span>投稿した質問と回答が削除されます</span>
+                <li>
+                  • 投稿した質問や回答の内容は、サービス内に保持される場合があります。
                 </li>
-                <li className="flex items-start gap-3">
-                  <Icon name="close" size={20} className="mt-0.5 flex-shrink-0" />
-                  <span>個人データが削除されます</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Icon name="close" size={20} className="mt-0.5 flex-shrink-0" />
-                  <span>削除後のアカウント復旧はできません</span>
+                <li>
+                  • 退会手続きを完了すると、ただちにアカウントが無効になります。
                 </li>
               </ul>
             </div>
@@ -102,47 +95,43 @@ export default function WithdrawPage() {
 
         {/* フォーム */}
         <div className="bg-white rounded-lg p-6 border border-gray-200">
-          {/* 削除理由 */}
+          {/* 退会理由選択 */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              退会理由（任意）
+              退会理由<span className="text-gray-500 ml-1">（任意）</span>
             </label>
-            <textarea
+            <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="退会理由があればお聞かせください"
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-            />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="">選択してください</option>
+              <option value="service-not-fit">サービスが合わない</option>
+              <option value="no-longer-needed">必要なくなった</option>
+              <option value="privacy-concern">プライバシー上の懸念</option>
+              <option value="other">その他</option>
+            </select>
           </div>
 
-          {/* 確認テキスト */}
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              確認：下のテキストボックスに「削除する」と入力してください
+          {/* 注意事項確認チェック */}
+          <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={confirmChecked}
+                onChange={(e) => setConfirmChecked(e.target.checked)}
+                className="w-5 h-5 mt-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+              <span className="text-sm text-gray-700">
+                上記の注意事項を理解し、退会に同意します
+              </span>
             </label>
-            <input
-              type="text"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              placeholder="削除する"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                confirmText === '削除する'
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-gray-500'
-              }`}
-            />
-            {confirmText === '削除する' && (
-              <p className="text-sm text-red-600 mt-2 font-semibold">
-                確認が完了しました
-              </p>
-            )}
           </div>
 
           {/* ボタン */}
           <div className="flex gap-3 justify-end">
             <button
-              onClick={() => router.back()}
+              onClick={() => router.push('/settings')}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
             >
               キャンセル
@@ -152,8 +141,7 @@ export default function WithdrawPage() {
               disabled={!isConfirmed || loading}
               className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              <Icon name="trash" size={18} className="text-white" />
-              {loading ? '削除中...' : 'アカウントを削除'}
+              {loading ? '退会中...' : '退会実行'}
             </button>
           </div>
         </div>

@@ -55,13 +55,22 @@ const PREFECTURES = [
   '沖縄県',
 ];
 
-const CATEGORIES = ['医学', '栄養', '心理', '運動', '健康管理', 'メンタルヘルス', 'その他'];
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  group?: string;
+  description?: string;
+  order?: number;
+}
 
 interface ProfileData {
   displayName: string;
   region: string;
+  gender?: string;
+  birthYear?: string;
   categories: string[];
-  bio: string;
+  notificationConsent: boolean;
 }
 
 export default function ProfileEditPage() {
@@ -73,39 +82,59 @@ export default function ProfileEditPage() {
   const [formData, setFormData] = useState<ProfileData>({
     displayName: '',
     region: '東京都',
+    gender: '',
+    birthYear: '',
     categories: [],
-    bio: '',
+    notificationConsent: false,
   });
+  const [categories, setCategories] = useState<Category[]>([]);
+  const grouped = categories.reduce<Record<string, Category[]>>((acc, c) => {
+    const key = c.group || 'その他';
+    acc[key] = acc[key] || [];
+    acc[key].push(c);
+    acc[key].sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+    return acc;
+  }, {});
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchAll = async () => {
       setLoading(true);
       try {
         const userId = localStorage.getItem('userId');
-        if (!userId) {
-          router.push('/auth/login');
-          return;
+        if (!userId || userId === 'undefined') {
+          localStorage.setItem('userId', 'dev-mock-user');
         }
+        const effectiveUserId = userId && userId !== 'undefined' ? userId : 'dev-mock-user';
 
-        const response = await fetch(`/api/users/${userId}/profile`);
-        if (!response.ok) throw new Error('プロフィール取得に失敗しました');
+        const [catRes, profRes] = await Promise.all([
+          fetch('/api/system/categories'),
+          fetch(`/api/users/profile?userId=${effectiveUserId}`),
+        ]);
 
-        const data = await response.json();
-        setFormData({
-          displayName: data.profile.name,
-          region: data.profile.region,
-          categories: data.profile.categories,
-          bio: data.profile.bio || '',
-        });
+        const catData = await catRes.json();
+        setCategories(catData.categories || []);
+
+        if (!profRes.ok) throw new Error('プロフィール取得に失敗しました');
+        const data = await profRes.json();
+        if (data.user) {
+          setFormData({
+            displayName: data.user.displayName || '',
+            region: data.user.region || '東京都',
+            gender: data.user.gender || '',
+            birthYear: data.user.birthYear || '',
+            categories: data.user.categories || [],
+            notificationConsent: data.user.notificationConsent === true,
+          });
+        }
       } catch (err) {
-        console.error('[Profile Edit] Failed to fetch profile:', err);
+        console.error('[Profile Edit] Failed to fetch data:', err);
         setError(err instanceof Error ? err.message : 'エラーが発生しました');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    fetchAll();
   }, [router]);
 
   const handleInputChange = (
@@ -133,21 +162,32 @@ export default function ProfileEditPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.displayName.trim()) {
-      setError('表示名を入力してください');
+      setError('ニックネームを入力してください');
+      return;
+    }
+    if (!formData.region) {
+      setError('地域を選択してください');
+      return;
+    }
+    if (!formData.notificationConsent) {
+      setError('通知の受信に同意してください');
       return;
     }
 
     setSaving(true);
     try {
-      const userId = localStorage.getItem('userId');
-      const response = await fetch(`/api/users/${userId}/profile`, {
+      const userId = localStorage.getItem('userId') || 'mock_user';
+      const response = await fetch('/api/users/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.displayName,
+          userId,
+          displayName: formData.displayName,
           region: formData.region,
+          gender: formData.gender,
+          birthYear: formData.birthYear,
           categories: formData.categories,
-          bio: formData.bio,
+          notificationConsent: formData.notificationConsent,
         }),
       });
 
@@ -167,7 +207,7 @@ export default function ProfileEditPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin">
-            <Icon name="loading" size={40} className="text-blue-600" />
+            <Icon name="autorenew" size={40} className="text-blue-600" />
           </div>
           <p className="text-gray-600 mt-3">読み込み中...</p>
         </div>
@@ -193,91 +233,177 @@ export default function ProfileEditPage() {
       </div>
 
       {/* メインコンテンツ */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleSave} className="bg-white rounded-lg p-6 border border-gray-200">
-          {/* 表示名 */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              表示名
+        <form onSubmit={handleSave} className="space-y-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          {/* ニックネーム */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              ニックネーム <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="displayName"
               value={formData.displayName}
               onChange={handleInputChange}
-              placeholder="表示名を入力"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="例：たなかん"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              required
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              サービス内で表示される名前です
+            </p>
           </div>
 
-          {/* 地域 */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              地域
+          {/* お住まいの地域 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              お住まいの地域 <span className="text-red-500">*</span>
             </label>
             <select
               name="region"
               value={formData.region}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              required
             >
+              <option value="">選択してください</option>
               {PREFECTURES.map((prefecture) => (
                 <option key={prefecture} value={prefecture}>
                   {prefecture}
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* カテゴリ */}
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              主な興味カテゴリ
-            </label>
-            <div className="space-y-2">
-              {CATEGORIES.map((category) => (
-                <label
-                  key={category}
-                  className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.categories.includes(category)}
-                    onChange={() => handleCategoryChange(category)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="font-semibold text-gray-800">{category}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* 自己紹介 */}
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              自己紹介
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleInputChange}
-              placeholder="自己紹介を入力"
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {formData.bio.length} / 500
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              地域に合わせた情報をお届けします
             </p>
           </div>
 
+          {/* 性別（任意） */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">性別（任意）</label>
+            <div className="flex gap-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={formData.gender === 'male'}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                />
+                <span className="ml-2 text-gray-900 dark:text-white">男性</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={formData.gender === 'female'}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                />
+                <span className="ml-2 text-gray-900 dark:text-white">女性</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="other"
+                  checked={formData.gender === 'other'}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                />
+                <span className="ml-2 text-gray-900 dark:text-white">その他・回答しない</span>
+              </label>
+            </div>
+          </div>
+
+          {/* 生まれ年（任意） */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">生まれ年（任意）</label>
+            <select
+              name="birthYear"
+              value={formData.birthYear}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+            >
+              <option value="">選択してください</option>
+              {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 18 - i).map((year) => (
+                <option key={year} value={String(year)}>
+                  {year}年
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              年齢層に応じた情報提供に役立てます
+            </p>
+          </div>
+
+          {/* 回答対象カテゴリ（任意・複数） */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+              回答を受け取りたい または 経験がある カテゴリ（任意・複数選択可）
+            </label>
+            <div className="space-y-6">
+              {Object.entries(grouped).map(([groupName, items]) => (
+                <section key={groupName}>
+                  <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{groupName}</h3>
+                  <div className="space-y-2">
+                    {items.map((cat) => (
+                      <label
+                        key={cat.id}
+                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                          formData.categories.includes(cat.name)
+                            ? 'border-[#2DB596] bg-[#2DB596]/5 dark:bg-[#2DB596]/10'
+                            : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.categories.includes(cat.name)}
+                          onChange={() => handleCategoryChange(cat.name)}
+                          className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                        />
+                        <Icon name={cat.icon} size={20} className="ml-3 text-[#2DB596]" />
+                        <span className="ml-2 text-gray-900 dark:text-white">{cat.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              選択したカテゴリの質問が優先的に届きます
+            </p>
+          </div>
+
+          {/* 通知の受信同意 */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.notificationConsent}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notificationConsent: e.target.checked }))}
+                className="w-5 h-5 text-[#2DB596] focus:ring-[#2DB596] rounded mt-0.5"
+                required
+              />
+              <div className="ml-3">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  通知の受信に同意します <span className="text-red-500">*</span>
+                </span>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">回答通知をLINEで受け取ることに同意します</p>
+              </div>
+            </label>
+          </div>
+
           {/* ボタン */}
-          <div className="flex gap-3 justify-end">
+          <div className="flex gap-3 justify-end mt-6">
             <button
               type="button"
               onClick={() => router.back()}
@@ -288,7 +414,7 @@ export default function ProfileEditPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? '保存中...' : '保存'}
             </button>

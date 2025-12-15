@@ -138,7 +138,7 @@ export default function LoginPage() {
             {loading ? (
               <div className="flex items-center gap-3">
                 <div className="animate-spin">
-                  <Icon name="loading" size={24} className="text-white" />
+                  <Icon name="autorenew" size={24} className="text-white" />
                 </div>
                 <span className="text-lg font-bold tracking-wide">ログイン処理中...</span>
               </div>
