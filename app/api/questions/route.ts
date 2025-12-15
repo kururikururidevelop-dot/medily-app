@@ -9,6 +9,7 @@ import {
   where,
   orderBy,
   getDocs,
+  getCountFromServer,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -74,9 +75,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const userId = searchParams.get('userId');
     const answeredBy = searchParams.get('answeredBy');
-    const region = searchParams.get('region');
-    const category = searchParams.get('category');
-    const status = searchParams.get('status');
+    const regionParams = searchParams.getAll('region').filter(Boolean);
+    const categoryParams = searchParams.getAll('category').filter(Boolean);
+    const statusParams = searchParams.getAll('status').filter(Boolean);
     const publicOnly = searchParams.get('public') === 'true';
     const limitStr = searchParams.get('limit');
     const pageStr = searchParams.get('page');
@@ -102,16 +103,37 @@ export async function GET(request: NextRequest) {
     const q = query(questionsRef, ...constraints);
 
     const querySnapshot = await getDocs(q);
-    let allQuestions = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        // Timestamp をフォーマット済み文字列に変換
-        createdAt: data.createdAt ? (data.createdAt instanceof Timestamp ? data.createdAt.toDate().toLocaleString('ja-JP') : data.createdAt) : '',
-        updatedAt: data.updatedAt ? (data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toLocaleString('ja-JP') : data.updatedAt) : '',
-      };
-    });
+    let allQuestions = await Promise.all(
+      querySnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        let answerCount = data.answerCount ?? 0;
+        try {
+          const countSnap = await getCountFromServer(
+            collection(db, 'questions', doc.id, 'answers')
+          );
+          answerCount = countSnap.data().count;
+        } catch (err) {
+          console.warn('Failed to count answers for', doc.id, err);
+        }
+
+        return {
+          id: doc.id,
+          ...data,
+          answerCount,
+          // Timestamp をフォーマット済み文字列に変換
+          createdAt: data.createdAt
+            ? data.createdAt instanceof Timestamp
+              ? data.createdAt.toDate().toLocaleString('ja-JP')
+              : data.createdAt
+            : '',
+          updatedAt: data.updatedAt
+            ? data.updatedAt instanceof Timestamp
+              ? data.updatedAt.toDate().toLocaleString('ja-JP')
+              : data.updatedAt
+            : '',
+        };
+      })
+    );
 
     // answeredBy が指定されている場合、その回答者が回答した質問のみに絞る
     if (answeredBy && db) {
@@ -128,14 +150,17 @@ export async function GET(request: NextRequest) {
     }
 
     // 追加フィルタはメモリで実施（index 不足の 500 を避ける）
-    if (region) {
-      allQuestions = allQuestions.filter((qDoc) => qDoc.region === region);
+    if (regionParams.length > 0) {
+      const regionSet = new Set(regionParams);
+      allQuestions = allQuestions.filter((qDoc) => regionSet.has(qDoc.region));
     }
-    if (category) {
-      allQuestions = allQuestions.filter((qDoc) => qDoc.category === category);
+    if (categoryParams.length > 0) {
+      const categorySet = new Set(categoryParams);
+      allQuestions = allQuestions.filter((qDoc) => categorySet.has(qDoc.category));
     }
-    if (status) {
-      allQuestions = allQuestions.filter((qDoc) => qDoc.status === status);
+    if (statusParams.length > 0) {
+      const statusSet = new Set(statusParams);
+      allQuestions = allQuestions.filter((qDoc) => statusSet.has(qDoc.status));
     }
 
     let paged = allQuestions;

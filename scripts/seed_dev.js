@@ -4,6 +4,12 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, Timestamp } = require('firebase-admin/firestore');
 
+// タイムスタンプを生成（古い順から新しい順）
+const now = Date.now();
+const createTimestamp = (daysAgo) => {
+  return Timestamp.fromMillis(now - daysAgo * 24 * 60 * 60 * 1000);
+};
+
 const categories = [
   { id: 'basic-internal', group: '基本的な診療科', label: '内科一般', description: '風邪、生活習慣病など', order: 101 },
   { id: 'basic-pediatrics', group: '基本的な診療科', label: '小児科', description: '子供の病気、予防接種など', order: 102 },
@@ -28,6 +34,34 @@ const categories = [
   { id: 'experience-cost', group: '病院選びの体験', label: '費用・保険', description: '自由診療、高額療養費、医療費控除など', order: 403 },
   { id: 'experience-second-opinion', group: '病院選びの体験', label: 'セカンドオピニオン', description: '転院の経験、他院との比較など', order: 404 },
 ];
+
+const statuses = [
+  { id: 'all', type: 'status', name: 'すべて', order: 0 },
+  { id: 'open', type: 'status', name: '回答募集中', order: 1 },
+  { id: 'answered', type: 'status', name: '回答済み', order: 2 },
+  { id: 'closed', type: 'status', name: 'クローズ', order: 3 },
+];
+
+const regionGroups = [
+  { group: '北海道', prefectures: ['北海道'] },
+  { group: '東北', prefectures: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] },
+  { group: '関東', prefectures: ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'] },
+  { group: '中部', prefectures: ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'] },
+  { group: '近畿', prefectures: ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'] },
+  { group: '中国', prefectures: ['鳥取県', '島根県', '岡山県', '広島県', '山口県'] },
+  { group: '四国', prefectures: ['徳島県', '香川県', '愛媛県', '高知県'] },
+  { group: '九州・沖縄', prefectures: ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'] },
+];
+
+const regions = regionGroups.flatMap((g, groupIndex) =>
+  g.prefectures.map((pref, prefIndex) => ({
+    id: pref,
+    type: 'region',
+    name: pref,
+    group: g.group,
+    order: groupIndex * 100 + prefIndex,
+  }))
+);
 
 const devUsers = [
   {
@@ -58,7 +92,77 @@ const devUsers = [
   },
 ];
 
+// NOTE: デモデータは固定IDを使用（テスト用URLが予測可能）
+// 本番APIはFirestoreの自動ID生成を使用（addDoc()により自動的にユニークなIDが生成される）
+// batch.set()は同じIDで実行すると上書きするため、重複は発生しない
 const demoQuestions = [
+  // === 新規質問（parentQuestionIdなし）===
+  {
+    id: 'demo-q-new-simple',
+    title: '花粉症の薬を変更するタイミング',
+    description: '今使っている花粉症の薬が効きにくくなってきた気がします。薬を変更する場合、どのタイミングで医師に相談すべきでしょうか？',
+    region: '東京都',
+    category: 'basic-ent',
+    userId: 'dev-mock-user',
+    authorName: 'デモユーザー',
+    public: true,
+    status: 'answered',
+    answerCount: 2,
+    createdAt: createTimestamp(0), // 最新
+    updatedAt: createTimestamp(0),
+  },
+  
+  // === 追加質問チェーン（親→子→孫）===
+  // 親質問
+  {
+    id: 'demo-q-parent',
+    title: '子どもの夜泣きが続いています',
+    description: '2歳の子どもが毎晩夜中に起きて泣いてしまいます。日中は元気なのですが、夜泣きで親も疲れてしまっています。何か良い対策はありますか？',
+    region: '神奈川県',
+    category: 'life-parenting',
+    userId: 'dev-mock-user',
+    authorName: 'デモユーザー',
+    public: true,
+    status: 'answered',
+    answerCount: 2,
+    parentQuestionId: null,
+    createdAt: createTimestamp(3), // 3日前
+    updatedAt: createTimestamp(3),
+  },
+  // 追加質問1（子）
+  {
+    id: 'demo-q-child1',
+    title: '夜泣き対策を試したのですが...',
+    description: '前回教えていただいた寝る前のルーティンを2週間試してみました。少し改善したのですが、まだ週に3-4回は起きてしまいます。次のステップとして何を試すべきでしょうか？',
+    region: '神奈川県',
+    category: 'life-parenting',
+    userId: 'dev-mock-user',
+    authorName: 'デモユーザー',
+    public: true,
+    status: 'answered',
+    answerCount: 1,
+    parentQuestionId: 'demo-q-parent',
+    createdAt: createTimestamp(4), // 4日前
+    updatedAt: createTimestamp(4),
+  },
+  // 追加質問2（孫）
+  {
+    id: 'demo-q-child2',
+    title: '小児科受診のタイミングについて',
+    description: '環境調整も試してみましたが、まだ夜泣きが続いています。この場合、小児科を受診したほうがいいでしょうか？受診のタイミングの目安があれば教えてください。',
+    region: '神奈川県',
+    category: 'life-parenting',
+    userId: 'dev-mock-user',
+    authorName: 'デモユーザー',
+    public: true,
+    status: 'open',
+    answerCount: 0,
+    parentQuestionId: 'demo-q-child1',
+    createdAt: createTimestamp(5), // 5日前
+    updatedAt: createTimestamp(5),
+  },
+  
+  // === 既存の質問（互換性維持）===
   {
     id: 'demo-q-internal',
     title: '小児科の発熱、受診目安を知りたい',
@@ -69,8 +173,8 @@ const demoQuestions = [
     public: true,
     status: 'open',
     answerCount: 2,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: createTimestamp(6), // 6日前
+    updatedAt: createTimestamp(6),
   },
   {
     id: 'dev-q1',
@@ -83,8 +187,8 @@ const demoQuestions = [
     public: true,
     status: 'open',
     answerCount: 2,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: createTimestamp(2), // 2日前
+    updatedAt: createTimestamp(2),
   },
   {
     id: 'demo-q-dermatology',
@@ -96,8 +200,8 @@ const demoQuestions = [
     public: true,
     status: 'open',
     answerCount: 0,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: createTimestamp(7), // 7日前
+    updatedAt: createTimestamp(7),
   },
   {
     id: 'demo-q-orthopedics',
@@ -109,8 +213,8 @@ const demoQuestions = [
     public: true,
     status: 'answered',
     answerCount: 1,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
+    createdAt: createTimestamp(8), // 8日前
+    updatedAt: createTimestamp(8),
   },
 ];
 
@@ -126,8 +230,8 @@ const moreOpenQuestions = Array.from({ length: 12 }).map((_, idx) => ({
   public: true,
   status: 'open',
   answerCount: idx % 3,
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
+  createdAt: createTimestamp(9 + idx), // 9日前から古い順
+  updatedAt: createTimestamp(9 + idx),
 }));
 
 const moreAnsweredQuestions = Array.from({ length: 12 }).map((_, idx) => ({
@@ -140,13 +244,14 @@ const moreAnsweredQuestions = Array.from({ length: 12 }).map((_, idx) => ({
   public: true,
   status: 'answered',
   answerCount: (idx % 3) + 1,
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
+  createdAt: createTimestamp(21 + idx), // 21日前から古い順
+  updatedAt: createTimestamp(21 + idx),
 }));
 
 demoQuestions.push(...moreOpenQuestions, ...moreAnsweredQuestions);
 
 const demoAnswers = [
+  // dev-q1への回答
   {
     questionId: 'dev-q1',
     userId: 'dev-helper-user',
@@ -158,6 +263,47 @@ const demoAnswers = [
     questionId: 'dev-q1',
     userId: 'dev-mock-user',
     content: 'ありがとうございます！夕食後の散歩から始めてみます。',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  },
+  
+  // 新規質問への回答
+  {
+    questionId: 'demo-q-new-simple',
+    userId: 'dev-helper-user',
+    content: '薬の効果が感じられなくなったら、すぐに医師に相談することをお勧めします。花粉症の薬は体質や症状によって合う・合わないがあります。2週間使用して改善が見られない場合は変更を検討しましょう。',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  },
+  {
+    questionId: 'demo-q-new-simple',
+    userId: 'dev-mock-user',
+    content: '私も同じ経験があります。病院を変えたら合う薬が見つかりました。セカンドオピニオンも検討してみてください。',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  },
+  
+  // 親質問への回答
+  {
+    questionId: 'demo-q-parent',
+    userId: 'dev-helper-user',
+    content: '2歳のお子さんの夜泣きは珍しくありません。まずは寝る前のルーティンを作ることをお勧めします。お風呂→絵本→寝る、といった流れを毎日同じ時間に繰り返すと効果的です。',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  },
+  {
+    questionId: 'demo-q-parent',
+    userId: 'dev-mock-user',
+    content: 'うちも同じ経験がありました。部屋の温度調整や寝具の見直しも効果がありましたよ。',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  },
+  
+  // 追加質問1（子）への回答
+  {
+    questionId: 'demo-q-child1',
+    userId: 'dev-helper-user',
+    content: '2週間続けられたのは素晴らしいですね。次は環境調整を試してみましょう。部屋の暗さ、温度（18-22度が理想）、湿度（50-60%）を確認してみてください。また、日中の活動量を増やすことも効果的です。',
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   },
@@ -184,6 +330,28 @@ async function main() {
   });
   await catBatch.commit();
   console.log('Seeded categories:', categories.length);
+
+  // マスタ投入（categories + statuses + regions）
+  const masterBatch = db.batch();
+  const masterCol = db.collection('masters');
+
+  categories.forEach((c) => {
+    const ref = masterCol.doc(c.id);
+    masterBatch.set(ref, { ...c, type: 'category', createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+  });
+
+  statuses.forEach((s) => {
+    const ref = masterCol.doc(`status-${s.id}`);
+    masterBatch.set(ref, { ...s, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+  });
+
+  regions.forEach((r) => {
+    const ref = masterCol.doc(`region-${r.id}`);
+    masterBatch.set(ref, { ...r, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+  });
+
+  await masterBatch.commit();
+  console.log('Seeded masters:', categories.length + statuses.length + regions.length);
 
   // 開発用ユーザー投入
   const userBatch = db.batch();

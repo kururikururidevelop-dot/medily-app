@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
+import MasterFilter from '@/components/MasterFilter';
 
 interface Question {
   id: string;
@@ -16,14 +17,11 @@ interface Question {
   status?: string;
 }
 
-const REGIONS = ['全国', '北海道', '東北', '関東', '中部', '関西', '中国', '四国', '九州・沖縄'];
-const CATEGORIES = ['全て', '内科一般', '整形外科', '皮膚科', '精神科', '婦人科', '小児科', '歯科', '眼科', 'その他'];
-
 export default function PublicQuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
-  const [region, setRegion] = useState('全国');
-  const [category, setCategory] = useState('全て');
+  const [region, setRegion] = useState<string[]>([]);
+  const [category, setCategory] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -36,11 +34,15 @@ export default function PublicQuestionsPage() {
     setLoading(true);
     try {
       let url = `/api/questions?public=true&status=open&limit=10&page=${pageNum}`;
-      if (region !== '全国') {
-        url += `&region=${encodeURIComponent(region)}`;
+      if (region.length > 0) {
+        region.forEach((r) => {
+          url += `&region=${encodeURIComponent(r)}`;
+        });
       }
-      if (category !== '全て') {
-        url += `&category=${encodeURIComponent(category)}`;
+      if (category.length > 0) {
+        category.forEach((cat) => {
+          url += `&category=${encodeURIComponent(cat)}`;
+        });
       }
 
       const response = await fetch(url);
@@ -97,43 +99,22 @@ export default function PublicQuestionsPage() {
       <div className="max-w-4xl mx-auto px-4 pb-6">
         <div className="bg-white rounded-lg p-4 border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 地域絞り込み */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Icon name="location_on" size={18} className="inline mr-1" />
-                地域
-              </label>
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              >
-                {REGIONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* カテゴリ絞り込み */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Icon name="category" size={18} className="inline mr-1" />
-                カテゴリ
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <MasterFilter
+              title="地域で絞り込み"
+              masterType="region"
+              multiple
+              grouped
+              value={region}
+              onChange={setRegion}
+            />
+            <MasterFilter
+              title="カテゴリで絞り込み"
+              masterType="category"
+              multiple
+              grouped
+              value={category}
+              onChange={setCategory}
+            />
           </div>
         </div>
       </div>

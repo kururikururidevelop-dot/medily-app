@@ -1,5 +1,5 @@
 // app/questions/[questionId]/page.tsx
-// 質問詳細・回答画面（L020）
+// E030 質問詳細・回答（Web）: 質問と回答の閲覧 + 追加質問導線 + 前後ナビ
 
 'use client';
 
@@ -24,8 +24,6 @@ interface Answer {
   authorName: string;
   authorId: string;
   createdAt: string;
-  likes: number;
-  isLiked?: boolean;
 }
 
 export default function QuestionDetailPage() {
@@ -35,10 +33,10 @@ export default function QuestionDetailPage() {
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [answerContent, setAnswerContent] = useState('');
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prevQuestionId, setPrevQuestionId] = useState<string | null>(null);
+  const [nextQuestionId, setNextQuestionId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -59,56 +57,21 @@ export default function QuestionDetailPage() {
 
     fetchQuestion();
   }, [questionId]);
-
-  const handleSubmitAnswer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!answerContent.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const response = await fetch(`/api/questions/${questionId}/answers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: answerContent }),
-      });
-
-      if (!response.ok) throw new Error('回答の投稿に失敗しました');
-
-      const newAnswer = await response.json();
-      setAnswers((prev) => [newAnswer, ...prev]);
-      setAnswerContent('');
-    } catch (err) {
-      console.error('[Question Detail] Failed to submit answer:', err);
-      setError(err instanceof Error ? err.message : 'エラーが発生しました');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleLikeAnswer = async (answerId: string) => {
-    try {
-      const response = await fetch(
-        `/api/questions/${questionId}/answers/${answerId}/like`,
-        { method: 'POST' }
-      );
-
-      if (!response.ok) throw new Error('いいね処理に失敗しました');
-
-      setAnswers((prev) =>
-        prev.map((a) =>
-          a.id === answerId
-            ? {
-                ...a,
-                isLiked: !a.isLiked,
-                likes: a.isLiked ? a.likes - 1 : a.likes + 1,
-              }
-            : a
-        )
-      );
-    } catch (err) {
-      console.error('Failed to like answer:', err);
-    }
-  };
+  // 任意: 前/次の質問IDを取得（実装がない場合は非表示）
+  useEffect(() => {
+    const fetchSiblings = async () => {
+      try {
+        const res = await fetch(`/api/questions/${questionId}/siblings`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setPrevQuestionId(data.prevQuestionId || null);
+        setNextQuestionId(data.nextQuestionId || null);
+      } catch {
+        /* no-op */
+      }
+    };
+    fetchSiblings();
+  }, [questionId]);
 
   if (loading) {
     return (
@@ -185,7 +148,17 @@ export default function QuestionDetailPage() {
               <p className="font-semibold text-gray-800">{question.authorName}</p>
               <p className="text-xs text-gray-500">{question.createdAt}</p>
             </div>
-            <Icon name="help" size={20} className="text-gray-400" />
+            <div className="flex items-center gap-2">
+              {/* 追加質問ボタン - 次の質問がない場合のみ表示（チェーンの最後） */}
+              {!nextQuestionId && (
+                <button
+                  onClick={() => router.push(`/questions/post?parentQuestionId=${questionId}`)}
+                  className="px-4 py-2 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg font-semibold"
+                >
+                  追加質問
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -195,37 +168,6 @@ export default function QuestionDetailPage() {
             <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
-
-        {/* 回答投稿フォーム */}
-        <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">回答を投稿する</h2>
-          <form onSubmit={handleSubmitAnswer}>
-            <textarea
-              value={answerContent}
-              onChange={(e) => setAnswerContent(e.target.value)}
-              placeholder="回答内容を入力してください..."
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              rows={4}
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setAnswerContent('')}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors"
-              >
-                クリア
-              </button>
-              <button
-                type="submit"
-                disabled={submitting || !answerContent.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <Icon name="send" size={18} className="text-white" />
-                投稿
-              </button>
-            </div>
-          </form>
-        </div>
 
         {/* 回答一覧 */}
         <div>
@@ -248,37 +190,45 @@ export default function QuestionDetailPage() {
                       <p className="font-semibold text-gray-800">{answer.authorName}</p>
                       <p className="text-xs text-gray-500">{answer.createdAt}</p>
                     </div>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Icon name="more_vert" size={18} className="text-gray-400" />
-                    </button>
+                    <span className="text-xs text-gray-400">回答</span>
                   </div>
 
                   <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
                     {answer.content}
                   </p>
-
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => handleLikeAnswer(answer.id)}
-                      className={`flex items-center gap-1 px-3 py-1 rounded-lg transition-colors ${
-                        answer.isLiked
-                          ? 'text-red-600 bg-red-50'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Icon
-                        name="thumbs_up"
-                        size={18}
-                        className={answer.isLiked ? 'text-red-600' : ''}
-                      />
-                      <span className="text-sm font-semibold">{answer.likes}</span>
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+
+        {/* 前へ・次へ ナビゲーション */}
+        {(prevQuestionId || nextQuestionId) && (
+          <div className="mt-8 flex items-center justify-between">
+            <button
+              disabled={!prevQuestionId}
+              onClick={() => prevQuestionId && router.push(`/questions/${prevQuestionId}`)}
+              className={`px-4 py-2 rounded-lg border ${
+                prevQuestionId
+                  ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              <Icon name="chevron_left" size={18} className="inline mr-1" /> 前の質問
+            </button>
+            <button
+              disabled={!nextQuestionId}
+              onClick={() => nextQuestionId && router.push(`/questions/${nextQuestionId}`)}
+              className={`px-4 py-2 rounded-lg border ${
+                nextQuestionId
+                  ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              次の質問 <Icon name="chevron_right" size={18} className="inline ml-1" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
