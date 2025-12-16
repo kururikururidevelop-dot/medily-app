@@ -47,6 +47,12 @@ export async function GET(
 
     const questionData = questionDoc.data();
 
+    const normalizedContent =
+      questionData.content ||
+      questionData.description ||
+      questionData.body ||
+      '';
+
     // 回答データを取得（サブコレクションから）
     const answersRef = collection(db, 'questions', questionId, 'answers');
     const answersQuery = query(
@@ -94,6 +100,7 @@ export async function GET(
       question: {
         id: questionDoc.id,
         ...questionData,
+        content: normalizedContent,
         createdAt: questionData.createdAt instanceof Timestamp 
           ? questionData.createdAt.toDate().toLocaleString('ja-JP') 
           : questionData.createdAt,

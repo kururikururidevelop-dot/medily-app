@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useRequireAuth } from '@/app/hooks/useRequireAuth';
 import Icon from '@/components/Icon';
 
 interface Question {
   id: string;
+  title?: string;
   body: string;
   categoryId: string;
   region: string;
@@ -48,11 +49,14 @@ const regionNames: Record<string, string> = {
   kyushu: '九州・沖縄',
 };
 
+const badgeClass =
+  'inline-flex items-center px-3 py-1 bg-[#2DB596]/5 border border-[#2DB596]/30 rounded-full text-sm font-semibold text-gray-800';
+
 export default function AnswerPage() {
   useRequireAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const questionId = searchParams.get('questionId');
+  const params = useParams();
+  const questionId = params?.questionId as string | undefined;
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [parentQuestion, setParentQuestion] = useState<ParentQuestion | null>(null);
@@ -80,12 +84,13 @@ export default function AnswerPage() {
           throw new Error('質問の取得に失敗しました');
         }
         const data = await response.json();
-        setQuestion(data);
-        setFormData(prev => ({ ...prev, questionId: data.id }));
+        const fetched = data.question || data;
+        setQuestion(fetched);
+        setFormData((prev) => ({ ...prev, questionId: fetched.id }));
         
         // 親質問IDがあれば取得
-        if (data.parentQuestionId) {
-          fetchParentQuestion(data.parentQuestionId);
+        if (fetched.parentQuestionId) {
+          fetchParentQuestion(fetched.parentQuestionId);
         }
       } catch (error) {
         console.error('Error fetching question:', error);
@@ -165,69 +170,58 @@ export default function AnswerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleCancel} className="text-gray-600">
-            <Icon name="arrow_back" size={24} />
-          </button>
-          <h1 className="text-xl font-bold">回答記入</h1>
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={handleCancel} className="text-gray-600">
+              <Icon name="arrow_back" size={24} />
+            </button>
+            <h1 className="text-2xl font-bold text-gray-800">回答記入</h1>
+          </div>
           <div className="w-6" />
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* 前の質問表示（追加質問の場合のみ） */}
-        {question?.parentQuestionId && parentQuestion && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h2 className="text-sm font-semibold text-blue-900 mb-3">前の質問</h2>
+      <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100 w-full">
+          {/* 前の質問表示（追加質問の場合のみ） */}
+          {question?.parentQuestionId && parentQuestion && (
             <div className="space-y-2 text-sm text-gray-700">
-              <div className="flex gap-2">
-                <span className="inline-block px-2 py-1 bg-white rounded text-xs font-medium">
-                  {categoryNames[parentQuestion.categoryId] || parentQuestion.categoryId}
-                </span>
-                <span className="inline-block px-2 py-1 bg-white rounded text-xs font-medium">
-                  {regionNames[parentQuestion.region] || parentQuestion.region}
-                </span>
+              <h2 className="text-sm font-semibold text-gray-900">前の質問</h2>
+              <div className="flex flex-wrap gap-2">
+                <span className={badgeClass}>{categoryNames[parentQuestion.categoryId] || parentQuestion.categoryId}</span>
+                <span className={badgeClass}>{regionNames[parentQuestion.region] || parentQuestion.region}</span>
               </div>
-              <p className="text-gray-800 mt-3">{parentQuestion.body}</p>
+              <p className="text-gray-800 whitespace-pre-wrap">{parentQuestion.body}</p>
             </div>
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 質問内容（読み取り専用） */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg shadow p-6">
-            <h2 className="text-sm font-medium text-blue-900 mb-4 flex items-center">
-              <Icon name="question_answer" size={20} className="mr-2" />
-              質問内容
-            </h2>
-            <div className="space-y-3">
-              <div>
-                <span className="text-xs text-blue-700">カテゴリ: </span>
-                <span className="text-sm font-medium text-blue-900">
-                  {categoryNames[question.categoryId] || question.categoryId}
-                </span>
-              </div>
-              <div>
-                <span className="text-xs text-blue-700">地域: </span>
-                <span className="text-sm font-medium text-blue-900">
-                  {regionNames[question.region] || question.region}
-                </span>
-              </div>
-              <div className="pt-2 border-t border-blue-200">
-                <p className="text-base text-gray-900 whitespace-pre-wrap">{question.body}</p>
-              </div>
+          )}
+
+          {/* 質問内容（タイトル+本文を同枠で強調、カテゴリ/地域はバッジ） */}
+          <div className="space-y-3">
+            <div className="rounded-xl border border-[#2DB596]/30 bg-[#2DB596]/5 p-5 space-y-3">
+              {question.title && (
+                <h2 className="text-xl font-bold text-gray-900 whitespace-pre-wrap break-words">{question.title}</h2>
+              )}
+              <p className="text-base leading-relaxed text-gray-900 whitespace-pre-wrap">{question.body}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className={badgeClass}>{categoryNames[question.categoryId] || question.categoryId}</span>
+              <span className={badgeClass}>{regionNames[question.region] || question.region}</span>
             </div>
           </div>
 
           {/* 回答選択肢 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-900">
               回答選択肢 <span className="text-red-500">*</span>
             </label>
             {question.choices && question.choices.length > 0 ? (
               <div className="space-y-2">
-                {question.choices.filter(c => c.trim()).map((choice, index) => (
-                  <label key={index} className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                {question.choices.filter((c) => c.trim()).map((choice, index) => (
+                  <label
+                    key={index}
+                    className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="choice"
@@ -257,10 +251,8 @@ export default function AnswerPage() {
           </div>
 
           {/* 場所情報 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              場所情報（任意）
-            </label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">場所情報（任意）</label>
             <input
               type="text"
               value={formData.location}
@@ -271,10 +263,8 @@ export default function AnswerPage() {
           </div>
 
           {/* URL情報 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              URL情報（任意）
-            </label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">URL情報（任意）</label>
             <input
               type="url"
               value={formData.url}
@@ -285,17 +275,15 @@ export default function AnswerPage() {
           </div>
 
           {/* 回答コメント */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
               回答コメント <span className="text-red-500">*</span>
-              <span className="ml-2 text-xs text-gray-500">
-                （100文字以上140文字以下）
-              </span>
+              <span className="ml-2 text-xs text-gray-500">（100文字以上140文字以下）</span>
             </label>
             <textarea
               value={formData.text}
               onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-              className={`w-full border rounded-lg p-3 min-h-32 focus:ring-2 focus:border-transparent ${
+              className={`w-full p-3 min-h-48 md:min-h-56 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent ${
                 textLength > 0 && !isTextValid
                   ? 'border-red-300 focus:ring-red-500'
                   : 'border-gray-300 focus:ring-[#2DB596]'
@@ -303,7 +291,7 @@ export default function AnswerPage() {
               placeholder="回答コメントを入力してください（100文字以上140文字以下）"
               required
             />
-            <div className="mt-2 text-sm text-right">
+            <div className="text-sm text-right">
               <span className={textLength > 0 && !isTextValid ? 'text-red-600 font-medium' : 'text-gray-600'}>
                 {textLength} / 140文字
               </span>
@@ -313,21 +301,25 @@ export default function AnswerPage() {
             </div>
           </div>
 
-          {/* 注意事項 */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-medium text-yellow-900 mb-2 flex items-center">
-              <Icon name="warning" size={20} className="mr-2" />
-              注意事項
-            </h3>
-            <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">
-              <li>医療行為や診断に該当する内容は記載しないでください</li>
-              <li>誹謗中傷や不適切な表現は控えてください</li>
-              <li>送信前にAIによる内容チェックが行われます</li>
-            </ul>
+          {/* 注意事項（Q010/Q011 系とトーンを合わせて淡色ボックス化） */}
+          <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+            <div className="flex items-start gap-2">
+              <span className="text-[#2DB596] mt-0.5">
+                <Icon name="info" size={18} />
+              </span>
+              <div className="space-y-1">
+                <span className="font-semibold">注意事項</span>
+                <ul className="list-disc list-inside space-y-1 text-gray-800">
+                  <li>医療行為や診断に該当する内容は記載しないでください</li>
+                  <li>誹謗中傷や不適切な表現は控えてください</li>
+                  <li>送信前にAIによる内容チェックが行われます</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* ボタン */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 pt-2">
             <button
               type="button"
               onClick={handleCancel}

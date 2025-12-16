@@ -20,12 +20,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const {
       userId,
-      title,
-      description,
-      region,
-      category,
+      title: rawTitle,
+      description: rawDescription,
+      body: rawBody,
+      region: rawRegion,
+      regionIds,
+      category: rawCategory,
+      categoryIds,
       tags = [],
     } = body;
+
+    const title = (rawTitle || '').trim();
+    const description = (rawDescription || rawBody || '').trim();
+    const region = rawRegion || (Array.isArray(regionIds) ? regionIds[0] : undefined);
+    const category = rawCategory || (Array.isArray(categoryIds) ? categoryIds[0] : undefined);
+
+    if (!title || title.length > 60) {
+      return NextResponse.json(
+        { error: 'Title is required and must be 60 characters or fewer' },
+        { status: 400 }
+      );
+    }
 
     if (!userId || !title || !description || !region || !category) {
       return NextResponse.json(
@@ -46,6 +61,7 @@ export async function POST(request: NextRequest) {
       userId,
       title,
       description,
+      content: description, // 互換フィールド
       region,
       category,
       tags,

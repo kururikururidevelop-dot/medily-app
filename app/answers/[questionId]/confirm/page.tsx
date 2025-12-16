@@ -7,6 +7,7 @@ import Icon from '@/components/Icon';
 
 interface Question {
   id: string;
+  title?: string;
   body: string;
   categoryId: string;
   region: string;
@@ -135,71 +136,71 @@ export default function AnswerConfirmPage() {
     );
   }
 
+  const badgeClass = 'inline-flex items-center px-3 py-1 bg-[#2DB596]/5 border border-[#2DB596]/30 rounded-full text-sm font-semibold text-gray-800';
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <button onClick={handleBack} className="text-gray-600" disabled={isSubmitting}>
             <Icon name="arrow_back" size={24} />
           </button>
-          <h1 className="text-xl font-bold">回答記入確認</h1>
+          <h1 className="text-2xl font-bold text-gray-800">回答記入確認</h1>
           <div className="w-6" />
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="space-y-6">
-          {/* 確認メッセージ */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              以下の内容で回答を送信します。内容をご確認ください。
-            </p>
+          {/* 確認メッセージ（Q011 と同様のスタイル） */}
+          <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+            <div className="flex items-start gap-2">
+              <span className="text-[#2DB596] mt-0.5">
+                <Icon name="info" size={18} />
+              </span>
+              <div>
+                <span className="font-semibold">以下の内容で回答を送信します。内容をご確認ください。</span>
+              </div>
+            </div>
           </div>
 
           {/* 前の質問表示（追加質問の場合のみ） */}
           {question?.parentQuestionId && parentQuestion && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h2 className="text-sm font-semibold text-blue-900 mb-3">前の質問</h2>
-              <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex gap-2">
-                  <span className="inline-block px-2 py-1 bg-white rounded text-xs font-medium">
-                    {categoryNames[parentQuestion.categoryId] || parentQuestion.categoryId}
-                  </span>
-                  <span className="inline-block px-2 py-1 bg-white rounded text-xs font-medium">
-                    {regionNames[parentQuestion.region] || parentQuestion.region}
-                  </span>
-                </div>
-                <p className="text-gray-800 mt-3">{parentQuestion.body}</p>
+            <div className="space-y-2 text-sm text-gray-700">
+              <h2 className="text-sm font-semibold text-gray-900">前の質問</h2>
+              <div className="flex flex-wrap gap-2">
+                <span className={badgeClass}>{categoryNames[parentQuestion.categoryId] || parentQuestion.categoryId}</span>
+                <span className={badgeClass}>{regionNames[parentQuestion.region] || parentQuestion.region}</span>
               </div>
+              <p className="text-gray-800 whitespace-pre-wrap">{parentQuestion.body}</p>
             </div>
           )}
 
-          {/* 質問内容 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-sm font-medium text-gray-500 mb-3 flex items-center">
-              <Icon name="question_answer" size={18} className="mr-2" />
-              質問内容
-            </h2>
-            <div className="space-y-2">
-              <div>
-                <span className="text-xs text-gray-600">カテゴリ: </span>
-                <span className="text-sm">{categoryNames[question.categoryId] || question.categoryId}</span>
-              </div>
-              <div>
-                <span className="text-xs text-gray-600">地域: </span>
-                <span className="text-sm">{regionNames[question.region] || question.region}</span>
-              </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-base whitespace-pre-wrap text-gray-700">{question.body}</p>
-              </div>
+          <hr className="border-gray-200" />
+
+          {/* 質問内容（タイトル+本文を同枠で強調、カテゴリ/地域はバッジ） */}
+          <div className="space-y-3">
+            <div className="rounded-xl border border-[#2DB596]/30 bg-[#2DB596]/5 p-5 space-y-3">
+              {question.title && (
+                <h2 className="text-xl font-bold text-gray-900 whitespace-pre-wrap break-words">{question.title}</h2>
+              )}
+              <p className="text-base leading-relaxed whitespace-pre-wrap text-gray-800">{question.body}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className={badgeClass}>{categoryNames[question.categoryId] || question.categoryId}</span>
+              <span className={badgeClass}>{regionNames[question.region] || question.region}</span>
             </div>
           </div>
+
+          <hr className="border-gray-200" />
 
           {/* 回答選択肢 */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-sm font-medium text-gray-500 mb-2">回答選択肢</h2>
             <p className="text-base font-medium text-gray-900">{formData.choice}</p>
           </div>
+
+          <hr className="border-gray-200" />
 
           {/* 場所情報 */}
           {formData.location && (
@@ -208,6 +209,8 @@ export default function AnswerConfirmPage() {
               <p className="text-base">{formData.location}</p>
             </div>
           )}
+
+          {formData.location && <hr className="border-gray-200" />}
 
           {/* URL情報 */}
           {formData.url && (
@@ -223,6 +226,8 @@ export default function AnswerConfirmPage() {
               </a>
             </div>
           )}
+
+          {formData.url && <hr className="border-gray-200" />}
 
           {/* 回答コメント */}
           <div className="bg-white rounded-lg shadow p-6">

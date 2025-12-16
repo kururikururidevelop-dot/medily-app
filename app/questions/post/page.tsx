@@ -27,6 +27,7 @@ import MasterFilter from '@/components/MasterFilter';
 // TemplateSelect は仕様変更により未使用
 
 interface QuestionFormData {
+  title: string;
   body: string;
   categoryIds: string[];
   choices: string[];
@@ -50,6 +51,7 @@ export default function QuestionPostPage() {
   const searchParams = useSearchParams();
 
   const [formData, setFormData] = useState<QuestionFormData>({
+    title: '',
     body: '',
     categoryIds: [],
     choices: ['', ''],
@@ -128,11 +130,12 @@ export default function QuestionPostPage() {
       const res = await fetch(`/api/questions/${questionId}`);
       if (res.ok) {
         const data = await res.json();
+        const question = data.question || data;
         setParentQuestion({
-          id: data.id,
-          categoryId: data.categoryId,
-          region: data.region,
-          body: data.body || data.description,
+          id: question.id,
+          categoryId: question.category || question.categoryId,
+          region: question.region,
+          body: question.body || question.description || question.content,
         });
       }
     } catch (error) {
@@ -145,6 +148,11 @@ export default function QuestionPostPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const trimmedTitle = formData.title.trim();
+    if (!trimmedTitle || trimmedTitle.length > 60) {
+      alert('質問タイトルを1〜60文字で入力してください');
+      return;
+    }
     if (!formData.body.trim()) {
       alert('相談内容を入力してください');
       return;
@@ -227,6 +235,23 @@ export default function QuestionPostPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+
+          {/* 質問タイトル */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
+              質問タイトル <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              placeholder="例）発熱が続くときの受診目安は？"
+              maxLength={60}
+              required
+            />
+            <p className="text-xs text-gray-500">1〜60文字で入力してください。通知や一覧で表示されます。</p>
+          </div>
 
           {/* 相談内容 */}
           <div className="space-y-2">
