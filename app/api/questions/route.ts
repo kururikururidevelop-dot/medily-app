@@ -2,17 +2,7 @@
 // 質問投稿・取得 API
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  orderBy,
-  getDocs,
-  getCountFromServer,
-  Timestamp,
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { questionService, QuestionFilter } from '@/lib/services/questionService';
 
 // 質問投稿
 export async function POST(request: NextRequest) {
@@ -28,6 +18,7 @@ export async function POST(request: NextRequest) {
       category: rawCategory,
       categoryIds,
       tags = [],
+      parentQuestionId
     } = body;
 
     const title = (rawTitle || '').trim();
@@ -49,31 +40,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Firebase is not configured' },
-        { status: 500 }
-      );
-    }
-
-    const questionsRef = collection(db, 'questions');
-    const docRef = await addDoc(questionsRef, {
+    const questionId = await questionService.createQuestion({
       userId,
       title,
       description,
-      content: description, // 互換フィールド
       region,
       category,
       tags,
-      status: 'open', // open | answered | closed
-      answerCount: 0,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
+      parentQuestionId
     });
 
     return NextResponse.json({
       success: true,
-      questionId: docRef.id,
+      questionId,
       message: 'Question posted successfully.',
     });
   } catch (error) {
@@ -89,107 +68,20 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
-    const answeredBy = searchParams.get('answeredBy');
-    const regionParams = searchParams.getAll('region').filter(Boolean);
-    const categoryParams = searchParams.getAll('category').filter(Boolean);
-    const statusParams = searchParams.getAll('status').filter(Boolean);
-    const publicOnly = searchParams.get('public') === 'true';
-    const limitStr = searchParams.get('limit');
-    const pageStr = searchParams.get('page');
-    const limitNum = limitStr ? Number(limitStr) : undefined;
-    const pageNum = pageStr ? Math.max(1, Number(pageStr)) : 1;
+    const filter: QuestionFilter = {
+      userId: searchParams.get('userId') || undefined,
+      answeredBy: searchParams.get('answeredBy') || undefined,
+      region: searchParams.getAll('region').filter(Boolean),
+      category: searchParams.getAll('category').filter(Boolean),
+      status: searchParams.getAll('status').filter(Boolean),
+      publicOnly: searchParams.get('public') === 'true',
+      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
+      page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
+    };
 
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Firebase is not configured' },
-        { status: 500 }
-      );
-    }
+    const result = await questionService.getQuestions(filter);
 
-    const questionsRef = collection(db, 'questions');
-    // クエリは index 依存を避けるためシンプルにし、詳細フィルタはメモリで実施
-    const constraints = [] as any[];
-    if (userId) {
-      constraints.push(where('userId', '==', userId));
-    } else if (publicOnly) {
-      constraints.push(where('public', '==', true));
-    }
-    constraints.push(orderBy('createdAt', 'desc'));
-    const q = query(questionsRef, ...constraints);
-
-    const querySnapshot = await getDocs(q);
-    let allQuestions = await Promise.all(
-      querySnapshot.docs.map(async (doc) => {
-        const data = doc.data();
-        let answerCount = data.answerCount ?? 0;
-        try {
-          const countSnap = await getCountFromServer(
-            collection(db, 'questions', doc.id, 'answers')
-          );
-          answerCount = countSnap.data().count;
-        } catch (err) {
-          console.warn('Failed to count answers for', doc.id, err);
-        }
-
-        return {
-          id: doc.id,
-          ...data,
-          answerCount,
-          // Timestamp をフォーマット済み文字列に変換
-          createdAt: data.createdAt
-            ? data.createdAt instanceof Timestamp
-              ? data.createdAt.toDate().toLocaleString('ja-JP')
-              : data.createdAt
-            : '',
-          updatedAt: data.updatedAt
-            ? data.updatedAt instanceof Timestamp
-              ? data.updatedAt.toDate().toLocaleString('ja-JP')
-              : data.updatedAt
-            : '',
-        };
-      })
-    );
-
-    // answeredBy が指定されている場合、その回答者が回答した質問のみに絞る
-    if (answeredBy && db) {
-      const questionIdsWithAnswers = new Set<string>();
-      for (const question of allQuestions) {
-        const answersRef = collection(db, 'questions', question.id, 'answers');
-        const answersQuery = query(answersRef, where('userId', '==', answeredBy));
-        const answersSnapshot = await getDocs(answersQuery);
-        if (!answersSnapshot.empty) {
-          questionIdsWithAnswers.add(question.id);
-        }
-      }
-      allQuestions = allQuestions.filter((q) => questionIdsWithAnswers.has(q.id));
-    }
-
-    // 追加フィルタはメモリで実施（index 不足の 500 を避ける）
-    if (regionParams.length > 0) {
-      const regionSet = new Set(regionParams);
-      allQuestions = allQuestions.filter((qDoc) => regionSet.has(qDoc.region));
-    }
-    if (categoryParams.length > 0) {
-      const categorySet = new Set(categoryParams);
-      allQuestions = allQuestions.filter((qDoc) => categorySet.has(qDoc.category));
-    }
-    if (statusParams.length > 0) {
-      const statusSet = new Set(statusParams);
-      allQuestions = allQuestions.filter((qDoc) => statusSet.has(qDoc.status));
-    }
-
-    let paged = allQuestions;
-    if (typeof limitNum === 'number' && limitNum > 0) {
-      const offset = (pageNum - 1) * limitNum;
-      paged = allQuestions.slice(offset, offset + limitNum);
-    }
-
-    const hasMore = typeof limitNum === 'number' && limitNum > 0
-      ? allQuestions.length > (pageNum * limitNum)
-      : false;
-
-    return NextResponse.json({ questions: paged, hasMore });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Get questions error:', error);
     return NextResponse.json(
@@ -198,3 +90,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

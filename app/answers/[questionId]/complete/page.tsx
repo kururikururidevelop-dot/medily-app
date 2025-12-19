@@ -41,11 +41,11 @@ export default function AnswerCompletePage() {
 
           {/* 説明テキスト */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-left">
-            <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+            <h3 className="font-medium text-blue-900 mb-4 flex items-center">
               <Icon name="info" size={20} className="mr-2" />
               お知らせ
             </h3>
-            <ul className="text-sm text-blue-800 space-y-2 list-disc list-inside">
+            <ul className="text-sm text-blue-800 space-y-2 list-disc list-inside ml-4">
               <li>あなたの回答が質問者の助けになりました</li>
               <li>回答履歴は「マイページ」から確認できます</li>
               <li>貢献度が加算され、ツリーが成長します</li>

@@ -2,8 +2,7 @@
 // ユーザープロフィール登録/更新 API
 
 import { NextRequest, NextResponse } from 'next/server';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { userService } from '@/lib/services/userService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,39 +18,28 @@ export async function POST(request: NextRequest) {
       notificationConsent,
     } = body;
 
-    if (!userId || !displayName || !region) {
+    // Validation: userId is mandatory.
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing userId' },
         { status: 400 }
       );
     }
 
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Firebase is not configured' },
-        { status: 500 }
-      );
+    // Construct update data carefully to avoid undefined values overrides or Firestore errors
+    const updateData: any = {};
+    if (displayName !== undefined) updateData.displayName = displayName;
+    if (region !== undefined) updateData.region = region;
+    if (categories !== undefined) {
+      updateData.categories = Array.isArray(categories) ? categories : [];
+    } else if (category !== undefined) {
+      updateData.categories = [category];
     }
+    if (medicalBackground !== undefined) updateData.medicalBackground = medicalBackground;
+    if (avatar !== undefined) updateData.avatar = avatar;
+    if (typeof notificationConsent === 'boolean') updateData.notificationConsent = notificationConsent;
 
-    // ユーザードキュメント更新
-    const userRef = doc(db, 'users', userId);
-    await setDoc(
-      userRef,
-      {
-        displayName,
-        region,
-        // 旧フィールドの互換保持
-        primaryCategory: category || (Array.isArray(categories) && categories.length > 0 ? categories[0] : undefined),
-        // 複数カテゴリ（新仕様）
-        categories: Array.isArray(categories) ? categories : (category ? [category] : []),
-        medicalBackground: medicalBackground || '',
-        avatar: avatar || '',
-        notificationConsent: typeof notificationConsent === 'boolean' ? notificationConsent : undefined,
-        profileCompletedAt: new Date(),
-        updatedAt: new Date(),
-      },
-      { merge: true }
-    );
+    await userService.updateUserProfile(userId, updateData);
 
     return NextResponse.json({
       success: true,
@@ -78,24 +66,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!db) {
-      return NextResponse.json(
-        { error: 'Firebase is not configured' },
-        { status: 500 }
-      );
-    }
+    const user = await userService.getUserProfile(userId);
 
-    const userRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
+    if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ user: userSnap.data() });
+    return NextResponse.json({ user });
   } catch (error) {
     console.error('Get profile error:', error);
     return NextResponse.json(
@@ -104,3 +84,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

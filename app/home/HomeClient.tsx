@@ -7,6 +7,9 @@ import ContributionGraphic from '@/components/ContributionGraphic';
 import ThankCount from '@/components/ThankCount';
 import ContributionCategory from '@/components/ContributionCategory';
 import MasterFilter from '@/components/MasterFilter';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 
 interface Question {
   id: string;
@@ -38,10 +41,10 @@ interface HomeClientProps {
 
 type TabType = 'latest' | 'my-questions' | 'answered';
 
-
-
+import { useRequireAuth } from '@/app/hooks/useRequireAuth';
 
 export default function HomeClient({ initialData, summary, userName, userId, avatarUrl }: HomeClientProps) {
+  useRequireAuth();
   const [tab, setTab] = useState<TabType>('latest');
   const [data, setData] = useState<Record<TabType, Question[]>>({
     latest: initialData.latest,
@@ -179,49 +182,70 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
   };
 
   const renderQuestionCard = (q: Question, isChild = false, hasChildren = false, childCount = 0, onToggle?: () => void, isExpanded = false) => {
-    const statusColor =
-      q.status === 'answered' ? 'bg-purple-100 text-purple-700' : q.status === 'closed' ? 'bg-gray-100 text-gray-600' : 'bg-amber-100 text-amber-700';
-    const statusIcon = q.status === 'answered' ? 'check_circle' : q.status === 'closed' ? 'block' : 'schedule';
-    const statusText = q.status === 'answered' ? '回答済み' : q.status === 'closed' ? 'クローズ' : '回答募集中';
+    let badgeVariant: 'success' | 'neutral' | 'warning' = 'warning';
+    let statusText = '回答募集中';
+    let statusIcon = 'schedule';
+
+    if (q.status === 'answered') {
+      badgeVariant = 'success';
+      statusText = '回答済み';
+      statusIcon = 'check_circle';
+    } else if (q.status === 'closed') {
+      badgeVariant = 'neutral';
+      statusText = 'クローズ';
+      statusIcon = 'block';
+    }
 
     return (
-      <div key={q.id} className={`bg-white border ${isChild ? 'border-l-4 border-l-blue-400 ml-6' : 'border-gray-200'} rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow`}>
+      <Card
+        key={q.id}
+        className={`p-4 ${isChild ? 'border-l-4 border-l-blue-400 ml-6' : ''}`}
+        hoverable
+      >
         <Link href={`/questions/${q.id}`} className="block space-y-2">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-semibold text-gray-800 text-base flex-1">{q.title}</h3>
-            <span className={`${statusColor} px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 whitespace-nowrap`}>
-              <Icon name={statusIcon} size={14} />
-              {statusText}
-            </span>
           </div>
 
-          <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
+          <p className="text-sm text-gray-600 line-clamp-2 mb-3">{q.description}</p>
 
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1">
               <Icon name="schedule" size={14} />
-              {new Date(q.createdAt).toLocaleDateString('ja-JP')}
+              {new Date(q.createdAt).toLocaleString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </span>
-            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">{q.category}</span>
+            <Badge variant="success" icon="category" className="text-xs py-0.5 px-2">
+              {q.category}
+            </Badge>
             <span className="flex items-center gap-1">
               <Icon name="chat" size={14} />
               {q.answerCount} 件の回答
             </span>
           </div>
         </Link>
-        {hasChildren && onToggle && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              onToggle();
-            }}
-            className="mt-3 flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
-          >
-            <Icon name={isExpanded ? 'expand_less' : 'expand_more'} size={16} />
-            {isExpanded ? '追加の質問を隠す' : '追加の質問を表示'}（{childCount}件）
-          </button>
-        )}
-      </div>
+        {
+          hasChildren && onToggle && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                onToggle();
+              }}
+              className="mt-3 text-blue-600 hover:text-blue-800 p-0 h-auto font-medium hover:bg-transparent"
+            >
+              <Icon name={isExpanded ? 'expand_less' : 'expand_more'} size={16} />
+              {isExpanded ? '追加の質問を隠す' : '追加の質問を表示'}（{childCount}件）
+            </Button>
+          )
+        }
+      </Card >
     );
   };
 
@@ -232,7 +256,7 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Icon name="home" size={28} className="text-[#2DB596]" />
+              <Icon name="home" size={28} className="text-primary" />
               <h1 className="text-2xl font-bold text-gray-800">ホーム</h1>
             </div>
             <div className="flex items-center gap-2">
@@ -259,23 +283,23 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
                   )}
                 </span>
               </Link>
-              <Link
+              <Button
                 href="/questions/post"
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg transition-colors font-semibold"
+                className="hidden md:flex"
+                icon="add"
               >
-                <Icon name="add" size={20} className="text-white" />
                 質問を投稿
-              </Link>
+              </Button>
             </div>
           </div>
           <div className="md:hidden mt-3">
-            <Link
+            <Button
               href="/questions/post"
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg transition-colors font-semibold"
+              className="w-full"
+              icon="add"
             >
-              <Icon name="add" size={20} className="text-white" />
               質問を投稿
-            </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -283,7 +307,7 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
       {/* サマリー表示 */}
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-4xl mx-auto px-4 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-emerald-50 px-3 py-3 shadow-sm">
+          <Card className="flex flex-col gap-2 border-gray-100 bg-emerald-50 px-3 py-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <Icon name="help" size={18} className="text-emerald-700" />
               <span>質問数</span>
@@ -299,15 +323,15 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
                 新着あり {(data.latest || []).length} 件
               </span>
             </div>
-          </div>
+          </Card>
 
-          <div className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-blue-50 px-3 py-3 shadow-sm">
+          <Card className="flex flex-col gap-2 border-gray-100 bg-blue-50 px-3 py-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <Icon name="chat" size={18} className="text-blue-700" />
               <span>回答数</span>
             </div>
             <div className="text-2xl font-bold text-blue-700">{summary.answers}</div>
-          </div>
+          </Card>
         </div>
       </div>
 
@@ -315,18 +339,18 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">
         {/* 貢献サマリー */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
+          <Card className="p-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">貢献度グラフィック</h3>
             <ContributionGraphic />
-          </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 flex flex-col">
+          </Card>
+          <Card className="p-6 flex flex-col">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">獲得サンキュー数</h3>
             <ThankCount />
-          </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
+          </Card>
+          <Card className="p-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">貢献カテゴリ</h3>
             <ContributionCategory />
-          </div>
+          </Card>
         </div>
 
         {/* タブ切り替え */}
@@ -340,11 +364,10 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
               <button
                 key={item.id}
                 onClick={() => setTab(item.id as TabType)}
-                className={`flex items-center gap-2 px-4 py-3 border-b-2 font-semibold transition-colors ${
-                  tab === item.id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-800'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 border-b-2 font-semibold transition-colors ${tab === item.id
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                  }`}
               >
                 <Icon name={item.icon} size={20} />
                 {item.label}
@@ -355,7 +378,7 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
 
         {/* フィルタ */}
         {tab === 'my-questions' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+          <Card className="p-4 space-y-4">
             <MasterFilter
               title="ステータスで絞り込み"
               masterType="status"
@@ -372,11 +395,11 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
               value={questionCategories}
               onChange={setQuestionCategories}
             />
-          </div>
+          </Card>
         )}
 
         {tab === 'answered' && (
-          <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+          <Card className="p-4 space-y-4">
             <MasterFilter
               title="ステータスで絞り込み"
               masterType="status"
@@ -393,16 +416,16 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
               value={answerCategories}
               onChange={setAnswerCategories}
             />
-          </div>
+          </Card>
         )}
 
         {/* 質問一覧 */}
         <div className="space-y-4">
           {chains.length === 0 && !loading && (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+            <Card className="p-8 text-center text-gray-500">
               <Icon name="inbox" size={48} className="mx-auto mb-2 text-gray-400" />
               <p>まだ質問がありません</p>
-            </div>
+            </Card>
           )}
 
           {chains.map(({ root, children }) => {
@@ -430,12 +453,13 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
 
           {!loading && hasMore[tab] && chains.length > 0 && (
             <div className="text-center pt-4">
-              <button
+              <Button
+                variant="secondary"
                 onClick={loadMore}
-                className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700"
               >
                 もっと見る
-              </button>
+              </Button>
             </div>
           )}
         </div>

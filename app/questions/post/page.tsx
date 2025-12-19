@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 
 interface Category {
   id: string;
@@ -45,7 +45,7 @@ interface ParentQuestion {
   body: string;
 }
 
-export default function QuestionPostPage() {
+function QuestionPostContent() {
   useRequireAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -195,6 +195,17 @@ export default function QuestionPostPage() {
     setFormData({ ...formData, choices: newChoices });
   };
 
+  const handleBack = () => {
+    // フォーム入力中は確認を入れる、またはヘッダーの戻るは単純に戻る（要件次第だが、未保存破棄の観点からCancelと同じが安全）
+    // しかし「戻る」ボタンはブラウザバック相当なので、confirmなしで戻るとデータが残るかも？（ブラウザによる）
+    // ユーザー要望「遷移前の状態になっている」＝router.back()ならスクロール位置などは戻る。
+    // 入力破棄のアラートは「キャンセル」ボタンの仕様。ヘッダーの「戻る」は通常ナビゲーション。
+    // ここではヘッダー戻るも handleCancel と合わせるか、単に back するか。
+    // キャンセルボタンは「入力内容は破棄されます」と出るので、明示的。
+    // ヘッダー戻るは router.back() にする。
+    router.back();
+  };
+
   const handleCategoryChange = (categoryName: string) => {
     const next = formData.categoryIds.includes(categoryName)
       ? formData.categoryIds.filter((c) => c !== categoryName)
@@ -202,19 +213,26 @@ export default function QuestionPostPage() {
     setFormData({ ...formData, categoryIds: next });
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー（プロフィール編集と合わせたスタイル） */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={handleCancel} className="text-gray-600 hover:text-gray-800">
-              <Icon name="arrow_back" size={24} />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">質問投稿</h1>
-          </div>
-        </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2DB596]"></div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* ヘッダー */}
+      <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-screen-md mx-auto px-4 h-16 flex items-center justify-between">
+          <button onClick={handleBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Icon name="arrow_back" size={24} />
+          </button>
+          <h1 className="text-lg font-bold text-gray-800">質問を投稿</h1>
+          <div className="w-6" /> {/* Spacer */}
+        </div>
+      </header>
 
       <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         {formData.parentQuestionId && parentQuestion && (
@@ -265,6 +283,9 @@ export default function QuestionPostPage() {
               placeholder="できるだけ具体的な相談内容を入力してください"
               required
             />
+            <div className="text-sm text-right text-gray-600">
+              {formData.body.length}文字
+            </div>
           </div>
 
           {/* 回答例から選択してもらう（トグル表示） */}
@@ -404,14 +425,13 @@ export default function QuestionPostPage() {
               <div>
                 <label className="block text-sm font-bold text-gray-800 mb-2">回答相手の年代（任意）</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {['10代','20代','30代','40代','50代','60代','その他の年代','指定しない'].map((label) => (
-                    <label 
-                      key={label} 
-                      className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${
-                        formData.ageGroups.includes(label)
-                          ? 'border-[#2DB596] bg-[#2DB596]/5'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
+                  {['10代', '20代', '30代', '40代', '50代', '60代', 'その他の年代', '指定しない'].map((label) => (
+                    <label
+                      key={label}
+                      className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${formData.ageGroups.includes(label)
+                        ? 'border-[#2DB596] bg-[#2DB596]/5'
+                        : 'border-gray-200 hover:bg-gray-50'
+                        }`}
                     >
                       <input
                         type="checkbox"
@@ -442,11 +462,10 @@ export default function QuestionPostPage() {
                         {items.map((cat) => (
                           <label
                             key={cat.id}
-                            className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                              formData.categoryIds.includes(cat.name)
-                                ? 'border-[#2DB596] bg-[#2DB596]/5'
-                                : 'border-gray-300 hover:bg-gray-50'
-                            }`}
+                            className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.categoryIds.includes(cat.name)
+                              ? 'border-[#2DB596] bg-[#2DB596]/5'
+                              : 'border-gray-300 hover:bg-gray-50'
+                              }`}
                           >
                             <input
                               type="checkbox"
@@ -517,5 +536,13 @@ export default function QuestionPostPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function QuestionPostPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <QuestionPostContent />
+    </Suspense>
   );
 }

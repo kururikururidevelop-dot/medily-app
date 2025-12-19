@@ -88,7 +88,7 @@ export default function AnswerPage() {
         const fetched = data.question || data;
         setQuestion(fetched);
         setFormData((prev) => ({ ...prev, questionId: fetched.id }));
-        
+
         // 親質問IDがあれば取得
         if (fetched.parentQuestionId) {
           fetchParentQuestion(fetched.parentQuestionId);
@@ -138,39 +138,36 @@ export default function AnswerPage() {
 
   const handleCancel = () => {
     if (confirm('入力内容は破棄されます。よろしいですか？')) {
-      router.push('/home');
+      router.back();
     }
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">読み込み中...</div>
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="animate-spin h-10 w-10 border-4 border-[#2DB596] border-t-transparent rounded-full" />
       </div>
     );
   }
 
-  if (!question) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">質問が見つかりませんでした</div>
-      </div>
-    );
-  }
+  if (!question) return null;
 
   const textLength = formData.text.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* ヘッダー */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={handleCancel} className="text-gray-600">
-              <Icon name="arrow_back" size={24} />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">回答記入</h1>
-          </div>
-          <div className="w-6" />
+        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+          <button onClick={handleBack} className="text-gray-600 hover:text-gray-900">
+            <Icon name="arrow_back" size={24} />
+          </button>
+          <h1 className="text-lg font-bold text-gray-900">回答を作成</h1>
+          <div className="w-6"></div>
         </div>
       </header>
 
@@ -213,11 +210,10 @@ export default function AnswerPage() {
                 {question.choices.filter((c) => c.trim()).map((choice, index) => (
                   <label
                     key={index}
-                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                      formData.choice.includes(choice)
-                        ? 'border-[#2DB596] bg-[#2DB596]/5'
-                        : 'border-gray-300 hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes(choice)
+                      ? 'border-[#2DB596] bg-[#2DB596]/5'
+                      : 'border-gray-300 hover:bg-gray-50'
+                      }`}
                   >
                     <input
                       type="checkbox"
@@ -241,11 +237,10 @@ export default function AnswerPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                  formData.choice.includes('yes')
-                    ? 'border-[#2DB596] bg-[#2DB596]/5'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('yes')
+                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  : 'border-gray-300 hover:bg-gray-50'
+                  }`}>
                   <input
                     type="checkbox"
                     value="yes"
@@ -262,11 +257,10 @@ export default function AnswerPage() {
                   <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">A</span>
                   <span>はい</span>
                 </label>
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                  formData.choice.includes('no')
-                    ? 'border-[#2DB596] bg-[#2DB596]/5'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('no')
+                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  : 'border-gray-300 hover:bg-gray-50'
+                  }`}>
                   <input
                     type="checkbox"
                     value="no"
@@ -283,11 +277,10 @@ export default function AnswerPage() {
                   <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">B</span>
                   <span>いいえ</span>
                 </label>
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                  formData.choice.includes('other')
-                    ? 'border-[#2DB596] bg-[#2DB596]/5'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('other')
+                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  : 'border-gray-300 hover:bg-gray-50'
+                  }`}>
                   <input
                     type="checkbox"
                     value="other"
@@ -332,7 +325,7 @@ export default function AnswerPage() {
               type="text"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
               placeholder="例: 東京医科大学附属病院"
             />
           </div>
@@ -344,7 +337,7 @@ export default function AnswerPage() {
               type="url"
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
               placeholder="https://example.com"
             />
           </div>
@@ -377,8 +370,7 @@ export default function AnswerPage() {
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:bg-[#2DB596] disabled:text-white disabled:opacity-100 disabled:cursor-not-allowed"
-              disabled={!formData.text.trim()}
+              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383]"
             >
               回答確定
             </button>

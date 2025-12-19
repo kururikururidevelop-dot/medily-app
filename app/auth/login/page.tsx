@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Icon from '@/components/Icon';
-
 export default function LoginPage() {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const next = searchParams.get('next');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,10 +35,15 @@ export default function LoginPage() {
         localStorage.setItem('token', token);
         localStorage.setItem('userId', userId);
         localStorage.setItem('displayName', displayName);
-        router.push('/home');
+
+        // 元の画面へリダイレクト（デフォルトはホーム）
+        const redirectUrl = next ? decodeURIComponent(next) : '/home';
+        router.push(redirectUrl);
       } else {
         // 本番: LINE OAuth へリダイレクト
-        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/line`;
+        // nextパラメータをcallbackとして渡す（APIの仕様によるが、一般的なパラメータ名で付与）
+        const callbackUrl = next ? `?callback=${encodeURIComponent(next)}` : '';
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/line${callbackUrl}`;
       }
     } catch (err) {
       console.error('[Login] Authentication failed:', err);
@@ -145,10 +151,10 @@ export default function LoginPage() {
             ) : (
               <>
                 {/* LINE公式アイコン（画像） */}
-                <img 
-                  src="/icons/line-logo-white@2x.png" 
+                <img
+                  src="/icons/line-logo-white@2x.png"
                   srcSet="/icons/line-logo-white@2x.png 2x, /icons/line-logo-white@3x.png 3x"
-                  alt="LINE" 
+                  alt="LINE"
                   className="absolute left-5 w-[40px] h-[40px]"
                   style={{ imageRendering: 'crisp-edges' }}
                 />
