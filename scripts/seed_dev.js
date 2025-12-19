@@ -99,10 +99,14 @@ const demoQuestions = [
   // === 新規質問（parentQuestionIdなし）===
   {
     id: 'demo-q-new-simple',
-    title: '花粉症の薬を変更するタイミング',
-    description: '今使っている花粉症の薬が効きにくくなってきた気がします。薬を変更する場合、どのタイミングで医師に相談すべきでしょうか？',
-    region: '東京都',
-    category: 'basic-ent',
+    title: '花粉症の薬を変えるべきか迷っています',
+    description: 'ここ2週間ほど花粉症の薬の効き目が弱く感じています。朝と夜にくしゃみと鼻水が続き、日中の作業にも支障が出ています。薬を変更する場合の目安や、医師に相談するタイミングを知りたいです。',
+    body: 'ここ2週間ほど花粉症の薬の効き目が弱く感じています。朝と夜にくしゃみと鼻水が続き、日中の作業にも支障が出ています。薬を変更する場合の目安や、医師に相談するタイミングを知りたいです。',
+    region: 'kanto',
+    categoryId: 'dermatology',
+    category: 'dermatology',
+    categories: ['dermatology', 'internal_medicine', 'pediatrics'],
+    choices: ['すぐ医師に相談する', '2週間様子をみてから相談する', '市販薬を試してから相談する'],
     userId: 'dev-mock-user',
     authorName: 'デモユーザー',
     public: true,

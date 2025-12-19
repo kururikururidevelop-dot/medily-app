@@ -10,7 +10,9 @@ interface Question {
   title?: string;
   body: string;
   categoryId: string;
+  categories?: string[];
   region: string;
+  choices?: string[];
   parentQuestionId?: string;
 }
 
@@ -23,7 +25,7 @@ interface ParentQuestion {
 
 interface AnswerFormData {
   questionId: string;
-  choice: string;
+  choice: string[];
   location: string;
   url: string;
   text: string;
@@ -110,16 +112,17 @@ export default function AnswerConfirmPage() {
         throw new Error(error.message || '回答の送信に失敗しました');
       }
 
-      const result = await response.json();
+      await response.json();
       
       // ドラフトをクリア
       localStorage.removeItem('answerDraft');
       
       // 完了画面へ遷移
       router.push(`/answers/${params.questionId}/complete`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting answer:', error);
-      alert(error.message || '回答の送信に失敗しました。もう一度お試しください。');
+      const message = error instanceof Error ? error.message : '回答の送信に失敗しました。もう一度お試しください。';
+      alert(message);
       setIsSubmitting(false);
     }
   };
@@ -141,7 +144,7 @@ export default function AnswerConfirmPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <button onClick={handleBack} className="text-gray-600" disabled={isSubmitting}>
             <Icon name="arrow_back" size={24} />
           </button>
@@ -150,8 +153,8 @@ export default function AnswerConfirmPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <div className="space-y-6">
+      <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
+        <div className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           {/* 確認メッセージ（Q011 と同様のスタイル） */}
           <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
             <div className="flex items-start gap-2">
@@ -187,7 +190,11 @@ export default function AnswerConfirmPage() {
               <p className="text-base leading-relaxed whitespace-pre-wrap text-gray-800">{question.body}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className={badgeClass}>{categoryNames[question.categoryId] || question.categoryId}</span>
+              {(question.categories?.length ? question.categories : [question.categoryId]).map((cat) => (
+                <span key={cat} className={badgeClass}>
+                  {categoryNames[cat] || cat}
+                </span>
+              ))}
               <span className={badgeClass}>{regionNames[question.region] || question.region}</span>
             </div>
           </div>
@@ -195,17 +202,41 @@ export default function AnswerConfirmPage() {
           <hr className="border-gray-200" />
 
           {/* 回答選択肢 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-sm font-medium text-gray-500 mb-2">回答選択肢</h2>
-            <p className="text-base font-medium text-gray-900">{formData.choice}</p>
+          {formData.choice && formData.choice.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">回答選択肢</p>
+              <div className="space-y-2">
+                {formData.choice.map((choice, index) => {
+                  const choiceIndex = question?.choices?.indexOf(choice) ?? -1;
+                  const displayIndex = choiceIndex >= 0 ? choiceIndex : index;
+                  return (
+                    <div key={index} className="text-base flex items-center gap-2">
+                      <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100">
+                        {String.fromCharCode(65 + displayIndex)}
+                      </span>
+                      <span className="font-medium text-gray-900">{choice}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <hr className="border-gray-200" />
+
+          {/* 回答 */}
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-gray-900">回答</p>
+            <p className="text-base whitespace-pre-wrap">{formData.text}</p>
+            <div className="text-sm text-gray-500 text-right">{formData.text.length} 文字</div>
           </div>
 
           <hr className="border-gray-200" />
 
           {/* 場所情報 */}
           {formData.location && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-sm font-medium text-gray-500 mb-2">場所情報</h2>
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">場所情報</p>
               <p className="text-base">{formData.location}</p>
             </div>
           )}
@@ -214,11 +245,11 @@ export default function AnswerConfirmPage() {
 
           {/* URL情報 */}
           {formData.url && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-sm font-medium text-gray-500 mb-2">URL情報</h2>
-              <a 
-                href={formData.url} 
-                target="_blank" 
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">URL情報</p>
+              <a
+                href={formData.url}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-base text-[#2DB596] hover:underline break-all"
               >
@@ -229,26 +260,21 @@ export default function AnswerConfirmPage() {
 
           {formData.url && <hr className="border-gray-200" />}
 
-          {/* 回答コメント */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-sm font-medium text-gray-500 mb-2">回答コメント</h2>
-            <p className="text-base whitespace-pre-wrap">{formData.text}</p>
-            <div className="mt-2 text-sm text-gray-500 text-right">
-              {formData.text.length} 文字
+          {/* 注意事項（Q020と同トーン） */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-gray-800">
+            <div className="flex items-start gap-2">
+              <span className="text-yellow-600 mt-0.5">
+                <Icon name="warning_amber" size={18} />
+              </span>
+              <div className="space-y-1">
+                <span className="font-semibold text-yellow-900">注意事項</span>
+                <ul className="list-disc list-inside space-y-1 text-gray-800">
+                  <li>医療行為や診断に該当する内容は記載しないでください</li>
+                  <li>誹謗中傷や不適切な表現は控えてください</li>
+                  <li>送信前にAIによる内容チェックが行われます</li>
+                </ul>
+              </div>
             </div>
-          </div>
-
-          {/* 注意事項 */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-medium text-yellow-900 mb-2 flex items-center">
-              <Icon name="info" size={20} className="mr-2" />
-              送信について
-            </h3>
-            <ul className="text-sm text-yellow-800 space-y-1 list-disc list-inside">
-              <li>送信前にAIによる内容チェックが行われます</li>
-              <li>不適切な内容が検出された場合、送信できない場合があります</li>
-              <li>送信後、質問者にLINEで通知が配信されます</li>
-            </ul>
           </div>
 
           {/* ボタン */}
@@ -263,7 +289,7 @@ export default function AnswerConfirmPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:bg-[#2DB596] disabled:text-white disabled:opacity-100 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '送信中...' : '送信確定'}
             </button>

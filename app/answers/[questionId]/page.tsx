@@ -10,6 +10,7 @@ interface Question {
   title?: string;
   body: string;
   categoryId: string;
+  categories?: string[];
   region: string;
   choices: string[];
   parentQuestionId?: string;
@@ -24,7 +25,7 @@ interface ParentQuestion {
 
 interface AnswerFormData {
   questionId: string;
-  choice: string;
+  choice: string[];
   location: string;
   url: string;
   text: string;
@@ -63,7 +64,7 @@ export default function AnswerPage() {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<AnswerFormData>({
     questionId: questionId || '',
-    choice: '',
+    choice: [],
     location: '',
     url: '',
     text: '',
@@ -125,16 +126,8 @@ export default function AnswerPage() {
     e.preventDefault();
 
     // バリデーション
-    if (!formData.choice) {
-      alert('回答選択肢を選択してください');
-      return;
-    }
     if (!formData.text.trim()) {
-      alert('回答コメントを入力してください');
-      return;
-    }
-    if (formData.text.length < 100 || formData.text.length > 140) {
-      alert('回答コメントは100文字以上140文字以下で入力してください');
+      alert('回答を入力してください');
       return;
     }
 
@@ -166,7 +159,6 @@ export default function AnswerPage() {
   }
 
   const textLength = formData.text.length;
-  const isTextValid = textLength >= 100 && textLength <= 140;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -205,49 +197,132 @@ export default function AnswerPage() {
               <p className="text-base leading-relaxed text-gray-900 whitespace-pre-wrap">{question.body}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className={badgeClass}>{categoryNames[question.categoryId] || question.categoryId}</span>
+              {(question.categories?.length ? question.categories : [question.categoryId]).map((cat) => (
+                <span key={cat} className={badgeClass}>
+                  {categoryNames[cat] || cat}
+                </span>
+              ))}
               <span className={badgeClass}>{regionNames[question.region] || question.region}</span>
             </div>
           </div>
 
           {/* 回答選択肢 */}
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-900">
-              回答選択肢 <span className="text-red-500">*</span>
-            </label>
+          <div className="space-y-2">
             {question.choices && question.choices.length > 0 ? (
               <div className="space-y-2">
                 {question.choices.filter((c) => c.trim()).map((choice, index) => (
                   <label
                     key={index}
-                    className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      formData.choice.includes(choice)
+                        ? 'border-[#2DB596] bg-[#2DB596]/5'
+                        : 'border-gray-300 hover:bg-gray-50'
+                    }`}
                   >
                     <input
-                      type="radio"
-                      name="choice"
+                      type="checkbox"
                       value={choice}
-                      checked={formData.choice === choice}
-                      onChange={(e) => setFormData({ ...formData, choice: e.target.value })}
-                      className="mr-3"
-                      required
+                      checked={formData.choice.includes(choice)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({ ...formData, choice: [...formData.choice, choice] });
+                        } else {
+                          setFormData({ ...formData, choice: formData.choice.filter(c => c !== choice) });
+                        }
+                      }}
+                      className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
                     />
+                    <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">
+                      {String.fromCharCode(65 + index)}
+                    </span>
                     <span>{choice}</span>
                   </label>
                 ))}
               </div>
             ) : (
-              <select
-                value={formData.choice}
-                onChange={(e) => setFormData({ ...formData, choice: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
-                required
-              >
-                <option value="">選択してください</option>
-                <option value="yes">はい</option>
-                <option value="no">いいえ</option>
-                <option value="other">その他</option>
-              </select>
+              <div className="space-y-2">
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                  formData.choice.includes('yes')
+                    ? 'border-[#2DB596] bg-[#2DB596]/5'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}>
+                  <input
+                    type="checkbox"
+                    value="yes"
+                    checked={formData.choice.includes('yes')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({ ...formData, choice: [...formData.choice, 'yes'] });
+                      } else {
+                        setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'yes') });
+                      }
+                    }}
+                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                  />
+                  <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">A</span>
+                  <span>はい</span>
+                </label>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                  formData.choice.includes('no')
+                    ? 'border-[#2DB596] bg-[#2DB596]/5'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}>
+                  <input
+                    type="checkbox"
+                    value="no"
+                    checked={formData.choice.includes('no')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({ ...formData, choice: [...formData.choice, 'no'] });
+                      } else {
+                        setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'no') });
+                      }
+                    }}
+                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                  />
+                  <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">B</span>
+                  <span>いいえ</span>
+                </label>
+                <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                  formData.choice.includes('other')
+                    ? 'border-[#2DB596] bg-[#2DB596]/5'
+                    : 'border-gray-300 hover:bg-gray-50'
+                }`}>
+                  <input
+                    type="checkbox"
+                    value="other"
+                    checked={formData.choice.includes('other')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({ ...formData, choice: [...formData.choice, 'other'] });
+                      } else {
+                        setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'other') });
+                      }
+                    }}
+                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                  />
+                  <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">C</span>
+                  <span>その他</span>
+                </label>
+              </div>
             )}
+          </div>
+
+          {/* 回答 */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-900">
+              回答 <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={formData.text}
+              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+              className="w-full p-3 min-h-48 md:min-h-56 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              placeholder="回答を入力してください"
+              required
+            />
+            <div className="text-sm text-right text-gray-600">
+              {textLength}文字
+            </div>
           </div>
 
           {/* 場所情報 */}
@@ -274,41 +349,14 @@ export default function AnswerPage() {
             />
           </div>
 
-          {/* 回答コメント */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-900">
-              回答コメント <span className="text-red-500">*</span>
-              <span className="ml-2 text-xs text-gray-500">（100文字以上140文字以下）</span>
-            </label>
-            <textarea
-              value={formData.text}
-              onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-              className={`w-full p-3 min-h-48 md:min-h-56 rounded-lg border focus:outline-none focus:ring-2 focus:border-transparent ${
-                textLength > 0 && !isTextValid
-                  ? 'border-red-300 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-[#2DB596]'
-              }`}
-              placeholder="回答コメントを入力してください（100文字以上140文字以下）"
-              required
-            />
-            <div className="text-sm text-right">
-              <span className={textLength > 0 && !isTextValid ? 'text-red-600 font-medium' : 'text-gray-600'}>
-                {textLength} / 140文字
-              </span>
-              {textLength > 0 && textLength < 100 && (
-                <span className="ml-2 text-red-600">（あと{100 - textLength}文字必要です）</span>
-              )}
-            </div>
-          </div>
-
-          {/* 注意事項（Q010/Q011 系とトーンを合わせて淡色ボックス化） */}
-          <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+          {/* 注意事項（警告系：黄色トーン） */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-gray-800">
             <div className="flex items-start gap-2">
-              <span className="text-[#2DB596] mt-0.5">
-                <Icon name="info" size={18} />
+              <span className="text-yellow-600 mt-0.5">
+                <Icon name="warning_amber" size={18} />
               </span>
               <div className="space-y-1">
-                <span className="font-semibold">注意事項</span>
+                <span className="font-semibold text-yellow-900">注意事項</span>
                 <ul className="list-disc list-inside space-y-1 text-gray-800">
                   <li>医療行為や診断に該当する内容は記載しないでください</li>
                   <li>誹謗中傷や不適切な表現は控えてください</li>
@@ -329,10 +377,10 @@ export default function AnswerPage() {
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!isTextValid || !formData.choice}
+              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:bg-[#2DB596] disabled:text-white disabled:opacity-100 disabled:cursor-not-allowed"
+              disabled={!formData.text.trim()}
             >
-              確認
+              回答確定
             </button>
           </div>
         </form>

@@ -1,0 +1,159 @@
+[debug] [2025-12-19T03:10:26.998Z] ----------------------------------------------------------------------
+[debug] [2025-12-19T03:10:27.002Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\kurur\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2025-12-19T03:10:27.002Z] CLI Version:   15.0.0
+[debug] [2025-12-19T03:10:27.002Z] Platform:      win32
+[debug] [2025-12-19T03:10:27.003Z] Node Version:  v24.11.1
+[debug] [2025-12-19T03:10:27.003Z] Time:          Fri Dec 19 2025 12:10:27 GMT+0900 (日本標準時)
+[debug] [2025-12-19T03:10:27.003Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-12-19T03:10:27.005Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-12-19T03:10:29.579Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-19T03:10:29.580Z] > authorizing via signed-in user (kururikururi.develop@gmail.com)
+[debug] [2025-12-19T03:10:29.734Z] openjdk version "22" 2024-03-19
+OpenJDK Runtime Environment (build 22+36-2370)
+OpenJDK 64-Bit Server VM (build 22+36-2370, mixed mode, sharing)
+
+[debug] [2025-12-19T03:10:29.779Z] Parsed Java major version: 22
+[info] i  emulators: Starting emulators: auth, functions, firestore, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, functions, firestore, extensions"}}
+[debug] [2025-12-19T03:10:29.783Z] Checked if tokens are valid: false, expires at: 1765902249800
+[debug] [2025-12-19T03:10:29.783Z] Checked if tokens are valid: false, expires at: 1765902249800
+[debug] [2025-12-19T03:10:29.784Z] > refreshing access token with scopes: []
+[debug] [2025-12-19T03:10:29.786Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-12-19T03:10:29.786Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-19T03:10:29.926Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-12-19T03:10:29.926Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-12-19T03:10:29.939Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/medily-dev [none]
+[debug] [2025-12-19T03:10:29.942Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-12-19T03:10:29.942Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-12-19T03:10:30.740Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/medily-dev 200
+[debug] [2025-12-19T03:10:30.740Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/medily-dev {"projectNumber":"576089115312","projectId":"medily-dev","lifecycleState":"ACTIVE","name":"medily-dev","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-12-13T09:22:32.751583Z"}
+[debug] [2025-12-19T03:10:30.754Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.755Z] [auth] Authentication Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.755Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.755Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.755Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-12-19T03:10:30.760Z] Emulator locator file path: C:\Users\kurur\AppData\Local\Temp\hub-medily-dev.json
+[debug] [2025-12-19T03:10:30.760Z] [hub] writing locator at C:\Users\kurur\AppData\Local\Temp\hub-medily-dev.json
+[debug] [2025-12-19T03:10:30.767Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2025-12-19T03:10:30.771Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.771Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.771Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-12-19T03:10:30.771Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"auth":[{"address":"127.0.0.1","family":"IPv4","port":9099}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2025-12-19T03:10:30.817Z] defaultcredentials: writing to file C:\Users\kurur\AppData\Roaming\firebase\kururikururi_develop_gmail.com_application_default_credentials.json
+[debug] [2025-12-19T03:10:30.819Z] Setting GAC to C:\Users\kurur\AppData\Roaming\firebase\kururikururi_develop_gmail.com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\kurur\\AppData\\Roaming\\firebase\\kururikururi_develop_gmail.com_application_default_credentials.json"}}
+[debug] [2025-12-19T03:10:30.820Z] Checked if tokens are valid: true, expires at: 1766117428927
+[debug] [2025-12-19T03:10:30.820Z] Checked if tokens are valid: true, expires at: 1766117428927
+[debug] [2025-12-19T03:10:30.820Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/medily-dev/adminSdkConfig [none]
+[debug] [2025-12-19T03:10:31.183Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/medily-dev/adminSdkConfig 200
+[debug] [2025-12-19T03:10:31.183Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/medily-dev/adminSdkConfig {"projectId":"medily-dev","storageBucket":"medily-dev.firebasestorage.app"}
+[debug] [2025-12-19T03:10:31.202Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-12-19T03:10:31.202Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2025-12-19T03:10:31.203Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","C:\\Users\\kurur\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.20.2.jar","--host","127.0.0.1","--port",8080,"--websocket_port",9150,"--project_id","medily-dev","--rules","C:\\repos\\medily-app\\firestore.rules","--single_project_mode",true,"--functions_emulator","127.0.0.1:5001"],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8080} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\kurur\\\\.cache\\\\firebase\\\\emulators\\\\cloud-firestore-emulator-v1.20.2.jar\",\"--host\",\"127.0.0.1\",\"--port\",8080,\"--websocket_port\",9150,\"--project_id\",\"medily-dev\",\"--rules\",\"C:\\\\repos\\\\medily-app\\\\firestore.rules\",\"--single_project_mode\",true,\"--functions_emulator\",\"127.0.0.1:5001\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8080}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2025-12-19T03:10:33.298Z] Dec 19, 2025 12:10:33 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:10:33 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\r\nINFO: Started WebSocket server on ws://127.0.0.1:9150\r\n"}}
+[debug] [2025-12-19T03:10:33.383Z] API endpoint: http:// {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://"}}
+[debug] [2025-12-19T03:10:33.383Z] 127.0.0.1:8080
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"127.0.0.1:8080\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\r\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080\n\nIf you are running a Firestore in Datastore Mode project, run:\r\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\r\nDev App Server is now running.\n\r\n"}}
+[info] +  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[debug] [2025-12-19T03:10:37.867Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\repos\medily-app\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\repos\\medily-app\\functions\" for Cloud Functions..."}}
+[debug] [2025-12-19T03:10:37.876Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[debug] [2025-12-19T03:10:38.616Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint src",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "firebase-frameworks": "^0.4.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2025-12-19T03:10:38.617Z] Building nodejs source
+[debug] [2025-12-19T03:10:38.617Z] Failed to find version of module node: reached end of search path C:\repos\medily-app\functions\node_modules
+[info] +  functions: Using node@24 from host. 
+[debug] [2025-12-19T03:10:38.619Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-12-19T03:10:38.624Z] Found firebase-functions binary at 'C:\repos\medily-app\functions\node_modules\.bin\firebase-functions'
+[debug] [2025-12-19T03:10:38.786Z] Dec 19, 2025 12:10:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:10:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[info] Serving at port 8028
+
+[debug] [2025-12-19T03:10:40.131Z] Got response from /__/functions.yaml {"endpoints":{"exampleFunction":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"exampleFunction"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2025-12-19T03:10:44.243Z] defaultcredentials: writing to file C:\Users\kurur\AppData\Roaming\firebase\kururikururi_develop_gmail.com_application_default_credentials.json
+[debug] [2025-12-19T03:10:44.252Z] Setting GAC to C:\Users\kurur\AppData\Roaming\firebase\kururikururi_develop_gmail.com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\kurur\\AppData\\Roaming\\firebase\\kururikururi_develop_gmail.com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: exampleFunction. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: exampleFunction."}}
+[info] +  functions[us-central1-exampleFunction]: http function initialized (http://127.0.0.1:5001/medily-dev/us-central1/exampleFunction). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/medily-dev/us-central1/exampleFunction)."}}
+[debug] [2025-12-19T03:10:44.320Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬──────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI              │
+├────────────────┼────────────────┼──────────────────────────────────┤
+│ Authentication │ 127.0.0.1:9099 │ http://127.0.0.1:4000/auth       │
+├────────────────┼────────────────┼──────────────────────────────────┤
+│ Functions      │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions  │
+├────────────────┼────────────────┼──────────────────────────────────┤
+│ Firestore      │ 127.0.0.1:8080 │ http://127.0.0.1:4000/firestore  │
+├────────────────┼────────────────┼──────────────────────────────────┤
+│ Extensions     │ 127.0.0.1:5001 │ http://127.0.0.1:4000/extensions │
+└────────────────┴────────────────┴──────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+┌─────────────────────────┬───────────────┬─────────────────────┐
+│ Extension Instance Name │ Extension Ref │ View in Emulator UI │
+└─────────────────────────┴───────────────┴─────────────────────┘
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2025-12-19T03:11:03.068Z] Dec 19, 2025 12:11:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:11:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[debug] [2025-12-19T03:46:25.632Z] Dec 19, 2025 12:46:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:46:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[debug] [2025-12-19T03:55:22.679Z] Dec 19, 2025 12:55:22 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:55:22 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[debug] [2025-12-19T03:57:41.180Z] Dec 19, 2025 12:57:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Dec 19, 2025 12:57:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
