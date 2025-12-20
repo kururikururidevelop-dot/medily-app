@@ -10,12 +10,19 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    }
+
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
     if (!db) {
       return NextResponse.json({ error: 'Firebase is not configured' }, { status: 500 });

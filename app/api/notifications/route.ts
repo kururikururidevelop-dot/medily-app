@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,6 +17,12 @@ export async function GET(request: NextRequest) {
         { error: 'Missing userId' },
         { status: 400 }
       );
+    }
+
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     if (!db) {

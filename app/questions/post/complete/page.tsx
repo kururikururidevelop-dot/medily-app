@@ -2,8 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
+import { useRequireAuth } from '@/app/hooks/useRequireAuth';
 
 export default function QuestionCompletePage() {
+  useRequireAuth();
   const router = useRouter();
 
   const handleGoHome = () => {

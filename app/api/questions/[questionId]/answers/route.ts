@@ -14,6 +14,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 // 回答投稿
 export async function POST(
@@ -30,6 +31,12 @@ export async function POST(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     if (!db) {
@@ -76,7 +83,13 @@ export async function GET(
 ) {
   try {
     const { questionId } = await params;
-    
+
+    // Security Check
+    const authResult = await verifyAuth(request);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     if (!db) {
       return NextResponse.json(
         { error: 'Firebase is not configured' },

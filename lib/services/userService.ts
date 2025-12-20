@@ -19,6 +19,7 @@ export interface UserProfile {
     categories: string[];
     medicalBackground?: string;
     avatar?: string;
+    pictureUrl?: string; // LINE profile image
     notificationConsent?: boolean;
     profileCompletedAt?: any;
     updatedAt?: any;
@@ -50,6 +51,7 @@ export const userService = {
             categories: data.categories || [],
             medicalBackground: data.medicalBackground,
             avatar: data.avatar,
+            pictureUrl: data.pictureUrl,
             notificationConsent: data.notificationConsent,
             gender: data.gender,
             birthYear: data.birthYear,

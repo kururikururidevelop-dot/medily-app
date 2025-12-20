@@ -83,20 +83,27 @@ export async function GET(request: NextRequest) {
         isProfileCompleted: false,
       });
     } else {
-      // Update basic info
-      await userRef.update({
-        displayName,
-        pictureUrl,
-        updatedAt: new Date(),
-        lastLoginAt: new Date(),
-      });
-
       const userData = userSnap.data();
-      // Check if profile is historically completed
-      // (If you have a flag in DB, usage it. Here relying on client param mostly, 
-      // but passing DB state is better if available)
-      // For now, relies on isNewUser logic or client routing.
-      // If "member registration" means "profile completion", checking a field like `medicalHistory` or `region` might be needed.
+      const isProfileCompleted = userData?.isProfileCompleted === true;
+
+      if (isProfileCompleted) {
+        // Registered User: Do NOT overwrite displayName/pictureUrl
+        await userRef.update({
+          updatedAt: new Date(),
+          lastLoginAt: new Date(),
+        });
+        isNewUser = false;
+      } else {
+        // Provisional User: Sync LINE info
+        await userRef.update({
+          displayName,
+          pictureUrl,
+          updatedAt: new Date(),
+          lastLoginAt: new Date(),
+        });
+        // Treat as new user to force redirect to Profile Registration
+        isNewUser = true;
+      }
     }
 
     // 4. Generate Firebase Custom Token

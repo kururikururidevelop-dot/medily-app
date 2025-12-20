@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '@/lib/services/userService';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     if (displayName && displayName.length > 20) {
       return NextResponse.json(
         { error: 'Nickname must be 20 characters or less' },
@@ -45,6 +52,11 @@ export async function POST(request: NextRequest) {
     if (medicalBackground !== undefined) updateData.medicalBackground = medicalBackground;
     if (avatar !== undefined) updateData.avatar = avatar;
     if (typeof notificationConsent === 'boolean') updateData.notificationConsent = notificationConsent;
+
+    // Mark profile as completed
+    updateData.isProfileCompleted = true;
+    updateData.profileCompletedAt = new Date();
+    updateData.updatedAt = new Date();
 
     await userService.updateUserProfile(userId, updateData);
 
@@ -71,6 +83,12 @@ export async function GET(request: NextRequest) {
         { error: 'Missing userId' },
         { status: 400 }
       );
+    }
+
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     const user = await userService.getUserProfile(userId);

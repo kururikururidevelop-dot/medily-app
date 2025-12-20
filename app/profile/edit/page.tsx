@@ -100,15 +100,34 @@ export default function ProfileEditPage() {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        const userId = localStorage.getItem('userId');
-        if (!userId || userId === 'undefined') {
-          localStorage.setItem('userId', 'dev-mock-user');
+        const { auth } = await import('@/lib/firebase');
+        await auth?.authStateReady();
+        const user = auth?.currentUser;
+
+        // Dev mock fallback or actual user
+        let effectiveUserId = 'dev-mock-user';
+        let token = '';
+
+        if (user) {
+          effectiveUserId = user.uid;
+          token = await user.getIdToken();
+        } else {
+          // If no user in PROD, assume requireAuth handles it, but here we might fail fetch
+          const stored = localStorage.getItem('userId');
+          if (stored && stored !== 'undefined') effectiveUserId = stored;
+          // Note: if backend enforces auth, this will fail without token. 
+          // Development mode might bypass if we add allowDev logic? 
+          // But backend now strictly checks token.
+          // If allowDev is true in backend, fine. 
+          // But current backend enforce token unless we add dev bypass in backend-auth.
+          // Assume dev uses real auth emulator user?
         }
-        const effectiveUserId = userId && userId !== 'undefined' ? userId : 'dev-mock-user';
+
+        const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
 
         const [catRes, profRes] = await Promise.all([
           fetch('/api/system/categories'),
-          fetch(`/api/users/profile?userId=${effectiveUserId}`),
+          fetch(`/api/users/profile?userId=${effectiveUserId}`, { headers }),
         ]);
 
         const catData = await catRes.json();
@@ -176,12 +195,19 @@ export default function ProfileEditPage() {
 
     setSaving(true);
     try {
-      const userId = localStorage.getItem('userId') || 'mock_user';
+      const { auth } = await import('@/lib/firebase');
+      const user = auth?.currentUser;
+      if (!user) throw new Error('認証されていません');
+      const token = await user.getIdToken();
+
       const response = await fetch('/api/users/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
-          userId,
+          userId: user.uid,
           displayName: formData.displayName,
           region: formData.region,
           gender: formData.gender,
@@ -359,8 +385,8 @@ export default function ProfileEditPage() {
                       <label
                         key={cat.id}
                         className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.categories.includes(cat.name)
-                            ? 'border-primary bg-primary/5 dark:bg-primary/10'
-                            : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                          : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                           }`}
                       >
                         <input

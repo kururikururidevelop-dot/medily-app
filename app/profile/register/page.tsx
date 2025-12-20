@@ -44,6 +44,8 @@ export default function ProfileRegisterPage() {
   const [notificationConsent, setNotificationConsent] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [regions, setRegions] = useState<Region[]>([]); // 追加: 地域マスタ
+  const [avatarUrl, setAvatarUrl] = useState(''); // 追加: アバターURL
+  const [imgError, setImgError] = useState(false); // 追加: 画像読み込みエラー状態
 
   const grouped = categories.reduce<Record<string, Category[]>>((acc, c) => {
     const key = c.group || 'その他';
@@ -59,12 +61,42 @@ export default function ProfileRegisterPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // カテゴリ取得
+        // Wait for Firebase Auth to initialize and get current user
+        const { auth } = await import('@/lib/firebase');
+        if (!auth) return;
+
+        // Simple polling for auth user (useRequireAuth handles redirect, but we need the object here)
+        // Better: use onAuthStateChanged or just wait a bit if null?
+        // Actually, let's wrap in onAuthStateChanged to be safe
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            const token = await user.getIdToken();
+            const userId = user.uid;
+
+            // ユーザー情報取得
+            try {
+              const userRes = await fetch(`/api/users/profile?userId=${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              if (userRes.ok) {
+                const userData = await userRes.json();
+                if (userData.user) {
+                  if (userData.user.displayName) setDisplayName(userData.user.displayName);
+                  if (userData.user.pictureUrl) setAvatarUrl(userData.user.pictureUrl);
+                }
+              }
+            } catch (e) {
+              console.error('Failed to fetch user profile:', e);
+            }
+          }
+        });
+
+        // カテゴリ取得 (Public API)
         const catRes = await fetch('/api/system/categories');
         const catData = await catRes.json();
         setCategories(catData.categories || []);
 
-        // 地域マスタ取得
+        // 地域マスタ取得 (Public API)
         const regRes = await fetch('/api/system/regions');
         if (regRes.ok) {
           const regData = await regRes.json();
@@ -72,6 +104,8 @@ export default function ProfileRegisterPage() {
         } else {
           console.error('Failed to fetch regions');
         }
+
+        return () => unsubscribe();
       } catch (err) {
         console.error('Failed to fetch master data:', err);
       }
@@ -100,30 +134,42 @@ export default function ProfileRegisterPage() {
     setError('');
 
     try {
-      const userId = localStorage.getItem('userId') || 'mock_user';
+      const { auth } = await import('@/lib/firebase');
+      const user = auth?.currentUser;
+      if (!user) throw new Error('認証されていません');
+
+      const token = await user.getIdToken();
+      const userId = user.uid;
 
       const res = await fetch('/api/users/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           userId,
           displayName,
           region,
-          gender,
+          gender: gender === 'other' ? '' : gender,
           birthYear,
           categories: selectedCategories,
           notificationConsent,
+          avatar: avatarUrl, // アバターURLも保存（変更なしでも送信）
         }),
       });
 
-      if (!res.ok) throw new Error('プロフィール登録に失敗しました');
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'プロフィール登録に失敗しました');
+      }
 
       // displayName を localStorage に保存
       localStorage.setItem('displayName', displayName);
 
       router.push('/home');
-    } catch (err) {
-      setError('プロフィール登録に失敗しました。もう一度お試しください。');
+    } catch (err: any) {
+      setError(err.message || 'プロフィール登録に失敗しました。もう一度お試しください。');
       console.error('Profile registration error:', err);
     } finally {
       setLoading(false);
@@ -138,11 +184,23 @@ export default function ProfileRegisterPage() {
       <div className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         {/* ヘッダー */}
         <div className="text-center mb-8">
-          {/* ロゴ */}
+          {/* アバターまたはロゴ */}
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm border border-primary/10">
-              <Icon name="medical_services" size={40} className="text-primary" />
-            </div>
+            {avatarUrl && !imgError ? (
+              <div className="w-20 h-20 rounded-full border-2 border-white shadow-md overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={avatarUrl}
+                  alt="LINE Profile"
+                  className="w-full h-full object-cover"
+                  onError={() => setImgError(true)}
+                />
+              </div>
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center shadow-sm border border-gray-200">
+                <Icon name="account_circle" size={48} className="text-gray-400" />
+              </div>
+            )}
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">初回プロフィール登録</h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm">

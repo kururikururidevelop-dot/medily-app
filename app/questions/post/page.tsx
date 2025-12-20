@@ -105,8 +105,23 @@ function QuestionPostContent() {
 
   const fetchProfileDefaults = async () => {
     try {
-      const userId = localStorage.getItem('userId') || 'dev-mock-user';
-      const res = await fetch(`/api/users/profile?userId=${userId}`);
+      const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady();
+      const user = auth?.currentUser;
+
+      let userId = 'dev-mock-user';
+      let token = '';
+      if (user) {
+        userId = user.uid;
+        token = await user.getIdToken();
+      } else {
+        const stored = localStorage.getItem('userId');
+        if (stored) userId = stored;
+      }
+
+      const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+      const res = await fetch(`/api/users/profile?userId=${userId}`, { headers });
       if (!res.ok) return;
       const data = await res.json();
       const region = data.user?.region as string | undefined;
@@ -127,7 +142,17 @@ function QuestionPostContent() {
   const fetchParentQuestion = async (questionId: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/questions/${questionId}`);
+      const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady();
+      const user = auth?.currentUser;
+
+      const headers: HeadersInit = {};
+      if (user) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`/api/questions/${questionId}`, { headers });
       if (res.ok) {
         const data = await res.json();
         const question = data.question || data;

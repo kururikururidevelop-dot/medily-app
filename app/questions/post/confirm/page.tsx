@@ -71,7 +71,17 @@ export default function QuestionConfirmPage() {
 
   const fetchParentQuestion = async (questionId: string) => {
     try {
-      const res = await fetch(`/api/questions/${questionId}`);
+      const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady();
+      const user = auth?.currentUser;
+
+      const headers: HeadersInit = {};
+      if (user) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`/api/questions/${questionId}`, { headers });
       if (res.ok) {
         const data = await res.json();
         const question = data.question || data;
@@ -106,10 +116,23 @@ export default function QuestionConfirmPage() {
 
     try {
       // API呼び出し（質問投稿）
+      const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady();
+      const user = auth?.currentUser;
+
+      if (!user) {
+        alert('認証エラー: 再ログインしてください');
+        router.push('/auth/login');
+        return;
+      }
+
+      const token = await user.getIdToken();
+
       const primaryCategory = formData.categoryIds?.[0] || '';
       const primaryRegion = formData.regionIds?.[0] || '';
       const payload = {
         ...formData,
+        userId: user.uid, // Ensure we send the correct UID from auth, or trust API to use token? API uses body.userId currently but validates it against token.
         title: trimmedTitle,
         description,
         region: primaryRegion,
@@ -119,12 +142,14 @@ export default function QuestionConfirmPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('質問の投稿に失敗しました');
+        const errData = await response.json();
+        throw new Error(errData.error || '質問の投稿に失敗しました');
       }
 
       // ドラフトをクリア

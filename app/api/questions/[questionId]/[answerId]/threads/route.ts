@@ -14,6 +14,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 const MAX_RALLY = 5;
 
@@ -32,6 +33,12 @@ export async function POST(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     if (!db) {

@@ -29,10 +29,23 @@ export default function SettingsPage({ initialNotificationConsent }: SettingsCli
     setSaving(true);
     setError(null);
     try {
-      const userId = localStorage.getItem('userId') || 'mock_user';
+      const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady();
+      const user = auth?.currentUser;
+
+      if (!user) {
+        setError('認証エラー: 再ログインしてください');
+        return;
+      }
+      const token = await user.getIdToken();
+      const userId = user.uid;
+
       const response = await fetch('/api/users/profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           userId,
           notificationConsent: tempLineNotification,

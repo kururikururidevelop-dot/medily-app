@@ -67,6 +67,7 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
       try {
         let url = `/api/questions?limit=10&page=${pageNum}`;
         if (targetTab === 'latest') {
+          // User Requirement: Home "Latest" tab must only show OWN questions.
           url += `&userId=${encodeURIComponent(userId)}`;
         } else if (targetTab === 'my-questions') {
           url += `&userId=${encodeURIComponent(userId)}`;

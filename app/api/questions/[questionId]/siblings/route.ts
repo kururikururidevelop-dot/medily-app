@@ -13,6 +13,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function GET(
   request: NextRequest,
@@ -21,6 +22,12 @@ export async function GET(
   try {
     const { questionId } = await params;
     console.log('[API Siblings] Fetching siblings for:', questionId);
+
+    // Security Check
+    const authResult = await verifyAuth(request);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
 
     if (!db) {
       console.error('[API Siblings] Firebase db is not configured');
@@ -33,7 +40,7 @@ export async function GET(
     // 現在の質問を取得
     const currentRef = doc(db, 'questions', questionId);
     const currentDoc = await getDoc(currentRef);
-    
+
     if (!currentDoc.exists()) {
       return NextResponse.json(
         { error: '質問が見つかりません' },

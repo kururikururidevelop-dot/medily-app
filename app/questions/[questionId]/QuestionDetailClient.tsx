@@ -13,6 +13,8 @@ interface QuestionDetailClientProps {
     error?: string;
 }
 
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+
 export default function QuestionDetailClient({
     initialQuestion,
     initialAnswers,
@@ -20,6 +22,7 @@ export default function QuestionDetailClient({
     initialNextId,
     error: initialError
 }: QuestionDetailClientProps) {
+    useRequireAuth();
     const router = useRouter();
 
     // State is initialized from Server Props

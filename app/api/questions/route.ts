@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { questionService, QuestionFilter } from '@/lib/services/questionService';
+import { verifyAuth } from '@/lib/backend-auth';
 
 // 質問投稿
 export async function POST(request: NextRequest) {
@@ -40,6 +41,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Security Check
+    const authResult = await verifyAuth(request, userId);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const questionId = await questionService.createQuestion({
       userId,
       title,
@@ -68,13 +75,29 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    const publicOnly = searchParams.get('public') === 'true';
+    const userId = searchParams.get('userId') || undefined;
+
+    // Security Check: If not explicitly requesting public data, or if requesting specific user data, enforce auth
+    if (!publicOnly) {
+      // If fetching specific user's questions, verify ownership
+      if (userId) {
+        const authResult = await verifyAuth(request, userId);
+        if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      } else {
+        // Generic private fetch? Should require at least a valid token
+        const authResult = await verifyAuth(request);
+        if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      }
+    }
+
     const filter: QuestionFilter = {
-      userId: searchParams.get('userId') || undefined,
+      userId,
       answeredBy: searchParams.get('answeredBy') || undefined,
       region: searchParams.getAll('region').filter(Boolean),
       category: searchParams.getAll('category').filter(Boolean),
       status: searchParams.getAll('status').filter(Boolean),
-      publicOnly: searchParams.get('public') === 'true',
+      publicOnly,
       limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
       page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
     };

@@ -123,6 +123,7 @@ const devUsers = [
     categories: ['内科一般', '皮膚科', '小児科'],
     medicalBackground: '看護師（経験3年）',
     avatar: '',
+    pictureUrl: '', // 空文字で上書きして削除
     notificationConsent: true,
     profileCompletedAt: Timestamp.now(),
     createdAt: Timestamp.now(),

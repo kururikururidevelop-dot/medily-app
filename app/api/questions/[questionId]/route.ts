@@ -13,6 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function GET(
   request: NextRequest,
@@ -21,6 +22,12 @@ export async function GET(
   try {
     const { questionId } = await params;
     console.log('[API] Fetching question:', questionId);
+
+    // Security Check
+    const authResult = await verifyAuth(request);
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
 
     if (!db) {
       console.error('[API] Firebase db is not configured');
@@ -66,11 +73,11 @@ export async function GET(
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt instanceof Timestamp 
-          ? data.createdAt.toDate().toLocaleString('ja-JP') 
+        createdAt: data.createdAt instanceof Timestamp
+          ? data.createdAt.toDate().toLocaleString('ja-JP')
           : data.createdAt,
-        updatedAt: data.updatedAt instanceof Timestamp 
-          ? data.updatedAt.toDate().toLocaleString('ja-JP') 
+        updatedAt: data.updatedAt instanceof Timestamp
+          ? data.updatedAt.toDate().toLocaleString('ja-JP')
           : data.updatedAt,
       };
     });
@@ -80,17 +87,17 @@ export async function GET(
     if (questionData?.parentQuestionId) {
       const parentRef = doc(db, 'questions', questionData.parentQuestionId);
       const parentDoc = await getDoc(parentRef);
-      
+
       if (parentDoc.exists()) {
         const parentData = parentDoc.data();
         parentQuestion = {
           id: parentDoc.id,
           ...parentData,
-          createdAt: parentData.createdAt instanceof Timestamp 
-            ? parentData.createdAt.toDate().toLocaleString('ja-JP') 
+          createdAt: parentData.createdAt instanceof Timestamp
+            ? parentData.createdAt.toDate().toLocaleString('ja-JP')
             : parentData.createdAt,
-          updatedAt: parentData.updatedAt instanceof Timestamp 
-            ? parentData.updatedAt.toDate().toLocaleString('ja-JP') 
+          updatedAt: parentData.updatedAt instanceof Timestamp
+            ? parentData.updatedAt.toDate().toLocaleString('ja-JP')
             : parentData.updatedAt,
         };
       }
@@ -101,11 +108,11 @@ export async function GET(
         id: questionDoc.id,
         ...questionData,
         content: normalizedContent,
-        createdAt: questionData.createdAt instanceof Timestamp 
-          ? questionData.createdAt.toDate().toLocaleString('ja-JP') 
+        createdAt: questionData.createdAt instanceof Timestamp
+          ? questionData.createdAt.toDate().toLocaleString('ja-JP')
           : questionData.createdAt,
-        updatedAt: questionData.updatedAt instanceof Timestamp 
-          ? questionData.updatedAt.toDate().toLocaleString('ja-JP') 
+        updatedAt: questionData.updatedAt instanceof Timestamp
+          ? questionData.updatedAt.toDate().toLocaleString('ja-JP')
           : questionData.updatedAt,
       },
       answers,
