@@ -116,7 +116,7 @@ export default function QuestionDetailClient({
                             {!nextQuestionId && (
                                 <button
                                     onClick={() => router.push(`/questions/post?parentQuestionId=${question.id}`)}
-                                    className="px-4 py-2 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg font-semibold"
+                                    className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold"
                                 >
                                     追加質問
                                 </button>
@@ -172,8 +172,8 @@ export default function QuestionDetailClient({
                             disabled={!prevQuestionId}
                             onClick={() => prevQuestionId && router.push(`/questions/${prevQuestionId}`)}
                             className={`px-4 py-2 rounded-lg border ${prevQuestionId
-                                    ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
-                                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+                                : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
                             <Icon name="chevron_left" size={18} className="inline mr-1" /> 前の質問
@@ -182,8 +182,8 @@ export default function QuestionDetailClient({
                             disabled={!nextQuestionId}
                             onClick={() => nextQuestionId && router.push(`/questions/${nextQuestionId}`)}
                             className={`px-4 py-2 rounded-lg border ${nextQuestionId
-                                    ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
-                                    : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
+                                : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
                             次の質問 <Icon name="chevron_right" size={18} className="inline ml-1" />

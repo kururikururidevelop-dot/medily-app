@@ -22,7 +22,7 @@ export default function QuestionCompletePage() {
         <div className="bg-white rounded-lg shadow p-8 text-center">
           {/* 完了アイコン */}
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-[#2DB596] rounded-full flex items-center justify-center">
+            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
               <Icon name="check" size={48} className="text-white" />
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function QuestionCompletePage() {
           {/* ボタン */}
           <button
             onClick={handleGoHome}
-            className="w-full py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383]"
+            className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark"
           >
             ホームに戻る
           </button>

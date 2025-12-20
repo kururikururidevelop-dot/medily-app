@@ -91,7 +91,7 @@ export default function SettingsPage({ initialNotificationConsent }: SettingsCli
                 id="lineNotification"
                 checked={tempLineNotification}
                 onChange={(e) => setTempLineNotification(e.target.checked)}
-                className="w-5 h-5 text-[#2DB596] focus:ring-[#2DB596] rounded mt-0.5"
+                className="w-5 h-5 text-primary focus:ring-primary rounded mt-0.5"
               />
               <div className="flex-1">
                 <label htmlFor="lineNotification" className="block font-semibold text-gray-800 cursor-pointer">
@@ -144,7 +144,7 @@ export default function SettingsPage({ initialNotificationConsent }: SettingsCli
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-3 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+              className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
             >
               {saving ? '保存中...' : '保存'}
             </button>

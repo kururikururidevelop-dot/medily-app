@@ -252,7 +252,7 @@ export default function ProfileEditPage() {
               value={formData.displayName}
               onChange={handleInputChange}
               placeholder="例：たなかん"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -269,7 +269,7 @@ export default function ProfileEditPage() {
               name="region"
               value={formData.region}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               required
             >
               <option value="">選択してください</option>
@@ -295,7 +295,7 @@ export default function ProfileEditPage() {
                   value="male"
                   checked={formData.gender === 'male'}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">男性</span>
               </label>
@@ -306,7 +306,7 @@ export default function ProfileEditPage() {
                   value="female"
                   checked={formData.gender === 'female'}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">女性</span>
               </label>
@@ -317,7 +317,7 @@ export default function ProfileEditPage() {
                   value="other"
                   checked={formData.gender === 'other'}
                   onChange={handleInputChange}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">その他・回答しない</span>
               </label>
@@ -331,7 +331,7 @@ export default function ProfileEditPage() {
               name="birthYear"
               value={formData.birthYear}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             >
               <option value="">選択してください</option>
               {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 18 - i).map((year) => (
@@ -358,19 +358,18 @@ export default function ProfileEditPage() {
                     {items.map((cat) => (
                       <label
                         key={cat.id}
-                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                          formData.categories.includes(cat.name)
-                            ? 'border-[#2DB596] bg-[#2DB596]/5 dark:bg-[#2DB596]/10'
+                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.categories.includes(cat.name)
+                            ? 'border-primary bg-primary/5 dark:bg-primary/10'
                             : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
+                          }`}
                       >
                         <input
                           type="checkbox"
                           checked={formData.categories.includes(cat.name)}
                           onChange={() => handleCategoryChange(cat.name)}
-                          className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                          className="w-4 h-4 text-primary focus:ring-primary rounded"
                         />
-                        <Icon name={cat.icon} size={20} className="ml-3 text-[#2DB596]" />
+                        <Icon name={cat.icon} size={20} className="ml-3 text-primary" />
                         <span className="ml-2 text-gray-900 dark:text-white">{cat.name}</span>
                       </label>
                     ))}
@@ -390,7 +389,7 @@ export default function ProfileEditPage() {
                 type="checkbox"
                 checked={formData.notificationConsent}
                 onChange={(e) => setFormData((prev) => ({ ...prev, notificationConsent: e.target.checked }))}
-                className="w-5 h-5 text-[#2DB596] focus:ring-[#2DB596] rounded mt-0.5"
+                className="w-5 h-5 text-primary focus:ring-primary rounded mt-0.5"
                 required
               />
               <div className="ml-3">
@@ -414,7 +413,7 @@ export default function ProfileEditPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-6 py-2 bg-[#2DB596] hover:bg-[#1E8F75] text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? '保存中...' : '保存'}
             </button>

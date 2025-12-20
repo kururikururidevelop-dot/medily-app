@@ -2,11 +2,11 @@
 
 @theme {
   --font-sans: var(--font-noto-sans-jp), var(--font-geist-sans), system-ui, sans-serif;
-  
-  --color-primary: #2DB596;
-  --color-primary-light: #4CCAB0;
-  --color-primary-dark: #1E8F75;
-  --color-primary-ultralight: #E8F8F4;
+
+  --color-primary: #FFB03B;
+  --color-primary-light: #FFC266;
+  --color-primary-dark: #CC8D2F;
+  --color-primary-ultralight: #FFF6E5;
   --color-background-light: #f9fafb;
   --color-background-dark: #111827;
   --color-surface-light: #ffffff;

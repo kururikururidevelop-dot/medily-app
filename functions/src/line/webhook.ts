@@ -1,9 +1,8 @@
 import * as logger from "firebase-functions/logger";
 import { onRequest } from "firebase-functions/v2/https";
 import { WebhookEvent } from "@line/bot-sdk";
-import { lineClient, lineConfig } from "./client";
-import { middleware } from "@line/bot-sdk";
-import * as express from "express";
+
+
 
 // Validating signature manually or using middleware
 // Since Cloud Functions v2 onRequest gives us a standard Request/Response,

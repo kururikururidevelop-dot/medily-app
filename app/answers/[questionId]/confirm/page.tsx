@@ -68,7 +68,7 @@ export default function AnswerConfirmPage() {
     const parsed = JSON.parse(draft);
     setFormData(parsed.formData);
     setQuestion(parsed.question);
-    
+
     // 親質問IDがあれば取得
     if (parsed.question?.parentQuestionId) {
       fetchParentQuestion(parsed.question.parentQuestionId);
@@ -113,10 +113,10 @@ export default function AnswerConfirmPage() {
       }
 
       await response.json();
-      
+
       // ドラフトをクリア
       localStorage.removeItem('answerDraft');
-      
+
       // 完了画面へ遷移
       router.push(`/answers/${params.questionId}/complete`);
     } catch (error: unknown) {
@@ -139,7 +139,7 @@ export default function AnswerConfirmPage() {
     );
   }
 
-  const badgeClass = 'inline-flex items-center px-3 py-1 bg-[#2DB596]/5 border border-[#2DB596]/30 rounded-full text-sm font-semibold text-gray-800';
+  const badgeClass = 'inline-flex items-center px-3 py-1 bg-primary/5 border border-primary/30 rounded-full text-sm font-semibold text-gray-800';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -156,9 +156,9 @@ export default function AnswerConfirmPage() {
       <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         <div className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           {/* 確認メッセージ（Q011 と同様のスタイル） */}
-          <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+          <div className="bg-primary-ultralight border border-primary/30 rounded-lg p-4 text-sm text-gray-800">
             <div className="flex items-start gap-2">
-              <span className="text-[#2DB596] mt-0.5">
+              <span className="text-primary mt-0.5">
                 <Icon name="info" size={18} />
               </span>
               <div>
@@ -183,7 +183,7 @@ export default function AnswerConfirmPage() {
 
           {/* 質問内容（タイトル+本文を同枠で強調、カテゴリ/地域はバッジ） */}
           <div className="space-y-3">
-            <div className="rounded-xl border border-[#2DB596]/30 bg-[#2DB596]/5 p-5 space-y-3">
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 space-y-3">
               {question.title && (
                 <h2 className="text-xl font-bold text-gray-900 whitespace-pre-wrap break-words">{question.title}</h2>
               )}
@@ -251,7 +251,7 @@ export default function AnswerConfirmPage() {
                 href={formData.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-base text-[#2DB596] hover:underline break-all"
+                className="text-base text-primary hover:underline break-all"
               >
                 {formData.url}
               </a>
@@ -289,7 +289,7 @@ export default function AnswerConfirmPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:bg-[#2DB596] disabled:text-white disabled:opacity-100 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark disabled:bg-primary disabled:text-white disabled:opacity-100 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '送信中...' : '送信確定'}
             </button>

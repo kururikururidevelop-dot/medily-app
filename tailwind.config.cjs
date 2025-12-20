@@ -11,10 +11,10 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#2DB596',
-          light: '#4CCAB0',
-          dark: '#1E8F75',
-          ultralight: '#E8F8F4',
+          DEFAULT: '#FFB03B',
+          light: '#FFC266',
+          dark: '#CC8D2F',
+          ultralight: '#FFF6E5',
         },
         'background-light': '#f9fafb',
         'background-dark': '#111827',

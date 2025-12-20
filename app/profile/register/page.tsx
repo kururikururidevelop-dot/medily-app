@@ -17,15 +17,15 @@ interface Category {
   order?: number;
 }
 
-const PREFECTURES = [
-  '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
-  '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
-  '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県',
-  '三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
-  '鳥取県', '島根県', '岡山県', '広島県', '山口県',
-  '徳島県', '香川県', '愛媛県', '高知県',
-  '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県',
-];
+
+
+
+interface Region {
+  id: string;
+  name: string;
+  group: string;
+  order: number;
+}
 
 const BACKGROUNDS = [
   { id: 'patient', label: '患者・家族' },
@@ -43,6 +43,8 @@ export default function ProfileRegisterPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [notificationConsent, setNotificationConsent] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]); // 追加: 地域マスタ
+
   const grouped = categories.reduce<Record<string, Category[]>>((acc, c) => {
     const key = c.group || 'その他';
     acc[key] = acc[key] || [];
@@ -55,17 +57,27 @@ export default function ProfileRegisterPage() {
   useRequireAuth();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/api/system/categories');
-        const data = await res.json();
-        setCategories(data.categories || []);
+        // カテゴリ取得
+        const catRes = await fetch('/api/system/categories');
+        const catData = await catRes.json();
+        setCategories(catData.categories || []);
+
+        // 地域マスタ取得
+        const regRes = await fetch('/api/system/regions');
+        if (regRes.ok) {
+          const regData = await regRes.json();
+          setRegions(regData.regions || []);
+        } else {
+          console.error('Failed to fetch regions');
+        }
       } catch (err) {
-        console.error('Failed to fetch categories:', err);
+        console.error('Failed to fetch master data:', err);
       }
     };
 
-    fetchCategories();
+    fetchData();
   }, []);
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -78,12 +90,12 @@ export default function ProfileRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!notificationConsent) {
       setError('通知の受信に同意いただく必要があります');
       return;
     }
-    
+
     setLoading(true);
     setError('');
 
@@ -128,8 +140,8 @@ export default function ProfileRegisterPage() {
         <div className="text-center mb-8">
           {/* ロゴ */}
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2DB596]/20 to-[#2DB596]/5 flex items-center justify-center shadow-sm border border-[#2DB596]/10">
-              <Icon name="medical_services" size={40} className="text-[#2DB596]" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm border border-primary/10">
+              <Icon name="medical_services" size={40} className="text-primary" />
             </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">初回プロフィール登録</h1>
@@ -150,11 +162,12 @@ export default function ProfileRegisterPage() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="例：たなかん"
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              maxLength={20}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              サービス内で表示される名前です
+              サービス内で表示される名前です（最大20文字）
             </p>
           </div>
 
@@ -166,13 +179,13 @@ export default function ProfileRegisterPage() {
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               required
             >
               <option value="">選択してください</option>
-              {PREFECTURES.map((pref) => (
-                <option key={pref} value={pref}>
-                  {pref}
+              {regions.map((reg) => (
+                <option key={reg.id} value={reg.name}>
+                  {reg.name}
                 </option>
               ))}
             </select>
@@ -194,7 +207,7 @@ export default function ProfileRegisterPage() {
                   value="male"
                   checked={gender === 'male'}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">男性</span>
               </label>
@@ -205,7 +218,7 @@ export default function ProfileRegisterPage() {
                   value="female"
                   checked={gender === 'female'}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">女性</span>
               </label>
@@ -216,7 +229,7 @@ export default function ProfileRegisterPage() {
                   value="other"
                   checked={gender === 'other'}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596]"
+                  className="w-4 h-4 text-primary focus:ring-primary"
                 />
                 <span className="ml-2 text-gray-900 dark:text-white">その他・回答しない</span>
               </label>
@@ -231,7 +244,7 @@ export default function ProfileRegisterPage() {
             <select
               value={birthYear}
               onChange={(e) => setBirthYear(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             >
               <option value="">選択してください</option>
               {birthYears.map((year) => (
@@ -260,20 +273,19 @@ export default function ProfileRegisterPage() {
                     {items.map((cat) => (
                       <label
                         key={cat.id}
-                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedCategories.includes(cat.id)
-                            ? 'border-[#2DB596] bg-[#2DB596]/5 dark:bg-[#2DB596]/10'
-                            : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
+                        className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${selectedCategories.includes(cat.id)
+                          ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                          : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
                       >
                         <input
                           type="checkbox"
                           value={cat.id}
                           checked={selectedCategories.includes(cat.id)}
                           onChange={() => handleCategoryToggle(cat.id)}
-                          className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                          className="w-4 h-4 text-primary focus:ring-primary rounded"
                         />
-                        <Icon name={cat.icon} size={20} className="ml-3 text-[#2DB596]" />
+                        <Icon name={cat.icon} size={20} className="ml-3 text-primary" />
                         <span className="ml-2 text-gray-900 dark:text-white">{cat.name}</span>
                       </label>
                     ))}
@@ -293,7 +305,7 @@ export default function ProfileRegisterPage() {
                 type="checkbox"
                 checked={notificationConsent}
                 onChange={(e) => setNotificationConsent(e.target.checked)}
-                className="w-5 h-5 text-[#2DB596] focus:ring-[#2DB596] rounded mt-0.5"
+                className="w-5 h-5 text-primary focus:ring-primary rounded mt-0.5"
                 required
               />
               <div className="ml-3">
@@ -318,7 +330,7 @@ export default function ProfileRegisterPage() {
           <button
             type="submit"
             disabled={loading || !notificationConsent}
-            className="w-full py-3 bg-[#2DB596] hover:bg-[#1E8F75] text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? '登録中...' : '登録完了'}
           </button>
@@ -330,14 +342,14 @@ export default function ProfileRegisterPage() {
             登録することで、
             <a
               href="/terms"
-              className="underline hover:text-[#2DB596] transition-colors mx-1"
+              className="underline hover:text-primary transition-colors mx-1"
             >
               利用規約
             </a>
             および
             <a
               href="/privacy"
-              className="underline hover:text-[#2DB596] transition-colors mx-1"
+              className="underline hover:text-primary transition-colors mx-1"
             >
               プライバシーポリシー
             </a>

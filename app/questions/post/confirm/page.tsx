@@ -45,7 +45,7 @@ const regionNames: Record<string, string> = {
 
 const asDisplayName = (id: string, map: Record<string, string>) => map[id] || id;
 const badgeClass =
-  'inline-flex items-center px-3 py-1 bg-[#2DB596]/10 border border-[#2DB596]/30 rounded-full text-sm font-semibold text-gray-800';
+  'inline-flex items-center px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-sm font-semibold text-gray-800';
 
 export default function QuestionConfirmPage() {
   useRequireAuth();
@@ -62,7 +62,7 @@ export default function QuestionConfirmPage() {
     }
     const data = JSON.parse(draft);
     setFormData({ title: '', ...data });
-    
+
     // 親質問IDがあれば取得
     if (data.parentQuestionId) {
       fetchParentQuestion(data.parentQuestionId);
@@ -129,7 +129,7 @@ export default function QuestionConfirmPage() {
 
       // ドラフトをクリア
       localStorage.removeItem('questionDraft');
-      
+
       // 完了画面へ遷移
       router.push('/questions/post/complete');
     } catch (error) {
@@ -169,9 +169,9 @@ export default function QuestionConfirmPage() {
       <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         <div className="space-y-6 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           {/* 確認メッセージ（Q010と同様のスタイルに統一） */}
-          <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+          <div className="bg-primary-ultralight border border-primary/30 rounded-lg p-4 text-sm text-gray-800">
             <div className="flex items-start gap-2">
-              <span className="text-[#2DB596] mt-0.5">
+              <span className="text-primary mt-0.5">
                 <Icon name="info" size={18} />
               </span>
               <div>
@@ -197,7 +197,7 @@ export default function QuestionConfirmPage() {
           {/* テンプレートは削除仕様（表示なし） */}
 
           {/* タイトルと相談内容（同じ枠に統合） */}
-          <div className="rounded-xl border border-[#2DB596]/30 bg-[#2DB596]/5 p-5 space-y-3">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 space-y-3">
             <h2 className="text-xl font-bold text-gray-900 whitespace-pre-wrap break-words">{formData.title}</h2>
             <p className="text-base leading-relaxed whitespace-pre-wrap">{formData.body}</p>
           </div>
@@ -299,7 +299,7 @@ export default function QuestionConfirmPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '投稿中...' : '投稿確定'}
             </button>

@@ -169,7 +169,7 @@ export default function ProfilePage({ initialProfile }: ProfileClientProps) {
               href={item.href}
               className="flex items-center gap-4 px-6 py-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all hover:bg-gray-50"
             >
-              <Icon name={item.icon} size={20} className="flex-shrink-0 text-[#2DB596]" />
+              <Icon name={item.icon} size={20} className="flex-shrink-0 text-primary" />
               <span className="flex-1 font-semibold text-gray-800">
                 {item.label}
               </span>

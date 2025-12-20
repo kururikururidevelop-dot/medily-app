@@ -60,7 +60,7 @@ async function fetchPublicQuestions() {
       // I'll skip 'public' constraint for now to ensure I get *some* questions, or just `status=open`.
       // This is a landing page. Showing "open" questions is safe.
       where('status', '==', 'open'),
-      // orderBy('createdAt', 'desc'), // Requires index. Sorting in memory or just taking any 3 for now.
+      orderBy('createdAt', 'desc'),
       limit(3)
     );
     const snapshot = await getDocs(q);
@@ -76,29 +76,29 @@ async function fetchPublicQuestions() {
 
 export default function Home() {
   const steps = [
-    { num: 1, title: 'ログイン', desc: 'LINEでサインイン' },
-    { num: 2, title: 'プロフィール登録', desc: '地域と関心ごとを設定' },
-    { num: 3, title: '質問投稿', desc: '医療に関する疑問を投稿' },
-    { num: 4, title: '回答を受け取る', desc: '地域の経験者から回答' },
+    { num: 1, title: 'まずは登録', desc: 'LINEでかんたんに始められます' },
+    { num: 2, title: 'プロフィール入力', desc: '興味のある地域や分野を選ぶだけ' },
+    { num: 3, title: '質問・相談する', desc: '気になること、不安なことを投稿' },
+    { num: 4, title: '回答が届く', desc: '同じ経験を持つ人から返事が来ます' },
   ];
 
   const features = [
     {
       icon: 'lock',
       title: 'クローズドな安心感',
-      desc: '相談内容は公開されず、マッチングした相手とだけの安心できる空間です。',
+      desc: '誰でも見られるSNSとは違い、必要な人にだけ届く仕組み。安心して本音を話せます。',
       color: 'text-primary',
     },
     {
       icon: 'favorite',
       title: '共感が癒しになる',
-      desc: '「わかる」という一言が、孤独な闘病生活の大きな支えになります。',
+      desc: '「その気持ち、わかります」。同じ経験をした人からの言葉が、何よりの心強さになります。',
       color: 'text-primary',
     },
     {
       icon: 'search',
       title: '病院選びの参考に',
-      desc: '実際に通院した人のリアルな感想を聞いて、納得のいく病院選びを。',
+      desc: '実際の雰囲気や待ち時間、先生の対応など。通った人しか知らないリアルな情報を参考にできます。',
       color: 'text-primary',
     },
   ];
@@ -109,7 +109,7 @@ export default function Home() {
       <nav className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-screen-lg mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">Medily</h1>
-          <Button href="/auth/login" variant="outline" size="sm">
+          <Button href="/auth/login?mode=login" variant="outline" size="sm">
             ログイン
           </Button>
         </div>
@@ -125,8 +125,8 @@ export default function Home() {
             あなたの経験が、<br className="hidden md:block" />だれかの<span className="text-primary relative">安心</span>に変わる。
           </h2>
           <p className="text-base md:text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-            同じ病気や怪我を経験した人だからこそ、話せることがあります。<br className="hidden sm:block" />
-            医療体験の「生の経験」を共有し、支え合う場所です。
+            同じ悩みを持つ人だから、分かち合えることがあります。<br className="hidden sm:block" />
+            あなたの体験が、誰かの不安を和らげる。<br className="hidden sm:block" />経験者同士でつながる、安心のコミュニティです。
           </p>
         </div>
 
@@ -141,11 +141,11 @@ export default function Home() {
 
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button href="/auth/login" size="lg" className="px-8 py-4 text-lg">
-              質問してみる
+            <Button href="/auth/login" size="lg" className="w-64 px-8 py-4 text-lg justify-center">
+              相談してみる
             </Button>
-            <Button href="/questions" size="lg" className="px-8 py-4 text-lg">
-              回答してみる
+            <Button href="/questions" size="lg" className="w-64 px-8 py-4 text-lg justify-center">
+              経験をシェアする
             </Button>
           </div>
         </div>
@@ -154,9 +154,10 @@ export default function Home() {
       {/* 特徴 */}
       <div className="max-w-screen-lg mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">専門家ではない、「経験者」に相談する</h3>
+          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">専門家とは違う、「経験者」という味方。</h3>
           <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Medilyの回答者は医療従事者ではなく、あなたと同じ経験を持つ一般の方々です。専門的な診断ではなく、生活の工夫や気持ちの持ち方など、経験者ならではの「生の声」を聞くことができます。
+            医療の専門家ではありませんが、同じ痛みを経験した仲間です。<br />
+            日々の暮らしの工夫や、治療への向き合い方など、教科書には載っていない「本当のところ」を聞いてみませんか？
           </p>
         </div>
 
@@ -191,10 +192,12 @@ export default function Home() {
 
         <div className="max-w-3xl mx-auto mb-12">
           <p className="text-lg text-gray-700 leading-relaxed mb-6">
-            医療の悩みは非常にデリケートで、一人で抱え込んでしまいがち。Medilyは、<span className="font-bold text-primary">システムがすべての対話を安全に仲介</span>することで、お互いの連絡先を明かさず、信頼できる経験者から直接アドバイスをもらえる環境を整えています。
+            病気やケガの悩みは、とてもデリケート。<br />
+            Medily（メディリー）なら、お互いの連絡先を知られることなく、安全にやり取りができます。<br />
+            あなたのプライバシーを守りながら、安心して相談できる場所を提供します。
           </p>
           <p className="text-lg text-gray-700 leading-relaxed">
-            あなたのプライバシーは守られ、相談内容は厳重に管理されます。この「守られた場所」だからこそ、本音で話し、本当に役に立つ生のアドバイスに出会えるのです。
+            この「守られた場所」だからこそ、本音で話し、本当に役に立つ生のアドバイスに出会えるのです。
           </p>
         </div>
 
@@ -262,7 +265,7 @@ export default function Home() {
             <div>
               <h4 className="font-bold text-white mb-4">Medily</h4>
               <p className="text-sm leading-relaxed">
-                医療に関する質問と回答のためのコミュニティプラットフォーム。
+                医療の安心コミュニティ。
               </p>
             </div>
             <div>
@@ -285,7 +288,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2025 Medily. All rights reserved.</p>
+            <p>&copy; 2025 kururikururi. All rights reserved.</p>
           </div>
         </div>
       </footer>

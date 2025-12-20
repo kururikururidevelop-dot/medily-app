@@ -26,6 +26,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (displayName && displayName.length > 20) {
+      return NextResponse.json(
+        { error: 'Nickname must be 20 characters or less' },
+        { status: 400 }
+      );
+    }
+
     // Construct update data carefully to avoid undefined values overrides or Firestore errors
     const updateData: any = {};
     if (displayName !== undefined) updateData.displayName = displayName;

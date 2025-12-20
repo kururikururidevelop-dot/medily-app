@@ -51,7 +51,7 @@ const regionNames: Record<string, string> = {
 };
 
 const badgeClass =
-  'inline-flex items-center px-3 py-1 bg-[#2DB596]/5 border border-[#2DB596]/30 rounded-full text-sm font-semibold text-gray-800';
+  'inline-flex items-center px-3 py-1 bg-primary/5 border border-primary/30 rounded-full text-sm font-semibold text-gray-800';
 
 export default function AnswerPage() {
   useRequireAuth();
@@ -149,7 +149,7 @@ export default function AnswerPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <div className="animate-spin h-10 w-10 border-4 border-[#2DB596] border-t-transparent rounded-full" />
+        <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -187,7 +187,7 @@ export default function AnswerPage() {
 
           {/* 質問内容（タイトル+本文を同枠で強調、カテゴリ/地域はバッジ） */}
           <div className="space-y-3">
-            <div className="rounded-xl border border-[#2DB596]/30 bg-[#2DB596]/5 p-5 space-y-3">
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 space-y-3">
               {question.title && (
                 <h2 className="text-xl font-bold text-gray-900 whitespace-pre-wrap break-words">{question.title}</h2>
               )}
@@ -211,7 +211,7 @@ export default function AnswerPage() {
                   <label
                     key={index}
                     className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes(choice)
-                      ? 'border-[#2DB596] bg-[#2DB596]/5'
+                      ? 'border-primary bg-primary/5'
                       : 'border-gray-300 hover:bg-gray-50'
                       }`}
                   >
@@ -226,7 +226,7 @@ export default function AnswerPage() {
                           setFormData({ ...formData, choice: formData.choice.filter(c => c !== choice) });
                         }
                       }}
-                      className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                      className="w-4 h-4 text-primary focus:ring-primary rounded"
                     />
                     <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">
                       {String.fromCharCode(65 + index)}
@@ -238,7 +238,7 @@ export default function AnswerPage() {
             ) : (
               <div className="space-y-2">
                 <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('yes')
-                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  ? 'border-primary bg-primary/5'
                   : 'border-gray-300 hover:bg-gray-50'
                   }`}>
                   <input
@@ -252,13 +252,13 @@ export default function AnswerPage() {
                         setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'yes') });
                       }
                     }}
-                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                    className="w-4 h-4 text-primary focus:ring-primary rounded"
                   />
                   <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">A</span>
                   <span>はい</span>
                 </label>
                 <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('no')
-                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  ? 'border-primary bg-primary/5'
                   : 'border-gray-300 hover:bg-gray-50'
                   }`}>
                   <input
@@ -272,13 +272,13 @@ export default function AnswerPage() {
                         setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'no') });
                       }
                     }}
-                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                    className="w-4 h-4 text-primary focus:ring-primary rounded"
                   />
                   <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">B</span>
                   <span>いいえ</span>
                 </label>
                 <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.choice.includes('other')
-                  ? 'border-[#2DB596] bg-[#2DB596]/5'
+                  ? 'border-primary bg-primary/5'
                   : 'border-gray-300 hover:bg-gray-50'
                   }`}>
                   <input
@@ -292,7 +292,7 @@ export default function AnswerPage() {
                         setFormData({ ...formData, choice: formData.choice.filter(c => c !== 'other') });
                       }
                     }}
-                    className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                    className="w-4 h-4 text-primary focus:ring-primary rounded"
                   />
                   <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-gray-100 ml-3 mr-2">C</span>
                   <span>その他</span>
@@ -309,7 +309,7 @@ export default function AnswerPage() {
             <textarea
               value={formData.text}
               onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-              className="w-full p-3 min-h-48 md:min-h-56 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full p-3 min-h-48 md:min-h-56 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="回答を入力してください"
               required
             />
@@ -325,7 +325,7 @@ export default function AnswerPage() {
               type="text"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="例: 東京医科大学附属病院"
             />
           </div>
@@ -337,7 +337,7 @@ export default function AnswerPage() {
               type="url"
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="https://example.com"
             />
           </div>
@@ -370,7 +370,7 @@ export default function AnswerPage() {
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383]"
+              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark"
             >
               回答確定
             </button>

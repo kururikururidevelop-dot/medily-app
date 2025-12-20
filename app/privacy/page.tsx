@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Icon from '@/components/Icon';
 
 export default function PrivacyPage() {
   return (
@@ -13,7 +14,7 @@ export default function PrivacyPage() {
 
       <div className="max-w-screen-lg mx-auto px-4 py-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">プライバシーポリシー</h1>
-        
+
         <div className="bg-white rounded-lg shadow-md p-8 space-y-6">
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-4">1. 個人情報の収集</h2>
@@ -26,7 +27,21 @@ export default function PrivacyPage() {
               <li>生まれ年（任意）</li>
               <li>性別（任意）</li>
               <li>メールアドレスまたはLINE連携情報</li>
+              <li><strong>機微な個人情報（ユーザーが投稿等の形式で自ら提供する病歴、身体状況、体験談など）</strong></li>
             </ul>
+            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-gray-800">
+              <div className="flex items-start gap-3">
+                <span className="text-yellow-600 mt-0.5">
+                  <Icon name="warning_amber" size={20} />
+                </span>
+                <div className="space-y-1">
+                  <p className="font-bold text-yellow-900">ご注意</p>
+                  <p className="text-yellow-900/90 leading-relaxed">
+                    公開設定で投稿された内容は、インターネット上で誰でも閲覧可能になります。個人が特定されるような詳細な情報の記述には十分ご注意ください。
+                  </p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section>

@@ -104,12 +104,12 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
 
       {/* 説明 */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+        <div className="bg-primary-ultralight border border-primary/30 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Icon name="info" size={24} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+            <Icon name="info" size={24} className="text-primary-dark flex-shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-sm font-bold text-emerald-900 mb-1">未回答の質問が一覧で表示されています</h2>
-              <p className="text-sm text-emerald-700">
+              <h2 className="text-sm font-bold text-gray-900 mb-1">未回答の質問が一覧で表示されています</h2>
+              <p className="text-sm text-gray-700">
                 回答するにはLINEでログインが必要です。あなたの経験が誰かの役に立ちます。
               </p>
             </div>
@@ -158,7 +158,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
         {loading && questions.length === 0 ? (
           <div className="flex justify-center items-center py-12">
             <div className="inline-block animate-spin">
-              <Icon name="autorenew" size={40} className="text-emerald-600" />
+              <Icon name="autorenew" size={40} className="text-primary" />
             </div>
             <p className="text-gray-600 ml-3">読み込み中...</p>
           </div>
@@ -172,7 +172,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
             {questions.map((question) => (
               <Card
                 key={question.id}
-                className="p-5 hover:border-emerald-300"
+                className="p-5 hover:border-primary"
                 hoverable
               >
                 {/* 質問タイトル */}
@@ -236,7 +236,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
                 <Button
                   onClick={handleLoadMore}
                   variant="outline"
-                  className="px-8 py-3 hover:border-emerald-500 hover:text-emerald-700"
+                  className="px-8 py-3 hover:border-primary hover:text-primary-dark"
                 >
                   もっと見る
                 </Button>
@@ -246,7 +246,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
             {loading && page > 1 && (
               <div className="flex justify-center py-4">
                 <div className="inline-block animate-spin">
-                  <Icon name="autorenew" size={32} className="text-emerald-600" />
+                  <Icon name="autorenew" size={32} className="text-primary" />
                 </div>
               </div>
             )}
@@ -259,10 +259,10 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-600">
             <div className="flex gap-6">
-              <Link href="/terms" className="hover:text-emerald-600 transition-colors">
+              <Link href="/terms" className="hover:text-primary transition-colors">
                 利用規約
               </Link>
-              <Link href="/privacy" className="hover:text-emerald-600 transition-colors">
+              <Link href="/privacy" className="hover:text-primary transition-colors">
                 プライバシーポリシー
               </Link>
             </div>

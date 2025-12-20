@@ -216,7 +216,7 @@ function QuestionPostContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2DB596]"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -263,7 +263,7 @@ function QuestionPostContent() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="例）発熱が続くときの受診目安は？"
               maxLength={60}
               required
@@ -279,7 +279,7 @@ function QuestionPostContent() {
             <textarea
               value={formData.body}
               onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-3 min-h-48 md:min-h-56 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full border border-gray-300 rounded-lg p-3 min-h-48 md:min-h-56 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               placeholder="できるだけ具体的な相談内容を入力してください"
               required
             />
@@ -302,7 +302,7 @@ function QuestionPostContent() {
                     setFormData((prev) => ({ ...prev, choices: ['', ''] }));
                   }
                 }}
-                className="w-4 h-4 border-gray-300 text-[#2DB596] rounded focus:ring-[#2DB596]"
+                className="w-4 h-4 border-gray-300 text-primary rounded focus:ring-primary"
               />
               回答例から選択してもらう
             </label>
@@ -317,7 +317,7 @@ function QuestionPostContent() {
                       type="text"
                       value={choice}
                       onChange={(e) => updateChoice(index, e.target.value)}
-                      className="flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+                      className="flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder={`選択肢 ${index + 1}`}
                     />
                     {formData.choices.length > 2 && (
@@ -335,7 +335,7 @@ function QuestionPostContent() {
                   <button
                     type="button"
                     onClick={addChoice}
-                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-[#2DB596] hover:text-[#2DB596]"
+                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary hover:text-primary"
                   >
                     + 選択肢を追加
                   </button>
@@ -347,9 +347,9 @@ function QuestionPostContent() {
           {/* 注意書き */}
           <div className="space-y-3">
             <hr className="border-gray-200" />
-            <div className="bg-[#E9FBF6] border border-[#2DB596]/30 rounded-lg p-4 text-sm text-gray-800">
+            <div className="bg-primary-ultralight border border-primary/30 rounded-lg p-4 text-sm text-gray-800">
               <div className="flex items-start gap-2">
-                <span className="text-[#2DB596] mt-0.5">
+                <span className="text-primary mt-0.5">
                   <Icon name="info" size={18} />
                 </span>
                 <div>
@@ -368,7 +368,7 @@ function QuestionPostContent() {
             <select
               value={formData.regionIds[0] || ''}
               onChange={(e) => setFormData((prev) => ({ ...prev, regionIds: e.target.value ? [e.target.value] : [] }))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2DB596] focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               required
             >
               <option value="">選択してください</option>
@@ -429,7 +429,7 @@ function QuestionPostContent() {
                     <label
                       key={label}
                       className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${formData.ageGroups.includes(label)
-                        ? 'border-[#2DB596] bg-[#2DB596]/5'
+                        ? 'border-primary bg-primary/5'
                         : 'border-gray-200 hover:bg-gray-50'
                         }`}
                     >
@@ -442,7 +442,7 @@ function QuestionPostContent() {
                             : formData.ageGroups.filter((l) => l !== label);
                           setFormData({ ...formData, ageGroups: next });
                         }}
-                        className="w-4 h-4 text-[#2DB596] border-gray-300 rounded focus:ring-[#2DB596]"
+                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                       />
                       <span className="text-sm">{label}</span>
                     </label>
@@ -463,7 +463,7 @@ function QuestionPostContent() {
                           <label
                             key={cat.id}
                             className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.categoryIds.includes(cat.name)
-                              ? 'border-[#2DB596] bg-[#2DB596]/5'
+                              ? 'border-primary bg-primary/5'
                               : 'border-gray-300 hover:bg-gray-50'
                               }`}
                           >
@@ -471,9 +471,9 @@ function QuestionPostContent() {
                               type="checkbox"
                               checked={formData.categoryIds.includes(cat.name)}
                               onChange={() => handleCategoryChange(cat.name)}
-                              className="w-4 h-4 text-[#2DB596] focus:ring-[#2DB596] rounded"
+                              className="w-4 h-4 text-primary focus:ring-primary rounded"
                             />
-                            <Icon name={cat.icon} size={20} className="ml-3 text-[#2DB596]" />
+                            <Icon name={cat.icon} size={20} className="ml-3 text-primary" />
                             <span className="ml-2 text-gray-900">{cat.name}</span>
                           </label>
                         ))}
@@ -528,7 +528,7 @@ function QuestionPostContent() {
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 bg-[#2DB596] text-white rounded-lg font-medium hover:bg-[#26a383]"
+              className="flex-1 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark"
             >
               投稿確認
             </button>

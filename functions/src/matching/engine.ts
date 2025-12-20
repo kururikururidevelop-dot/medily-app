@@ -30,13 +30,7 @@ interface Question {
     createdAt: admin.firestore.Timestamp;
 }
 
-// Region adjacency map (Simplified for example)
-// In real app, this should be comprehensive.
-const ADJACENT_REGIONS: Record<string, string[]> = {
-    '東京都': ['神奈川県', '埼玉県', '千葉県', '山梨県'],
-    '神奈川県': ['東京都', '静岡県', '山梨県'],
-    // ... add all
-};
+// Region adjacency map is now fetched from DB
 
 export async function runMatchingForQuestion(questionId: string, isRetry = false) {
     logger.info(`Starting matching for question: ${questionId}`);
@@ -55,20 +49,22 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
     }
 
     // 1. Find Candidates
-    // Strategy: Fetch all users who have LINE consent = true.
-    // Note: In large scale, we should filter by region in query.
-    // But requirement says: If exact region 0, try adjacent.
-    // So let's try exact region query first.
-
     let candidates = await fetchCandidatesByRegion(question.region);
     let regionMatchLevel = 2; // Exact match points
 
     if (candidates.length === 0) {
-        // Try adjacent
-        const adjacent = ADJACENT_REGIONS[question.region] || [];
-        if (adjacent.length > 0) {
-            candidates = await fetchCandidatesByRegions(adjacent);
-            regionMatchLevel = 1; // Adjacent match points
+        // Try adjacent regions from Master DB
+        try {
+            const masterDoc = await db.collection('masters').doc(`region-${question.region}`).get();
+            const masterData = masterDoc.data();
+            const adjacent = masterData?.adjacentRegions || [];
+
+            if (adjacent.length > 0) {
+                candidates = await fetchCandidatesByRegions(adjacent);
+                regionMatchLevel = 1; // Adjacent match points
+            }
+        } catch (e) {
+            logger.error(`Failed to fetch region master for ${question.region}`, e);
         }
     }
 

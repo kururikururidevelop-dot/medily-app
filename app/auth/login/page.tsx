@@ -7,6 +7,9 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const next = searchParams.get('next');
+  const mode = searchParams.get('mode');
+  const isLoginMode = mode === 'login';
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,78 +56,71 @@ export default function LoginPage() {
     }
   };
 
-  const handleSkip = () => {
-    // TODO: 未ログイン状態でアクセス可能な画面へ遷移（例：PRサイト）
-    router.push('/');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-200">
-      {/* トップバー */}
-      <div className="flex items-center bg-gray-50 dark:bg-gray-900 p-4 pb-2 justify-between sticky top-0 z-10">
-        <button
-          onClick={handleSkip}
-          className="text-gray-900 dark:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="閉じる"
-        >
-          <Icon name="close" size={24} />
-        </button>
-        <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
-          アカウント連携
-        </h2>
-      </div>
+
 
       {/* メインコンテンツ */}
-      <main className="flex flex-col items-center pt-8 px-6 w-full max-w-md mx-auto">
+      <main className="max-w-screen-sm mx-auto px-6 py-8 w-full">
         {/* ロゴセクション */}
-        <div className="mb-8 flex flex-col items-center">
-          <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2DB596]/20 to-[#2DB596]/5 flex items-center justify-center mb-4 shadow-sm border border-[#2DB596]/10">
-            <Icon name="medical_services" size={48} className="text-[#2DB596]" />
+        {/* ヘッダー */}
+        <div className="text-center mb-8">
+          {/* ロゴ */}
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm border border-primary/10">
+              <Icon name="medical_services" size={40} className="text-primary" />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white tracking-tight">
-            Medily
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {isLoginMode ? 'おかえりなさい！' : 'LINE連携で始めよう'}
           </h1>
+          {!isLoginMode ? (
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Medilyを始めるために、アカウントを連携してください。
+            </p>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              下のボタンからログインしてください。
+            </p>
+          )}
         </div>
 
-        {/* ヘッドライン */}
-        <h2 className="text-gray-900 dark:text-white tracking-tight text-[24px] font-bold leading-tight text-center mb-6">
-          LINE連携で始めよう
-        </h2>
+        {/* ベネフィットリスト (新規登録時のみ表示) */}
+        {!isLoginMode && (
+          <div className="w-full bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
+            <ul className="space-y-5">
+              {/* リスト項目1 */}
+              <li className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                  <Icon name="check" size={20} className="text-primary font-bold" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-gray-900 dark:text-white text-base">
+                    ワンタップでログイン
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                    IDやパスワード入力の手間がありません
+                  </span>
+                </div>
+              </li>
 
-        {/* ベネフィットリスト */}
-        <div className="w-full bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
-          <ul className="space-y-5">
-            {/* リスト項目1 */}
-            <li className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2DB596]/10 flex items-center justify-center mt-0.5">
-                <Icon name="check" size={20} className="text-[#2DB596] font-bold" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-900 dark:text-white text-base">
-                  ワンタップでログイン
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                  IDやパスワード入力の手間がありません
-                </span>
-              </div>
-            </li>
-
-            {/* リスト項目2 */}
-            <li className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#2DB596]/10 flex items-center justify-center mt-0.5">
-                <Icon name="notifications_active" size={20} className="text-[#2DB596] font-bold" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-gray-900 dark:text-white text-base">
-                  リアルタイムな回答をすぐに通知
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                  欲しい回答を見逃さず確認できます
-                </span>
-              </div>
-            </li>
-          </ul>
-        </div>
+              {/* リスト項目2 */}
+              <li className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+                  <Icon name="notifications_active" size={20} className="text-primary font-bold" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-gray-900 dark:text-white text-base">
+                    リアルタイムな回答をすぐに通知
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                    欲しい回答を見逃さず確認できます
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        )}
 
         {/* エラーメッセージ */}
         {error && (
@@ -134,12 +130,12 @@ export default function LoginPage() {
         )}
 
         {/* アクションエリア */}
-        <div className="w-full flex flex-col gap-4 mb-6">
+        <div className="w-full flex flex-col items-center gap-4 mb-6">
           {/* LINEログインボタン */}
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full cursor-pointer flex items-center justify-center rounded-xl h-14 px-5 bg-[#06C755] hover:brightness-90 transition-all text-white gap-3 shadow-md relative group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full max-w-xs cursor-pointer flex items-center justify-center rounded-xl h-14 px-5 bg-[#06C755] hover:brightness-90 transition-all text-white gap-3 shadow-md relative group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <div className="flex items-center gap-3">
@@ -171,14 +167,14 @@ export default function LoginPage() {
           ログインすることで、
           <a
             href="/terms"
-            className="underline hover:text-[#2DB596] transition-colors"
+            className="underline hover:text-primary transition-colors"
           >
             利用規約
           </a>
           {' '}および{' '}
           <a
             href="/privacy"
-            className="underline hover:text-[#2DB596] transition-colors"
+            className="underline hover:text-primary transition-colors"
           >
             プライバシーポリシー
           </a>
