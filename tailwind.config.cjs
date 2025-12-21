@@ -23,6 +23,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-noto-sans-jp)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        pop: ['var(--font-mochiy-pop)', 'sans-serif'],
       },
     },
   },

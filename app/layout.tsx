@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_JP } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_JP, Mochiy_Pop_One } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +16,12 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
+});
+
+const mochiyPopOne = Mochiy_Pop_One({
+  variable: "--font-mochiy-pop",
+  weight: "400",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -37,7 +43,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoSansJP.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${notoSansJP.variable} ${mochiyPopOne.variable} antialiased`}
       >
         {children}
       </body>

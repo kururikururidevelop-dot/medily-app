@@ -59,6 +59,15 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
   const [answerStatus, setAnswerStatus] = useState<string[]>([]);
   const [answerCategories, setAnswerCategories] = useState<string[]>([]);
   const [expandedChains, setExpandedChains] = useState<Set<string>>(new Set());
+  const [imgError, setImgError] = useState(false);
+
+  // Debug State for Contribution Graphic
+  const [debugAnswerCount, setDebugAnswerCount] = useState(0);
+  const [debugThankerCount, setDebugThankerCount] = useState(3);
+
+  useEffect(() => {
+    if (summary.answers) setDebugAnswerCount(summary.answers);
+  }, [summary.answers]);
 
   // 質問データ取得（ページネーションとフィルタ用）
   const fetchQuestions = useCallback(
@@ -253,12 +262,25 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* ヘッダー */}
+      {/* ヘッダー */}
       <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Icon name="home" size={28} className="text-primary" />
-              <h1 className="text-2xl font-bold text-gray-800">ホーム</h1>
+              <span className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold overflow-hidden border border-emerald-200">
+                {avatarUrl && !imgError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt="プロフィール"
+                    className="w-full h-full object-cover"
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  <Icon name="account_circle" size={32} className="text-emerald-700/50" />
+                )}
+              </span>
+              <h1 className="text-xl font-bold text-gray-800">{userName || 'ユーザー'}</h1>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -266,27 +288,14 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
                 aria-label="通知"
                 title="通知"
               >
-                <Icon name="notifications" size={22} />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                <Icon name="notifications" size={24} />
+                <span className="absolute 0 0 w-2 h-2 bg-red-500 rounded-full" />
               </button>
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 text-gray-700"
-                aria-label="マイページ"
-                title="マイページ"
-              >
-                <span className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold overflow-hidden border border-emerald-200">
-                  {avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={avatarUrl} alt="プロフィール" className="w-full h-full object-cover" />
-                  ) : (
-                    (userName || 'ユーザー').slice(0, 1)
-                  )}
-                </span>
-              </Link>
+              {/* Profile Link Removed as requested */}
               <Button
                 href="/questions/post"
-                className="hidden md:flex"
+                className="hidden md:flex text-lg px-8 py-3"
+                size="lg"
                 icon="add"
               >
                 質問を投稿
@@ -296,7 +305,7 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
           <div className="md:hidden mt-3">
             <Button
               href="/questions/post"
-              className="w-full"
+              className="w-full py-4 text-lg"
               icon="add"
             >
               質問を投稿
@@ -305,52 +314,79 @@ export default function HomeClient({ initialData, summary, userName, userId, ava
         </div>
       </div>
 
-      {/* サマリー表示 */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Card className="flex flex-col gap-2 border-gray-100 bg-emerald-50 px-3 py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <Icon name="help" size={18} className="text-emerald-700" />
-              <span>質問数</span>
-            </div>
-            <div className="text-2xl font-bold text-emerald-700">{summary.questions}</div>
-            <div className="text-xs text-gray-600 flex flex-wrap gap-3">
-              <span className="flex items-center gap-1">
-                <Icon name="check_circle" size={14} className="text-purple-600" />
-                回答あり {summary.answeredQuestions} 件
-              </span>
-              <span className="flex items-center gap-1">
-                <Icon name="update" size={14} className="text-amber-600" />
-                新着あり {(data.latest || []).length} 件
-              </span>
-            </div>
-          </Card>
-
-          <Card className="flex flex-col gap-2 border-gray-100 bg-blue-50 px-3 py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <Icon name="chat" size={18} className="text-blue-700" />
-              <span>回答数</span>
-            </div>
-            <div className="text-2xl font-bold text-blue-700">{summary.answers}</div>
-          </Card>
-        </div>
-      </div>
-
       {/* メインコンテンツ */}
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-10">
-        {/* 貢献サマリー */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">貢献度グラフィック</h3>
-            <ContributionGraphic />
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* 貢献サマリー (Simplified) */}
+        {/* 貢献サマリー (Simplified) */}
+        <div className="flex flex-col items-center gap-4">
+          <Card className="p-6 w-full max-w-2xl">
+            <h3 className="text-lg font-bold text-gray-800 mb-2 text-center">貢献度＆サンキュー</h3>
+            <ContributionGraphic answerCount={debugAnswerCount} thankerCount={debugThankerCount} />
           </Card>
-          <Card className="p-6 flex flex-col">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">獲得サンキュー数</h3>
-            <ThankCount />
+
+          {/* Debug Controls (Temporary) */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 flex flex-wrap gap-6 items-center shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-500">回答数 (Level)</span>
+              <button
+                onClick={() => setDebugAnswerCount(Math.max(0, debugAnswerCount - 1))}
+                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+              >-</button>
+              <span className="w-8 text-center font-bold">{debugAnswerCount}</span>
+              <button
+                onClick={() => setDebugAnswerCount(debugAnswerCount + 1)}
+                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+              >+</button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-500">質問者数 (Bubbles)</span>
+              <button
+                onClick={() => setDebugThankerCount(Math.max(0, debugThankerCount - 1))}
+                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+              >-</button>
+              <span className="w-8 text-center font-bold">{debugThankerCount}</span>
+              <button
+                onClick={() => setDebugThankerCount(debugThankerCount + 1)}
+                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+              >+</button>
+            </div>
+          </div>
+        </div>
+
+        {/* サマリー表示 (Moved Here) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Card className="flex flex-col gap-2 border-emerald-100 bg-white px-6 py-5 shadow-sm h-full">
+            {/* Line 1: Icon, Title, Count */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <Icon name="help" size={20} />
+              </div>
+              <span className="text-base font-bold text-gray-700">自分の質問</span>
+              <div className="ml-auto flex items-baseline gap-1">
+                <span className="text-xl font-bold text-gray-900">{summary.questions}</span>
+                <span className="text-sm font-medium text-blue-600">件</span>
+              </div>
+            </div>
+            {/* Line 2: Details */}
+            <div className="text-xs text-gray-400 flex flex-wrap gap-3 pl-11">
+              <span>回答あり {summary.answeredQuestions} 件</span>
+              <span>新着あり {(data.latest || []).length} 件</span>
+            </div>
           </Card>
-          <Card className="p-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">貢献カテゴリ</h3>
-            <ContributionCategory />
+
+          <Card className="flex flex-col gap-2 border-blue-100 bg-white px-6 py-5 shadow-sm h-full">
+            {/* Line 1: Icon, Title, Count */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                <Icon name="chat" size={20} />
+              </div>
+              <span className="text-base font-bold text-gray-700">自分の回答</span>
+              <div className="ml-auto flex items-baseline gap-1">
+                <span className="text-xl font-bold text-gray-900">{summary.answers}</span>
+                <span className="text-sm font-medium text-purple-600">件</span>
+              </div>
+            </div>
           </Card>
         </div>
 
