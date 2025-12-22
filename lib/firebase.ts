@@ -14,6 +14,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+const isServer = typeof window === 'undefined';
 const isConfigured = Object.values(firebaseConfig).every(Boolean);
 
 if (!isConfigured) {
@@ -26,6 +27,8 @@ if (!isConfigured) {
     hasAppId: !!firebaseConfig.appId,
   });
 }
+
+console.log(`[Firebase] Initializing... IsServer=${isServer}, Env=${process.env.NODE_ENV}, AppEnv=${process.env.NEXT_PUBLIC_APP_ENV}`);
 
 const app = isConfigured
   ? getApps().length === 0
@@ -48,11 +51,13 @@ if (
   try {
     connectFirestoreEmulator(db, 'localhost', 8080);
     connectAuthEmulator(auth, 'http://localhost:9099');
-    console.log('[Firebase] Connected to emulators (Firestore: 8080, Auth: 9099)');
+    console.log(`[Firebase] Connected to emulators (Firestore: 8080, Auth: 9099) [IsServer=${isServer}]`);
   } catch (error) {
     // Emulator already connected, only log if it's a different error
     if (error instanceof Error && !error.message.includes('already')) {
       console.error('[Firebase] Emulator connection error:', error);
+    } else {
+      console.log(`[Firebase] Emulator already connected [IsServer=${isServer}]`);
     }
   }
 }

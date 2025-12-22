@@ -103,18 +103,30 @@ export async function GET(
       }
     }
 
+    const question = {
+      id: questionDoc.id,
+      ...questionData,
+      categories: questionData.categories || (questionData.category ? [questionData.category] : []),
+      choices: questionData.choices || [],
+      isPublic: questionData.isPublic ?? true,
+      status: questionData.status,
+      content: normalizedContent,
+      createdAt: questionData.createdAt instanceof Timestamp
+        ? questionData.createdAt.toDate().toLocaleString('ja-JP')
+        : questionData.createdAt,
+      updatedAt: questionData.updatedAt instanceof Timestamp
+        ? questionData.updatedAt.toDate().toLocaleString('ja-JP')
+        : questionData.updatedAt,
+      postedAt: (questionData.postedAt || questionData.createdAt) instanceof Timestamp
+        ? (questionData.postedAt || questionData.createdAt).toDate().toLocaleString('ja-JP')
+        : (questionData.postedAt || questionData.createdAt),
+      closedAt: questionData.closedAt instanceof Timestamp
+        ? questionData.closedAt.toDate().toLocaleString('ja-JP')
+        : questionData.closedAt,
+    };
+
     return NextResponse.json({
-      question: {
-        id: questionDoc.id,
-        ...questionData,
-        content: normalizedContent,
-        createdAt: questionData.createdAt instanceof Timestamp
-          ? questionData.createdAt.toDate().toLocaleString('ja-JP')
-          : questionData.createdAt,
-        updatedAt: questionData.updatedAt instanceof Timestamp
-          ? questionData.updatedAt.toDate().toLocaleString('ja-JP')
-          : questionData.updatedAt,
-      },
+      question,
       answers,
       parentQuestion,
     });

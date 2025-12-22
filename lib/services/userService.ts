@@ -21,10 +21,11 @@ export interface UserProfile {
     avatar?: string;
     pictureUrl?: string; // LINE profile image
     notificationConsent?: boolean;
-    profileCompletedAt?: any;
-    updatedAt?: any;
+    profileCompletedAt?: string;
+    updatedAt?: string;
     gender?: string;
     birthYear?: string;
+    rank?: number;
 }
 
 export interface UserSummary {
@@ -55,8 +56,9 @@ export const userService = {
             notificationConsent: data.notificationConsent,
             gender: data.gender,
             birthYear: data.birthYear,
-            profileCompletedAt: data.profileCompletedAt, // Keep raw or format? Keeping raw for now
-            updatedAt: data.updatedAt
+            profileCompletedAt: data.profileCompletedAt?.toDate?.().toISOString() || null,
+            updatedAt: data.updatedAt?.toDate?.().toISOString() || null,
+            rank: data.rank || 0
         };
     },
 

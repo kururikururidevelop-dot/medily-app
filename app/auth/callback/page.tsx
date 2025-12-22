@@ -31,7 +31,7 @@ export default function AuthCallbackPage() {
 
         const doLogin = async () => {
             try {
-                const userCredential = await signInWithCustomToken(auth, token);
+                const userCredential = await signInWithCustomToken(auth!, token);
                 const user = userCredential.user;
 
                 // Store userId for ProfileRegisterPage usage

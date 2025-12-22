@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import MasterFilter from '@/components/MasterFilter';
@@ -9,22 +9,23 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { useRouter } from 'next/navigation';
 import { Question } from '@/lib/services/questionService';
-
-// Ensure Question interface matches the service one or extend/adapt if needed
-// The service Question interface has all fields needed.
-// But the component uses `Question` interface locally defined. 
-// I should import `Question` from service if possible, or adapt.
-// Service `Question` has `answerCount`, `createdAt` as string.
-// Local interface: 
-// interface Question { ... answerCount: number; createdAt: string; ... } => Matches.
+import { MasterItem } from '@/lib/services/masterService';
 
 interface PublicQuestionsClientProps {
   initialQuestions: Question[];
   initialHasMore: boolean;
   initialPage: number;
+  initialCategories: MasterItem[];
+  initialRegions: MasterItem[];
 }
 
-export default function PublicQuestionsClient({ initialQuestions, initialHasMore, initialPage }: PublicQuestionsClientProps) {
+export default function PublicQuestionsClient({
+  initialQuestions,
+  initialHasMore,
+  initialPage,
+  initialCategories,
+  initialRegions
+}: PublicQuestionsClientProps) {
   const router = useRouter();
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [loading, setLoading] = useState(false); // Initial load is done by Server
@@ -33,13 +34,11 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
   const [page, setPage] = useState(initialPage);
   const [hasMore, setHasMore] = useState(initialHasMore);
 
-  // When filters change, we need to fetch again (Client Side)
-  // But initial render should NOT fetch if filters are empty.
-  // HOWEVER, initial render has empty filters.
-  // We need to skip the first effect trigger if it matches initial state?
-  // Or just rely on the fact that initial data IS expected result for empty filters.
-  // Currently `useEffect` calls `fetchQuestions(1)` on mount because `region` and `category` are [].
-  // If we want to use initial data, we should skip this first fetch.
+  const categoryMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    initialCategories.forEach((c) => map[c.id] = c.name);
+    return map;
+  }, [initialCategories]);
 
   const [isFirstRender, setIsFirstRender] = useState(true);
 
@@ -55,13 +54,19 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
   const fetchQuestions = async (pageNum: number) => {
     setLoading(true);
     try {
-      let url = `/api/questions?public=true&status=open&limit=10&page=${pageNum}`;
+      let url = `/api/questions?public=true&limit=10&page=${pageNum}`;
+      // Add status filters for "Open" questions
+      ['open', 'matching', 'waiting_for_answer', 'matching_failed'].forEach(s => {
+        url += `&status=${s}`;
+      });
+
       if (region.length > 0) {
         region.forEach((r) => {
           url += `&region=${encodeURIComponent(r)}`;
         });
       }
       if (category.length > 0) {
+        // category param handles array in API
         category.forEach((cat) => {
           url += `&category=${encodeURIComponent(cat)}`;
         });
@@ -128,6 +133,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
               grouped
               value={region}
               onChange={setRegion}
+              options={initialRegions}
             />
             <MasterFilter
               title="カテゴリで絞り込み"
@@ -136,6 +142,7 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
               grouped
               value={category}
               onChange={setCategory}
+              options={initialCategories}
             />
           </div>
         </Card>
@@ -185,32 +192,23 @@ export default function PublicQuestionsClient({ initialQuestions, initialHasMore
                 <div className="flex items-center flex-wrap gap-y-2 gap-x-3 text-xs text-gray-500 mb-4">
                   <span className="flex items-center gap-1">
                     <Icon name="schedule" size={14} />
-                    {new Date(question.createdAt).toLocaleString('ja-JP', {
+                    {new Date(question.postedAt || question.createdAt).toLocaleString('ja-JP', {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',
                       hour: '2-digit',
                       minute: '2-digit',
-                      // Formatting here re-formats the string or already formatted string?
-                      // The service returns localized string. `new Date(string)` might fail or vary.
-                      // If service returns "2023/01/01 12:00:00", new Date() works in standard browsers.
-                      // But better to trust the string if it's already formatted?
-                      // The existing code was: new Date(question.createdAt).toLocaleString.
-                      // The service returns string formatted by `toLocaleString('ja-JP')`.
-                      // So `new Date("2023/1/1 12:00:00")` works.
-                      // I will leave it as is if it works, or just display string if already formatted.
-                      // The service `formatDate` output `toLocaleString('ja-JP')`.
-                      // This might produce "2023/1/1 12:00:00".
-                      // `new Date` on it works.
                     })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Icon name="person" size={14} />
                     {question.authorName}
                   </span>
-                  <Badge variant="success" icon="category" className="text-xs py-0.5 px-2">
-                    {question.category}
-                  </Badge>
+                  {question.categories && question.categories.length > 0 && (
+                    <Badge variant="success" icon="category" className="text-xs py-0.5 px-2">
+                      {categoryMap[question.categories[0]] || question.categories[0]}
+                    </Badge>
+                  )}
                   <Badge variant="default" icon="location_on" className="text-xs py-0.5 px-2">
                     {question.region}
                   </Badge>

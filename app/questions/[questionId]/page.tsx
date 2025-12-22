@@ -1,7 +1,7 @@
-
 import { questionService } from '@/lib/services/questionService';
 import QuestionDetailClient from './QuestionDetailClient';
 import { notFound } from 'next/navigation';
+import { masterService } from '@/lib/services/masterService';
 
 interface Props {
   params: Promise<{
@@ -14,26 +14,29 @@ export const dynamic = 'force-dynamic';
 export default async function QuestionDetailPage({ params }: Props) {
   const { questionId } = await params;
 
-  // Parallel fetch: Question+Answers, and Siblings
-  const [data, siblings] = await Promise.all([
+  // Fetch current question and master data in parallel
+  const [data, masterCategories] = await Promise.all([
     questionService.getQuestionById(questionId),
-    questionService.getQuestionSiblings(questionId)
+    masterService.getCategoryMap()
   ]);
 
   if (!data || !data.question) {
     notFound();
   }
 
-  // AuthorName filling?
-  // If `authorName` was not in DB, we might want to fetch it from userService?
-  // But for now, assuming it's in data or acceptable as is (backward compat).
+  // Chain Navigation Logic:
+  // Prev: Parent Question
+  // Next: First Child (Chain continues)
+  const prevQuestionId = data.question.parentQuestionId || null;
+  const nextQuestionId = await questionService.getNextChainQuestion(questionId);
 
   return (
     <QuestionDetailClient
       initialQuestion={data.question}
       initialAnswers={data.answers}
-      initialPrevId={siblings.prevQuestionId}
-      initialNextId={siblings.nextQuestionId}
+      initialPrevId={prevQuestionId}
+      initialNextId={nextQuestionId}
+      masterCategories={masterCategories}
     />
   );
 }

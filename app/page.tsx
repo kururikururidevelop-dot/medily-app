@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { masterService } from '@/lib/services/masterService';
 
 async function fetchPublicQuestions() {
   if (!db) return [];
@@ -297,7 +298,15 @@ export default function Home() {
 }
 
 async function QuestionExamples() {
-  const questions = await fetchPublicQuestions();
+  const [questions, categories, regions] = await Promise.all([
+    fetchPublicQuestions(),
+    masterService.getMasters('category'),
+    masterService.getMasters('region')
+  ]);
+
+  const categoryMap = Object.fromEntries(categories.map(c => [c.id, c.name]));
+  const regionMap = Object.fromEntries(regions.map(r => [r.id, r.name]));
+
   if (!questions.length) {
     return (
       <div className="text-center text-gray-600">公開質問の例は現在ありません。</div>
@@ -307,12 +316,14 @@ async function QuestionExamples() {
     <div className="grid md:grid-cols-3 gap-6">
       {questions.map((q: any) => (
         <Card key={q.id} className="p-6 border-gray-100 hover:shadow-md">
-          <div className="text-sm text-gray-500 mb-2">{q.region}・{q.category}</div>
+          <div className="text-sm text-gray-500 mb-2">
+            {regionMap[q.region] || q.region}・{categoryMap[q.category] || q.category}
+          </div>
           <h4 className="text-lg font-bold text-gray-900 mb-2">{q.title ?? '質問'}</h4>
-          <p className="text-gray-700 text-sm line-clamp-3 mb-4">{q.content ?? q.body}</p>
+          <p className="text-gray-700 text-sm line-clamp-3 mb-4">{q.content ?? q.body ?? q.description}</p>
           <div className="flex items-center justify-between text-sm text-gray-500">
             <span>回答数: {q.answerCount ?? 0}</span>
-            <Link href="/questions" className="text-primary hover:underline">詳細を見る</Link>
+            <Link href={`/questions/${q.id}`} className="text-primary hover:underline">詳細を見る</Link>
           </div>
         </Card>
       ))}

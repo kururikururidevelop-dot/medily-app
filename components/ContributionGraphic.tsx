@@ -1,65 +1,18 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import Icon from './Icon';
+import React, { useState, useEffect } from 'react';
+import Avatar from './Avatar';
+import { calculateRank, calculateStep, getFlowerIcon, getRankTitle, MAX_RANK } from '@/lib/rankUtils';
+import { UserProfile } from '@/lib/services/userService';
 
 type Props = {
   answerCount?: number;
-  thankerCount?: number;
-};
-// ... (rest of file)
-
-// Mock data generator
-const getMockThankers = (count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i + 1,
-    name: `User ${i + 1}`,
-    color: ['bg-blue-100 text-blue-600', 'bg-red-100 text-red-600', 'bg-green-100 text-green-600', 'bg-yellow-100 text-yellow-600', 'bg-purple-100 text-purple-600', 'bg-pink-100 text-pink-600'][i % 6]
-  }));
+  thankers?: UserProfile[];
 };
 
-export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 }: Props) {
-  // Logic: Cycle of 3. 
-  // Rank 1: 1 ans(1/3), 2 ans(2/3), 3 ans(Full/RankUp).
-  // Rank 2: 4 ans(1/3 - Start with 1 lit), 5 ans(2/3), 6 ans(Full)...
-  const ANSWERS_PER_RANK = 3;
-  const MAX_RANK = 6;
-
-  const currentRank = Math.max(1, Math.min(MAX_RANK, Math.floor((answerCount - 1) / ANSWERS_PER_RANK) + 1));
-
-  // Steps in current rank logic:
-  // If count is 0, step is 0.
-  // If count > 0, ((count - 1) % 3) + 1.
-  const currentStep = answerCount === 0 ? 0 : ((answerCount - 1) % ANSWERS_PER_RANK) + 1;
-
-  // ... (rest of file)
-
-  {/* Pop Rank Title */ }
-  <div className="mt-4 text-center">
-    <h4 className={`text-2xl font-black tracking-wider drop-shadow-sm font-pop ${currentRank === 6
-      ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-pulse scale-110"
-      : "text-gray-800"
-      }`}>
-      {currentRank === 1 && <span className="text-blue-500">デビュー！</span>}
-      {currentRank === 2 && <span className="text-emerald-500">いい感じ！</span>}
-      {currentRank === 3 && <span className="text-teal-500">すてき！</span>}
-      {currentRank === 4 && <span className="text-pink-500">さすが！</span>}
-      {currentRank === 5 && <span className="text-amber-500">神対応！</span>}
-      {currentRank === 6 && "最高！"}
-    </h4>
-  </div>
-
-  // Flower Icon per Stage
-  const getFlowerIcon = (rank: number) => {
-    switch (rank) {
-      case 1: return { name: 'water_drop', size: 40, color: 'text-blue-400' };
-      case 2: return { name: 'grass', size: 50, color: 'text-emerald-400' };
-      case 3: return { name: 'eco', size: 60, color: 'text-teal-500' };
-      case 4: return { name: 'local_florist', size: 70, color: 'text-pink-400' };
-      case 5: return { name: 'emoji_nature', size: 75, color: 'text-amber-500' };
-      case 6: return { name: 'volunteer_activism', size: 75, color: 'text-rose-500' };
-      default: return { name: 'local_florist', size: 70, color: 'text-pink-400' };
-    }
-  };
-
+export default function ContributionGraphic({ answerCount = 0, thankers = [] }: Props) {
+  const thankerCount = thankers.length;
+  const currentRank = calculateRank(answerCount);
+  const currentStep = calculateStep(answerCount, currentRank);
+  const title = getRankTitle(currentRank);
   const flower = getFlowerIcon(currentRank);
 
   // Gauge Segment Logic
@@ -76,17 +29,20 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
   const dashArray = `${segmentLength} ${circumference}`; // Draw 1 segment then gap for rest
 
   // Thankers Logic
-  const allThankers = useMemo(() => getMockThankers(thankerCount), [thankerCount]);
-  const visibleThankers = allThankers.slice(0, 6);
-  const remainingCount = Math.max(0, allThankers.length - 6);
+  const visibleThankers = thankers.slice(0, 6);
+  const remainingCount = Math.max(0, thankerCount - 6);
 
-  // Bubbles Logic (Max 10)
-  const [bubbles, setBubbles] = useState<{ id: number; delay: number; duration: number; marginLeft: number; bottom: number; }[]>([]);
+  // Bubbles Logic (Max 12)
+  const [bubbles, setBubbles] = useState<{ id: number; delay: number; duration: number; marginLeft: number; bottom: number; name: string }[]>([]);
+
+  // Stable dependency for useEffect
+  const thankerIds = thankers.map(t => t.id || 'unknown').join(',');
 
   useEffect(() => {
     const bubbleCount = Math.min(12, thankerCount);
     const newBubbles = Array.from({ length: bubbleCount }, (_, i) => ({
       id: i,
+      name: thankers[i]?.displayName || 'ユーザー',
       // Randomize timing only
       delay: Math.random() * 4, // 0s to 4s delay for more variance
       duration: 3 + Math.random() * 1, // Slight duration variance 3s-4s
@@ -95,7 +51,7 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
       bottom: 20, // Fixed bottom start
     }));
     setBubbles(newBubbles);
-  }, [thankerCount]);
+  }, [thankerCount, thankerIds]); // Removed thankers array from deps (using thankerIds and count)
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center pb-4 relative overflow-hidden">
@@ -106,6 +62,18 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
           80% { opacity: 1; transform: translateY(-30px); }
           100% { opacity: 0; transform: translateY(-40px); }
         }
+        @keyframes sway {
+          0%, 100% { transform: rotate(-10deg); }
+          50% { transform: rotate(10deg); }
+        }
+        @keyframes vertical-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-sway { animation: sway 3s ease-in-out infinite; }
+        .animate-vertical-bounce { animation: vertical-bounce 1.5s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
+        .animate-ping-slow { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
       `}</style>
 
       {/* Main Graphic Container */}
@@ -113,6 +81,17 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
 
         {/* Background Track SVG */}
         <svg className="absolute inset-0 w-full h-full rotate-[150deg]" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ff0000" />
+              <stop offset="20%" stopColor="#ffff00" />
+              <stop offset="40%" stopColor="#00ff00" />
+              <stop offset="60%" stopColor="#00ffff" />
+              <stop offset="80%" stopColor="#0000ff" />
+              <stop offset="100%" stopColor="#ff00ff" />
+              <animateTransform attributeName="gradientTransform" type="rotate" from="0 .5 .5" to="360 .5 .5" dur="3s" repeatCount="indefinite" />
+            </linearGradient>
+          </defs>
           {[0, 1, 2].map((i) => (
             <circle
               key={i}
@@ -131,12 +110,15 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
         <svg className="absolute inset-0 w-full h-full rotate-[150deg]" viewBox="0 0 100 100">
           {[0, 1, 2].map((i) => {
             const isActive = i < currentStep;
+            // Apply Rainbow Gradient if Rank 6, otherwise Theme Color
+            const strokeColor = currentRank === 6 ? "url(#rainbow-gradient)" : flower.stroke;
+
             return (
               <circle
                 key={i}
                 cx="50" cy="50" r="44"
                 fill="transparent"
-                stroke="#13ec5b" // primary
+                stroke={strokeColor}
                 strokeWidth="8"
                 strokeDasharray="75 200"
                 strokeLinecap="round"
@@ -147,14 +129,16 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
           })}
         </svg>
 
-        {/* Center Flower */}
-        <div className="w-40 h-40 rounded-full bg-gradient-to-tr from-green-50 to-green-100 flex items-center justify-center border border-green-500/20 shadow-inner relative z-10">
-          <Icon name={flower.name} size={88} className={`${flower.color} drop-shadow-sm transition-all duration-500`} />
+        {/* Center Flower (Emoji Render) */}
+        <div className={`w-40 h-40 rounded-full bg-gradient-to-tr ${flower.bg} flex items-center justify-center border ${flower.border} shadow-inner relative z-10 transition-colors duration-500`}>
+          <span className={`${flower.size} drop-shadow-sm select-none ${flower.animation}`} style={{ lineHeight: 1 }}>
+            {flower.char}
+          </span>
 
-          {/* No Next Label */}
+          {/* No Next Label if Max */}
           {currentRank >= MAX_RANK && (
             <div className="absolute bottom-6">
-              <span className="text-xs text-yellow-600 font-bold">MAX</span>
+              <span className="text-xs text-yellow-600 font-bold hidden">MAX</span>
             </div>
           )}
         </div>
@@ -185,7 +169,7 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
             }}
           >
             <div
-              className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-2xl rounded-bl-none shadow-sm border border-green-500/20 text-[11px] font-bold text-gray-800 whitespace-nowrap"
+              className={`bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-2xl rounded-bl-none shadow-sm border ${flower.border} text-[11px] font-bold text-gray-800 whitespace-nowrap`}
               style={{
                 animation: `float-pop ${b.duration}s ease-in-out infinite`,
                 animationDelay: `${b.delay}s`
@@ -200,40 +184,28 @@ export default function ContributionGraphic({ answerCount = 0, thankerCount = 0 
       {/* Stacked Thankers */}
       <div className="flex items-center justify-center -space-x-3 mt-4 relative z-10 w-full px-8">
         {visibleThankers.map((u, i) => (
-          <div
-            key={u.id}
-            className={`w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold shadow-sm ${u.color} shrink-0`}
-            title={u.name}
-          >
-            {u.name.slice(0, 1)}
+          <div key={u.id || i} className="relative z-10 hover:z-20 transition-all hover:scale-110">
+            <Avatar
+              src={u.pictureUrl || u.avatar}
+              alt={u.displayName}
+              size="md"
+              className="border-2 border-white shadow-sm"
+            />
           </div>
         ))}
         {remainingCount > 0 && (
-          <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0 shadow-sm relative">
+          <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shrink-0 shadow-sm relative z-0">
             +{remainingCount}
           </div>
         )}
       </div>
 
-      {/* Current Level Text (Optional - kept for context or remove if purely matching design? 
-          Reference design doesn't show this text explicitly in the snippet, 
-          but usually helpful. I'll keep it subtle.) 
-      */}
       {/* Pop Rank Title */}
       <div className="mt-4 text-center">
-        <h4 className={`text-3xl font-bold drop-shadow-sm font-pop ${currentRank === 6
-          ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-pulse scale-110"
-          : "text-gray-800"
-          }`}>
-          {currentRank === 1 && <span className="text-blue-500">デビュー！</span>}
-          {currentRank === 2 && <span className="text-emerald-500">いい感じ！</span>}
-          {currentRank === 3 && <span className="text-teal-500">すてき！</span>}
-          {currentRank === 4 && <span className="text-pink-500">さすが！</span>}
-          {currentRank === 5 && <span className="text-amber-500">神対応！</span>}
-          {currentRank === 6 && "最高！"}
+        <h4 className={`text-3xl font-bold drop-shadow-sm font-pop ${title.color}`}>
+          {title.text}
         </h4>
       </div>
-
     </div>
   );
 }

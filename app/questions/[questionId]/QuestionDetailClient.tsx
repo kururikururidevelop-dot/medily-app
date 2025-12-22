@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
 import { Question, Answer } from '@/lib/services/questionService';
+import Badge from '@/components/ui/Badge';
+import Avatar from '@/components/Avatar';
 
 interface QuestionDetailClientProps {
     initialQuestion: Question | null;
     initialAnswers: Answer[];
     initialPrevId: string | null;
     initialNextId: string | null;
+    masterCategories: Record<string, string>;
     error?: string;
 }
 
@@ -20,22 +23,34 @@ export default function QuestionDetailClient({
     initialAnswers,
     initialPrevId,
     initialNextId,
+    masterCategories,
     error: initialError
 }: QuestionDetailClientProps) {
     useRequireAuth();
     const router = useRouter();
 
-    // State is initialized from Server Props
+    const [isConditionsOpen, setIsConditionsOpen] = useState(false);
     const [question, setQuestion] = useState<Question | null>(initialQuestion);
     const [answers, setAnswers] = useState<Answer[]>(initialAnswers);
     const [prevQuestionId, setPrevQuestionId] = useState<string | null>(initialPrevId);
     const [nextQuestionId, setNextQuestionId] = useState<string | null>(initialNextId);
     const [error, setError] = useState<string | null>(initialError || null);
 
-    // No need for initial fetch useEffects anymore!
+    // Sync state with props (Debugging: Ensure fresh data on navigation)
+    useEffect(() => {
+        setQuestion(initialQuestion);
+        setAnswers(initialAnswers);
+    }, [initialQuestion, initialAnswers]);
+
+
+
+    // Logic for "Additional Question" (Add Child)
+    // Allowed if: (No Parent i.e. Root) OR (Has Parent AND Latest)
+    // Root question has no parent -> Can always add (start chain/branch)
+    // Child question -> Can only add if it's the latest in its chain
+    const shouldShowAddButton = !question?.parentQuestionId || !nextQuestionId;
 
     if (error) {
-        /* Error view logic */
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
@@ -69,9 +84,13 @@ export default function QuestionDetailClient({
         );
     }
 
+    // Categories Display Logic
+    // Categories Display Logic
+    const catIds = question.categories || [];
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* ヘッダー */}
+        <div className="min-h-screen bg-gray-50 pb-20">
+            {/* Header (Simplified) */}
             <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
                     <button
@@ -81,118 +100,223 @@ export default function QuestionDetailClient({
                         <Icon name="arrow_back" size={24} />
                         戻る
                     </button>
-                    <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                            <Icon name="share" size={20} className="text-gray-600" />
-                        </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                            <Icon name="more_vert" size={20} className="text-gray-600" />
-                        </button>
-                    </div>
+                    {/* Share/Hamburger Removed */}
                 </div>
             </div>
 
-            {/* メインコンテンツ */}
+            {/* Main Content */}
             <div className="max-w-3xl mx-auto px-4 py-8">
-                {/* 質問詳細 */}
-                <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                            {question.category}
-                        </span>
-                        <span className="text-sm text-gray-500">{question.region}</span>
-                    </div>
 
-                    <h1 className="text-3xl font-bold text-gray-800 mb-4">{question.title}</h1>
-
-                    <p className="text-gray-700 whitespace-pre-wrap mb-6 leading-relaxed">
-                        {question.content}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div>
-                            <p className="font-semibold text-gray-800">{question.authorName}</p>
-                            <p className="text-xs text-gray-500">{question.createdAt}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {/* 追加質問ボタン - 次の質問がない場合のみ表示（チェーンの最後） */}
-                            {!nextQuestionId && (
-                                <button
-                                    onClick={() => router.push(`/questions/post?parentQuestionId=${question.id}`)}
-                                    className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold"
-                                >
-                                    追加質問
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* エラーメッセージ */}
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-sm text-red-700">{error}</p>
-                    </div>
-                )}
-
-                {/* 回答一覧 */}
-                <div>
-                    <h2 className="text-lg font-bold text-gray-800 mb-4">回答 ({answers.length})</h2>
-
-                    {answers.length === 0 ? (
-                        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-                            <Icon name="message" size={40} className="text-gray-300 mx-auto mb-2" />
-                            <p className="text-gray-600">まだ回答がありません</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {answers.map((answer) => (
-                                <div
-                                    key={answer.id}
-                                    className="bg-white rounded-lg p-6 border border-gray-200 hover:border-gray-300 transition-colors"
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div>
-                                            <p className="font-semibold text-gray-800">{answer.authorName}</p>
-                                            <p className="text-xs text-gray-500">{answer.createdAt}</p>
-                                        </div>
-                                        <span className="text-xs text-gray-400">回答</span>
-                                    </div>
-
-                                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
-                                        {answer.content}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* 前へ・次へ ナビゲーション */}
+                {/* Prev/Next Navigation (Moved to Top) */}
                 {(prevQuestionId || nextQuestionId) && (
-                    <div className="mt-8 flex items-center justify-between">
+                    <div className="mb-6 flex items-center justify-between">
                         <button
                             disabled={!prevQuestionId}
-                            onClick={() => prevQuestionId && router.push(`/questions/${prevQuestionId}`)}
-                            className={`px-4 py-2 rounded-lg border ${prevQuestionId
+                            onClick={() => prevQuestionId && router.replace(`/questions/${prevQuestionId}`)}
+                            className={`px-4 py-2 rounded-lg border flex items-center gap-1 transition-colors ${prevQuestionId
                                 ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
                                 : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
-                            <Icon name="chevron_left" size={18} className="inline mr-1" /> 前の質問
+                            <Icon name="chevron_left" size={18} /> 前の質問
                         </button>
                         <button
                             disabled={!nextQuestionId}
-                            onClick={() => nextQuestionId && router.push(`/questions/${nextQuestionId}`)}
-                            className={`px-4 py-2 rounded-lg border ${nextQuestionId
+                            onClick={() => nextQuestionId && router.replace(`/questions/${nextQuestionId}`)}
+                            className={`px-4 py-2 rounded-lg border flex items-center gap-1 transition-colors ${nextQuestionId
                                 ? 'bg-white hover:bg-gray-50 border-gray-300 text-gray-700'
                                 : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
-                            次の質問 <Icon name="chevron_right" size={18} className="inline ml-1" />
+                            次の質問 <Icon name="chevron_right" size={18} />
                         </button>
                     </div>
                 )}
+
+                {/* Question Detail */}
+                <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200 shadow-sm space-y-8">
+
+                    {/* Date Header */}
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                            <Icon name="schedule" size={14} />
+                            {question.postedAt || question.createdAt}
+                        </span>
+                    </div>
+
+                    {/* Title & Body */}
+                    <div className="space-y-4">
+                        {/* Author Info */}
+                        <div className="flex items-center gap-3">
+                            <Avatar src={question.authorAvatarUrl} alt={question.authorName || 'ユーザー'} size="sm" />
+                            <span className="font-bold text-gray-800">{question.authorName || 'ユーザー'}</span>
+                        </div>
+
+                        <h1 className="text-2xl font-bold text-gray-900 break-words leading-tight">{question.title}</h1>
+                        <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{question.description}</p>
+                    </div>
+
+                    {/* Choices (回答例) */}
+                    {question.choices && question.choices.length > 0 && question.choices.some(c => c.trim()) && (
+                        <div className="space-y-2">
+                            <p className="text-sm font-semibold text-gray-900">回答例</p>
+                            <div className="space-y-1">
+                                {question.choices.filter(c => c.trim()).map((choice, i) => (
+                                    <div key={i} className="text-base flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                        <span className="w-6 h-6 inline-flex items-center justify-center text-xs font-semibold text-gray-700 border border-gray-300 rounded-full bg-white">
+                                            {String.fromCharCode(65 + i)}
+                                        </span>
+                                        <span className="text-gray-800 font-medium">{choice}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Collapsible Matching Conditions */}
+                    <div>
+                        <button
+                            onClick={() => setIsConditionsOpen(!isConditionsOpen)}
+                            className="flex items-center gap-2 text-gray-700 hover:text-primary font-semibold py-2 w-full text-left transition-colors"
+                        >
+                            <Icon name={isConditionsOpen ? 'expand_less' : 'expand_more'} size={24} />
+                            <span>マッチング条件</span>
+                        </button>
+
+                        {isConditionsOpen && (
+                            <div className="mt-4 space-y-6 p-4 border border-gray-200 rounded-lg">
+
+                                {/* Region */}
+                                <div className="space-y-1">
+                                    <p className="text-sm font-semibold text-gray-900">地域</p>
+                                    <p className="text-base text-gray-800">{question.region}</p>
+                                </div>
+
+                                {/* Gender */}
+                                {question.genderFilter && question.genderFilter !== 'none' && (
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-semibold text-gray-900">回答相手の性別</p>
+                                        <p className="text-base text-gray-800">
+                                            {question.genderFilter === 'male' ? '男性' : question.genderFilter === 'female' ? '女性' : 'その他・指定しない'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Age */}
+                                {question.ageGroups && question.ageGroups.length > 0 && (
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-semibold text-gray-900">回答相手の年代</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {question.ageGroups.map(age => (
+                                                <span key={age} className="inline-flex items-center px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-sm font-semibold text-gray-800">
+                                                    {age}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Categories */}
+                                <div className="space-y-1">
+                                    <p className="text-sm font-semibold text-gray-900">関連するカテゴリ</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {catIds.map((catId, idx) => (
+                                            <span key={idx} className="inline-flex items-center px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-sm font-semibold text-gray-800">
+                                                {masterCategories[catId] || catId}
+                                            </span>
+                                        ))}
+                                        {catIds.length === 0 && (
+                                            <span className="text-xs text-gray-400">カテゴリーなし</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons (Add Question) - Only show if logic permits */}
+                    {shouldShowAddButton && (
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => router.push(`/questions/post?parentQuestionId=${question.id}`)}
+                                className="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-base flex items-center gap-2 shadow-sm transition-colors"
+                            >
+                                <Icon name="add_circle" size={20} />
+                                追加質問
+                            </button>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* Answer Form Removed */}
+
+                {/* Answer List */}
+                <div>
+                    <div className="flex items-center gap-2 mb-4">
+                        <h2 className="text-lg font-bold text-gray-800">回答 ({answers.length})</h2>
+                    </div>
+
+                    {answers.length === 0 ? (
+                        <div className="text-center py-12 bg-white rounded-lg border border-gray-200 text-gray-400">
+                            <Icon name="message" size={40} className="mx-auto mb-2 opacity-50" />
+                            <p>まだ回答がありません</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {[...answers]
+                                .sort((a, b) => new Date(b.answeredAt || b.createdAt).getTime() - new Date(a.answeredAt || a.createdAt).getTime())
+                                .map((answer) => (
+                                    <div key={answer.id} className="bg-white rounded-lg p-6 border border-gray-200">
+
+                                        {/* Row 1: Date */}
+                                        <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                                            <Icon name="schedule" size={14} />
+                                            <span>
+                                                {new Date(answer.answeredAt || answer.createdAt).toLocaleString('ja-JP', {
+                                                    year: 'numeric',
+                                                    month: '2-digit',
+                                                    day: '2-digit',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </span>
+                                        </div>
+
+                                        {/* Row 2: Profile Image & Name */}
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <Avatar
+                                                src={answer.authorAvatarUrl}
+                                                alt={answer.authorName || '回答者'}
+                                                size="md"
+                                            />
+                                            <p className="font-bold text-gray-900 text-base">
+                                                {answer.authorName || '回答者'}
+                                            </p>
+                                        </div>
+
+                                        {/* Row 3+: Content THEN Choices */}
+                                        <div className="space-y-3 pl-1">
+                                            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed text-base">
+                                                {answer.content}
+                                            </p>
+
+                                            {answer.choices && answer.choices.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {answer.choices.map((c, i) => (
+                                                        <span key={i} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold border border-blue-100">
+                                                            {c}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

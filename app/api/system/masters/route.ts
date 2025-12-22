@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const items = snap.docs.map((doc) => {
       const data = doc.data() as any;
       return {
-        id: doc.id,
+        id: data.id || doc.id,
         name: data.name || data.label || '名称未設定',
         description: data.description || '',
         group: data.group || null,

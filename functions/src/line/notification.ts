@@ -17,8 +17,8 @@ export const onQuestionCreated = onDocumentCreated("questions/{questionId}", asy
     const questionId = event.params.questionId;
     const data = snapshot.data();
 
-    // Only run if status is open (it should be on create)
-    if (data.status === 'open') {
+    // Run matching if status is 'matching' (new initial status)
+    if (data.status === 'matching' || data.status === 'open') {
         logger.info(`New Question Created: ${questionId}. Running matching...`);
         await runMatchingForQuestion(questionId);
     }
@@ -62,13 +62,22 @@ export const onAnswerCreated = onDocumentCreated("questions/{questionId}/answers
         }
     }
 
-    // Update Question Status to 'answered' (?)
-    // If it was 'open' or 'waiting_for_answer'.
-    // User might manually close it, but usually 'answered' status is useful.
-    if (qData.status !== 'closed') {
-        await qDoc.ref.update({
-            status: 'answered',
-            answerCount: admin.firestore.FieldValue.increment(1)
-        });
+    // Update Question Status to 'answered' and update count (Count Aggregation)
+    // Allow update unless it is strictly closed/auto_closed
+    if (qData.status !== 'closed' && qData.status !== 'auto_closed') {
+        try {
+            const answersRef = db.collection('questions').doc(questionId).collection('answers');
+            const countSnapshot = await answersRef.count().get();
+            const currentCount = countSnapshot.data().count;
+
+            await qDoc.ref.update({
+                status: 'answered',
+                answerCount: currentCount
+            });
+        } catch (error) {
+            logger.error(`Failed to update answer count for ${questionId}`, error);
+            // Fallback to increment if count() fails (e.g. old SDK)? 
+            // Better to log error. This is critical for data integrity.
+        }
     }
 });

@@ -7,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     size?: 'sm' | 'md' | 'lg' | 'xl';
     icon?: string;
     iconPosition?: 'left' | 'right';
+    iconSize?: number;
     isLoading?: boolean;
     href?: string;
     target?: string;
@@ -19,6 +20,7 @@ export default function Button({
     size = 'md',
     icon,
     iconPosition = 'left',
+    iconSize,
     isLoading = false,
     disabled,
     href,
@@ -42,13 +44,17 @@ export default function Button({
         xl: 'px-8 py-4 text-lg gap-3',
     };
 
+    // Default icon size logic based on button size
+    const defaultIconSize = size === 'sm' ? 16 : size === 'xl' ? 24 : 20;
+    const finalIconSize = iconSize || defaultIconSize;
+
     const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
     const content = (
         <>
             {isLoading && <span className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />}
-            {!isLoading && icon && iconPosition === 'left' && <Icon name={icon} size={size === 'sm' ? 16 : size === 'xl' ? 24 : 20} />}
+            {!isLoading && icon && iconPosition === 'left' && <Icon name={icon} size={finalIconSize} />}
             <span>{children}</span>
-            {!isLoading && icon && iconPosition === 'right' && <Icon name={icon} size={size === 'sm' ? 16 : size === 'xl' ? 24 : 20} />}
+            {!isLoading && icon && iconPosition === 'right' && <Icon name={icon} size={finalIconSize} />}
         </>
     );
 

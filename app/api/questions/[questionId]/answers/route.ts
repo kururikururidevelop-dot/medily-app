@@ -24,7 +24,7 @@ export async function POST(
   try {
     const { questionId } = await params;
     const body = await request.json();
-    const { userId, content } = body;
+    const { userId, content, choices } = body;
 
     if (!userId || !content) {
       return NextResponse.json(
@@ -51,14 +51,15 @@ export async function POST(
     const docRef = await addDoc(answersRef, {
       userId,
       content,
+      choices: choices || [],
+      answeredAt: Timestamp.now(), // Business timestamp
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     });
 
-    // 質問の answerCount をインクリメント
+    // 質問の更新日時を更新 (answerCountはCloud Functionsでインクリメントされるためここでは更新しない)
     const questionRef = doc(db, 'questions', questionId);
     await updateDoc(questionRef, {
-      answerCount: increment(1),
       updatedAt: Timestamp.now(),
     });
 

@@ -16,6 +16,14 @@ export interface AuthResult {
  * @returns AuthResult with error details or the verified UID.
  */
 export async function verifyAuth(request: NextRequest, targetUserId?: string): Promise<AuthResult> {
+    // Development Bypass for mock user
+    if (process.env.NODE_ENV === 'development') {
+        // If the target user is the dev mock user, allow without token
+        if (targetUserId === 'dev-mock-user') {
+            return { uid: 'dev-mock-user' };
+        }
+    }
+
     const authHeader = request.headers.get('Authorization');
 
     if (!authHeader?.startsWith('Bearer ')) {

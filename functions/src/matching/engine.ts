@@ -22,10 +22,9 @@ interface Question {
     userId: string;
     title: string;
     region: string;
-    category: string;
-    categoryIds?: string[]; // Assuming array for multiple categories support
+    categories: string[]; // Updated
     tags?: string[];
-    ageGroups?: string[]; // e.g. ["30代", "40代"] targeted
+    ageGroups?: string[];
     status: string;
     createdAt: admin.firestore.Timestamp;
 }
@@ -43,7 +42,10 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
     }
     const question = { id: qSnap.id, ...qSnap.data() } as Question;
 
-    if (question.status === 'closed' || question.status === 'answered') {
+    // Skip if not 'matching' status (or 'open' for legacy)
+    // Actually we should only run if 'matching' or 'open'.
+    // If it's already 'waiting_for_answer', 'answered', 'closed', 'matching_failed' (without retry), skip.
+    if (['waiting_for_answer', 'answered', 'closed', 'auto_closed'].includes(question.status)) {
         logger.info(`Question ${questionId} is already ${question.status}. Skipping.`);
         return;
     }
@@ -68,9 +70,6 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
         }
     }
 
-    // If still 0? Fallback to all? Or stop.
-    // Requirement says: "Search match group...". If 0, search adjacent match group.
-
     // Filter by notified history
     const notifiedRef = qRef.collection('notified_users');
     const notifiedSnap = await notifiedRef.get();
@@ -82,10 +81,6 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
     let eligible = candidates.filter(u => !notifiedIds.has(u.id));
 
     // Scoring
-    // Category Match: 3pt
-    // Region Match: 2pt (Exact) or 1pt (Adjacent) - handled by regionMatchLevel
-    // Age Match: 1pt
-
     const scored = eligible.map(u => {
         let score = 0;
 
@@ -93,16 +88,18 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
         score += regionMatchLevel;
 
         // Category Score (3pt)
-        // Match if User.categories includes Question.category
-        // OR Question.categoryIds include any of User.categories
-        const qCats = new Set(question.categoryIds || [question.category]);
+        // Match if User.categories includes any of Question.categories
+        const qCats = new Set(question.categories || []);
+        // Fallback for old data?
+        if (qCats.size === 0 && (question as any).category) {
+            qCats.add((question as any).category);
+        }
+
         const uCats = u.categories || [];
         const hasCategoryMatch = uCats.some(c => qCats.has(c));
         if (hasCategoryMatch) score += 3;
 
         // Age Score (1pt)
-        // Logic: Calculate age from birthYear. Check if in question.ageGroups.
-        // Simplification: Check if birthYear roughly matches target generation.
         if (checkAgeMatch(u.birthYear, question.ageGroups)) {
             score += 1;
         }
@@ -139,10 +136,13 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
         });
 
         // Send LINE
+        // Use primary category for display
+        const displayCategory = question.categories?.[0] || (question as any).category || '未設定';
+
         notifications.push(
             lineClient.pushMessage(u.lineUserId, {
                 type: 'text',
-                text: `【新着Q&A】あなたの知識が必要です！\n\n${question.title}\n\nカテゴリ: ${question.category}\n地域: ${question.region}\n\n回答する: https://medily-app.web.app/questions/${question.id}`
+                text: `【新着Q&A】あなたの知識が必要です！\n\n${question.title}\n\nカテゴリ: ${displayCategory}\n地域: ${question.region}\n\n回答する: https://medily-app.web.app/questions/${question.id}`
             }).catch(e => logger.error(`Failed to send LINE to ${u.id}`, e))
         );
     }
