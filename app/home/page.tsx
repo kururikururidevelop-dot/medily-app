@@ -98,11 +98,11 @@ async function fetchInitialData(
 import { masterService } from '@/lib/services/masterService';
 
 type Props = {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function HomePage({ searchParams }: Props) {
-  const sp = searchParams;
+  const sp = await searchParams;
 
   const parseArray = (val: string | string[] | undefined): string[] => {
     if (!val) return [];

@@ -232,6 +232,9 @@ export const questionService = {
         const paged = allQuestions.slice(offset, offset + limitNum);
         const hasMore = allQuestions.length > (pageNum * limitNum);
 
+        console.log(`[getQuestions] Filter:`, JSON.stringify(filter));
+        console.log(`[getQuestions] Total Fetched: ${allQuestions.length}, Offset: ${offset}, Limit: ${limitNum}, HasMore: ${hasMore}`);
+
         return { questions: paged, hasMore };
     },
 
