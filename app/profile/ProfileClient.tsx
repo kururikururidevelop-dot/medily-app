@@ -85,12 +85,8 @@ export default function ProfilePage({ initialProfile }: ProfileClientProps) {
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-            <Icon name="arrow_back" size={24} />
-          </button>
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
           <h1 className="text-2xl font-bold text-gray-800">マイページ</h1>
-          <div className="w-6" />
         </div>
       </div>
 

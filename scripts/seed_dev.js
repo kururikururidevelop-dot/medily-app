@@ -3,118 +3,13 @@
 
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore, Timestamp } = require('firebase-admin/firestore');
+const { seedMasters } = require('./seed_masters');
 
 // タイムスタンプを生成（古い順から新しい順）
 const now = Date.now();
 const createTimestamp = (daysAgo) => {
   return Timestamp.fromMillis(now - daysAgo * 24 * 60 * 60 * 1000);
 };
-
-const categories = [
-  { id: 'basic-internal', group: '基本的な診療科', label: '内科一般', description: '風邪、生活習慣病など', order: 101 },
-  { id: 'basic-pediatrics', group: '基本的な診療科', label: '小児科', description: '子供の病気、予防接種など', order: 102 },
-  { id: 'basic-dermatology', group: '基本的な診療科', label: '皮膚科', description: '肌荒れ、アトピー、美容皮膚科など', order: 103 },
-  { id: 'basic-ophthalmology', group: '基本的な診療科', label: '眼科', description: '視力、コンタクト、目の不調など', order: 104 },
-  { id: 'basic-dentistry', group: '基本的な診療科', label: '歯科・矯正歯科', description: '虫歯、歯並び、ホワイトニングなど', order: 105 },
-  { id: 'basic-ent', group: '基本的な診療科', label: '耳鼻咽喉科', description: '花粉症、鼻炎、喉の痛みなど', order: 106 },
-  { id: 'basic-orthopedics', group: '基本的な診療科', label: '整形外科', description: '腰痛、関節痛、怪我など', order: 107 },
-  { id: 'basic-obgyn', group: '基本的な診療科', label: '産婦人科', description: '不妊治療、妊娠・出産、婦人科疾患など', order: 108 },
-  { id: 'concern-mental-health', group: 'お悩み・症状別', label: 'メンタルヘルス', description: 'ストレス、不眠、自律神経など', order: 201 },
-  { id: 'concern-gi', group: 'お悩み・症状別', label: '胃腸・消化器', description: '胃痛、便秘、腹痛など', order: 202 },
-  { id: 'concern-allergy', group: 'お悩み・症状別', label: 'アレルギー・免疫', description: '花粉症、食物アレルギー、喘息など', order: 203 },
-  { id: 'concern-rehab-care', group: 'お悩み・症状別', label: 'リハビリ・介護', description: '在宅介護、リハビリテーションなど', order: 204 },
-  { id: 'concern-diet-nutrition', group: 'お悩み・症状別', label: 'ダイエット・栄養', description: '食事制限、サプリメント、栄養指導など', order: 205 },
-  { id: 'concern-checkup', group: 'お悩み・症状別', label: '検査・人間ドック', description: '健康診断の結果、がん検診など', order: 206 },
-  { id: 'life-parenting', group: 'ライフステージ・属性別', label: '子育て・乳幼児', description: '夜泣き、離乳食、発育など', order: 301 },
-  { id: 'life-women', group: 'ライフステージ・属性別', label: '女性特有の悩み', description: '生理不順、更年期障害など', order: 302 },
-  { id: 'life-seniors', group: 'ライフステージ・属性別', label: '高齢者の健康', description: '認知症、持病の管理など', order: 303 },
-  { id: 'life-long-treatment', group: 'ライフステージ・属性別', label: '闘病・長期療養', description: '難病、慢性疾患との付き合い方など', order: 304 },
-  { id: 'experience-accessibility', group: '病院選びの体験', label: '通いやすさ・設備', description: '待ち時間、バリアフリー、清潔感など', order: 401 },
-  { id: 'experience-hospitality', group: '病院選びの体験', label: '接遇・対応', description: '医師の丁寧さ、看護師の対応など', order: 402 },
-  { id: 'experience-cost', group: '病院選びの体験', label: '費用・保険', description: '自由診療、高額療養費、医療費控除など', order: 403 },
-  { id: 'experience-second-opinion', group: '病院選びの体験', label: 'セカンドオピニオン', description: '転院の経験、他院との比較など', order: 404 },
-];
-
-const statuses = [
-  { id: 'matching', type: 'status', name: 'マッチング中', order: 1 },
-  { id: 'waiting_for_answer', type: 'status', name: '回答待ち', order: 2 },
-  { id: 'answered', type: 'status', name: '回答済み', order: 3 },
-  { id: 'matching_failed', type: 'status', name: 'マッチング失敗', order: 4 },
-  { id: 'closed', type: 'status', name: '解決済み', order: 5 },
-  { id: 'auto_closed', type: 'status', name: '期限切れ', order: 6 },
-];
-
-const regionGroups = [
-  { group: '北海道', prefectures: ['北海道'] },
-  { group: '東北', prefectures: ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] },
-  { group: '関東', prefectures: ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'] },
-  { group: '中部', prefectures: ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'] },
-  { group: '近畿', prefectures: ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'] },
-  { group: '中国', prefectures: ['鳥取県', '島根県', '岡山県', '広島県', '山口県'] },
-  { group: '四国', prefectures: ['徳島県', '香川県', '愛媛県', '高知県'] },
-  { group: '九州・沖縄', prefectures: ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'] },
-];
-
-const adjacencyMap = {
-  '北海道': ['青森県'],
-  '青森県': ['北海道', '岩手県', '秋田県'],
-  '岩手県': ['青森県', '宮城県', '秋田県'],
-  '宮城県': ['岩手県', '秋田県', '山形県', '福島県'],
-  '秋田県': ['青森県', '岩手県', '宮城県', '山形県'],
-  '山形県': ['宮城県', '秋田県', '福島県', '新潟県'],
-  '福島県': ['宮城県', '山形県', '茨城県', '栃木県', '群馬県', '新潟県'],
-  '茨城県': ['福島県', '栃木県', '埼玉県', '千葉県'],
-  '栃木県': ['福島県', '茨城県', '群馬県', '埼玉県'],
-  '群馬県': ['福島県', '栃木県', '埼玉県', '新潟県', '長野県'],
-  '埼玉県': ['茨城県', '栃木県', '群馬県', '千葉県', '東京都', '山梨県', '長野県'],
-  '千葉県': ['茨城県', '埼玉県', '東京都', '神奈川県'],
-  '東京都': ['埼玉県', '千葉県', '神奈川県', '山梨県'],
-  '神奈川県': ['千葉県', '東京都', '山梨県', '静岡県'],
-  '新潟県': ['山形県', '福島県', '群馬県', '富山県', '長野県'],
-  '富山県': ['新潟県', '石川県', '長野県', '岐阜県'],
-  '石川県': ['富山県', '福井県', '岐阜県'],
-  '福井県': ['石川県', '岐阜県', '滋賀県', '京都府'],
-  '山梨県': ['埼玉県', '東京都', '神奈川県', '長野県', '静岡県'],
-  '長野県': ['群馬県', '埼玉県', '新潟県', '富山県', '山梨県', '岐阜県', '静岡県', '愛知県'],
-  '岐阜県': ['富山県', '石川県', '福井県', '長野県', '愛知県', '三重県', '滋賀県'],
-  '静岡県': ['神奈川県', '山梨県', '長野県', '愛知県'],
-  '愛知県': ['長野県', '岐阜県', '静岡県', '三重県'],
-  '三重県': ['岐阜県', '愛知県', '滋賀県', '京都府', '奈良県', '和歌山県'],
-  '滋賀県': ['福井県', '岐阜県', '三重県', '京都府'],
-  '京都府': ['福井県', '三重県', '滋賀県', '大阪府', '兵庫県', '奈良県'],
-  '大阪府': ['京都府', '兵庫県', '奈良県', '和歌山県'],
-  '兵庫県': ['京都府', '大阪府', '鳥取県', '岡山県', '徳島県'],
-  '奈良県': ['三重県', '京都府', '大阪府', '和歌山県'],
-  '和歌山県': ['三重県', '大阪府', '奈良県', '徳島県'],
-  '鳥取県': ['兵庫県', '島根県', '岡山県', '広島県'],
-  '島根県': ['鳥取県', '広島県', '山口県'],
-  '岡山県': ['兵庫県', '鳥取県', '広島県', '香川県'],
-  '広島県': ['鳥取県', '島根県', '岡山県', '山口県', '愛媛県'],
-  '山口県': ['島根県', '広島県', '愛媛県', '福岡県', '大分県'],
-  '徳島県': ['兵庫県', '和歌山県', '香川県', '愛媛県', '高知県'],
-  '香川県': ['岡山県', '徳島県', '愛媛県'],
-  '愛媛県': ['広島県', '山口県', '徳島県', '香川県', '高知県', '大分県'],
-  '高知県': ['徳島県', '愛媛県'],
-  '福岡県': ['山口県', '佐賀県', '熊本県', '大分県'],
-  '佐賀県': ['福岡県', '長崎県'],
-  '長崎県': ['佐賀県', '熊本県'],
-  '熊本県': ['福岡県', '長崎県', '大分県', '宮崎県', '鹿児島県'],
-  '大分県': ['山口県', '愛媛県', '福岡県', '熊本県', '宮崎県'],
-  '宮崎県': ['熊本県', '大分県', '鹿児島県'],
-  '鹿児島県': ['熊本県', '宮崎県', '沖縄県'],
-  '沖縄県': ['鹿児島県'],
-};
-
-const regions = regionGroups.flatMap((g, groupIndex) =>
-  g.prefectures.map((pref, prefIndex) => ({
-    id: pref,
-    type: 'region',
-    name: pref,
-    group: g.group,
-    order: groupIndex * 100 + prefIndex,
-    adjacentRegions: adjacencyMap[pref] || [],
-  }))
-);
 
 const devUsers = [
   {
@@ -153,17 +48,6 @@ const devUsers = [
   { id: 'dev-answerer-x', displayName: '回答者X', region: '北海道', categories: [], pictureUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Max', isProfileCompleted: true, notificationConsent: true, profileCompletedAt: Timestamp.now(), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
   { id: 'dev-answerer-y', displayName: '回答者Y', region: '沖縄県', categories: [], pictureUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Luna', isProfileCompleted: true, notificationConsent: true, profileCompletedAt: Timestamp.now(), createdAt: Timestamp.now(), updatedAt: Timestamp.now() },
 ];
-
-// ... (skip Question section, handled by separate or implicitly preserved if not targeted)
-
-/* Wait, replace_file_content replaces a contiguous block. I need to span from devUsers (line 119) to demoAnswers (line 390) OR use multi_replace.
-   The instructions say "Use multi_replace... for NON-CONTIGUOUS".
-   I will use multi_replace for clearer edits.
-   
-   Chunk 1: devUsers
-   Chunk 2: demoAnswers (specific items)
-   Chunk 3: insertion logic (ensure choices used)
-*/
 
 // NOTE: デモデータは固定IDを使用（テスト用URLが予測可能）
 // 本番APIはFirestoreの自動ID生成を使用（addDoc()により自動的にユニークなIDが生成される）
@@ -371,6 +255,61 @@ const scenarioQuestions = [
 }));
 demoQuestions.push(...scenarioQuestions);
 
+// === Verification Question for Specification Changes ===
+const verificationQuestions = [
+  {
+    id: 'demo-q-public-multicat',
+    title: '公開・複数カテゴリの質問サンプル',
+    description: 'これは「公開」かつ「複数カテゴリ」を持つ質問の表示検証用データです。カテゴリバッジが正しく表示されるか確認してください。',
+    region: '東京都',
+    categories: ['basic-internal', 'basic-dermatology', 'basic-pediatrics'],
+    choices: [],
+    userId: 'dev-questioner-a', // Not me
+    isPublic: true,
+    status: 'matching',
+    answerCount: 0,
+    createdAt: createTimestamp(0),
+    updatedAt: createTimestamp(0),
+    postedAt: createTimestamp(0),
+  }
+];
+demoQuestions.push(...verificationQuestions);
+
+// === Private Questions (Verify A041) ===
+const privateQuestions = [
+  {
+    id: 'demo-q-private-matching',
+    title: '非公開：マッチング中（検証用）',
+    description: '非公開の質問です。公開の質問一覧には表示されてはいけません。',
+    region: '東京都',
+    categories: ['basic-internal'],
+    choices: [],
+    userId: 'dev-questioner-a',
+    isPublic: false,
+    status: 'matching',
+    answerCount: 0,
+    createdAt: createTimestamp(0),
+    updatedAt: createTimestamp(0),
+    postedAt: createTimestamp(0),
+  },
+  {
+    id: 'demo-q-private-answered',
+    title: '非公開：回答済み（検証用）',
+    description: '非公開ですが回答済みの質問です。これも公開一覧には表示されません。',
+    region: '神奈川県',
+    categories: ['basic-pediatrics'],
+    choices: [],
+    userId: 'dev-questioner-b',
+    isPublic: false,
+    status: 'answered',
+    answerCount: 1,
+    createdAt: createTimestamp(1),
+    updatedAt: createTimestamp(1),
+    postedAt: createTimestamp(1),
+  }
+];
+demoQuestions.push(...privateQuestions);
+
 const demoAnswers = [
   ...scenarioQuestions.flatMap(q => [
     { questionId: q.id, userId: 'dev-mock-user', content: 'My Answer', createdAt: Timestamp.now() },
@@ -438,6 +377,12 @@ const demoAnswers = [
     questionId: 'demo-q-child1',
     userId: 'dev-helper-user',
     content: '2週間続けられたのは素晴らしいですね。次は環境調整を試してみましょう。部屋の暗さ、温度（18-22度が理想）、湿度（50-60%）を確認してみてください。また、日中の活動量を増やすことも効果的です。',
+  },
+  // Private Question Answer
+  {
+    questionId: 'demo-q-private-answered',
+    userId: 'dev-helper-user',
+    content: '非公開質問への回答です。ユーザーBさんと私（回答者）しか見えません。',
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   },
@@ -455,43 +400,9 @@ async function main() {
   initializeApp({ projectId });
   const db = getFirestore();
 
-  // カテゴリ投入
-  const catBatch = db.batch();
-  const catCol = db.collection('categories');
-  categories.forEach((c) => {
-    const ref = catCol.doc(c.id);
-    catBatch.set(ref, { ...c, public: true, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
-  });
-  await catBatch.commit();
-  console.log('Seeded categories:', categories.length);
-
-  // マスタ投入（categories + statuses + regions）
-  const masterBatch = db.batch();
-  const masterCol = db.collection('masters');
-
-  categories.forEach((c) => {
-    const ref = masterCol.doc(c.id);
-    masterBatch.set(ref, { ...c, type: 'category', createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
-  });
-
-  statuses.forEach((s) => {
-    const ref = masterCol.doc(`status-${s.id}`);
-    masterBatch.set(ref, { ...s, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
-  });
-
-  regions.forEach((r) => {
-    const ref = masterCol.doc(`region-${r.id}`);
-    masterBatch.set(ref, { ...r, createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
-  });
-
-  // Cleanup obsolete masters
-  const obsoleteIds = ['status-all', 'status-open'];
-  obsoleteIds.forEach(id => {
-    masterBatch.delete(masterCol.doc(id));
-  });
-
-  await masterBatch.commit();
-  console.log('Seeded masters:', categories.length + statuses.length + regions.length);
+  // マスタ投入 (from seed_masters.js)
+  // マスター登録は seed_masters.js に委譲
+  await seedMasters(db);
 
   // 開発用ユーザー投入
   const userBatch = db.batch();
@@ -542,8 +453,6 @@ async function main() {
   console.log('Seeded demo answers:', demoAnswers.length);
 
   // 確認ログ
-  const catSnap = await catCol.orderBy('order').get();
-  console.log('Categories count:', catSnap.size);
   const qSnap = await qCol.limit(5).get();
   console.log('Questions count (sample up to 5):', qSnap.size);
 }

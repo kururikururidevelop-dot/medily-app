@@ -48,16 +48,8 @@ export default function WithdrawPage() {
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              <Icon name="arrow_back" size={24} />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">退会画面</h1>
-          </div>
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
+          <h1 className="text-2xl font-bold text-gray-800">退会画面</h1>
         </div>
       </div>
 

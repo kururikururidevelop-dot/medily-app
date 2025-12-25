@@ -14,6 +14,7 @@ interface QuestionDetailClientProps {
     initialNextId: string | null;
     masterCategories: Record<string, string>;
     error?: string;
+    // userId: string; // Removed prop reliance
 }
 
 import { useRequireAuth } from '@/hooks/useRequireAuth';
@@ -24,7 +25,7 @@ export default function QuestionDetailClient({
     initialPrevId,
     initialNextId,
     masterCategories,
-    error: initialError
+    error: initialError,
 }: QuestionDetailClientProps) {
     useRequireAuth();
     const router = useRouter();
@@ -35,6 +36,16 @@ export default function QuestionDetailClient({
     const [prevQuestionId, setPrevQuestionId] = useState<string | null>(initialPrevId);
     const [nextQuestionId, setNextQuestionId] = useState<string | null>(initialNextId);
     const [error, setError] = useState<string | null>(initialError || null);
+
+    // Client-side User ID for ownership check
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const uid = localStorage.getItem('userId');
+            setCurrentUserId(uid);
+        }
+    }, []);
 
     // Sync state with props (Debugging: Ensure fresh data on navigation)
     useEffect(() => {
@@ -90,19 +101,7 @@ export default function QuestionDetailClient({
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            {/* Header (Simplified) */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-                <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-semibold"
-                    >
-                        <Icon name="arrow_back" size={24} />
-                        戻る
-                    </button>
-                    {/* Share/Hamburger Removed */}
-                </div>
-            </div>
+
 
             {/* Main Content */}
             <div className="max-w-3xl mx-auto px-4 py-8">
@@ -234,6 +233,48 @@ export default function QuestionDetailClient({
                             </div>
                         )}
                     </div>
+
+                    {/* Re-open / Continue Recruiting Button */}
+                    {question.status === 'answered' && currentUserId === question.userId && (
+                        <div className="flex justify-end mb-4">
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('回答の募集を再開しますか？\nステータスが「マッチング中」になり、新たな回答者を探します。')) return;
+
+                                    try {
+                                        // Since we don't have a dedicated endpoint for status update yet, 
+                                        // we might need to assume one exists or create one.
+                                        // For now, let's assume a generic update endpoint or use a server action if this was a server component.
+                                        // But this is a Client Component.
+                                        // I will call a new endpoint: /api/questions/[questionId]/status
+
+                                        const res = await fetch(`/api/questions/${question.id}/status`, {
+                                            method: 'PATCH',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ status: 'matching' })
+                                        });
+
+                                        if (!res.ok) throw new Error('Failed to update status');
+
+                                        // Optimistic Update
+                                        setQuestion({ ...question, status: 'matching' });
+                                        alert('回答の募集を再開しました。');
+
+                                        // Refresh page to ensure consistency
+                                        router.refresh();
+
+                                    } catch (e) {
+                                        console.error(e);
+                                        alert('更新に失敗しました。');
+                                    }
+                                }}
+                                className="px-6 py-3 bg-white border-2 border-primary text-primary hover:bg-primary-ultralight rounded-lg font-bold text-base flex items-center gap-2 shadow-sm transition-colors"
+                            >
+                                <Icon name="campaign" size={24} />
+                                質問の受付を続ける
+                            </button>
+                        </div>
+                    )}
 
                     {/* Action Buttons (Add Question) - Only show if logic permits */}
                     {shouldShowAddButton && (

@@ -250,12 +250,8 @@ function QuestionPostContent() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* ヘッダー */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-screen-md mx-auto px-4 h-16 flex items-center justify-between">
-          <button onClick={handleBack} className="text-gray-600 hover:text-gray-900 transition-colors">
-            <Icon name="arrow_back" size={24} />
-          </button>
+        <div className="max-w-screen-md mx-auto px-4 h-16 flex items-center justify-center">
           <h1 className="text-lg font-bold text-gray-800">質問を投稿</h1>
-          <div className="w-6" /> {/* Spacer */}
         </div>
       </header>
 

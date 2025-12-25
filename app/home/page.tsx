@@ -5,16 +5,21 @@ import { userService } from '@/lib/services/userService';
 import { questionService } from '@/lib/services/questionService';
 
 // サーバー側で内部APIを呼び出す
-// サーバー側で内部APIを呼び出す
 async function fetchInitialData(
   userId: string,
   options: {
     mqPage: number;
     ansPage: number;
+    favPage: number;
     mqStatus?: string[];
     mqCategories?: string[];
+    mqKeyword?: string;
     ansStatus?: string[];
     ansCategories?: string[];
+    ansKeyword?: string;
+    favStatus?: string[];
+    favCategories?: string[];
+    favKeyword?: string;
   }
 ) {
   try {
@@ -22,9 +27,13 @@ async function fetchInitialData(
 
     const myLimit = Math.max(1, options.mqPage) * 10;
     const ansLimit = Math.max(1, options.ansPage) * 10;
+    const favLimit = Math.max(1, options.favPage) * 10;
+
+    // Get updated favorites first (needed for Favorites Tab)
+    const userFavoritesIds = await userService.getFavoriteQuestionIds(userId);
 
     // サマリーと各タブのデータを並列取得
-    const [summary, userProfile, myQuestionsResult, answeredResult] = await Promise.all([
+    const [summary, userProfile, myQuestionsResult, answeredResult, favoritesResult] = await Promise.all([
       userService.getUserSummary(userId),
       userService.getUserProfile(userId),
       questionService.getQuestions({
@@ -32,15 +41,26 @@ async function fetchInitialData(
         limit: myLimit,
         page: 1,
         status: options.mqStatus,
-        category: options.mqCategories
+        category: options.mqCategories,
+        keyword: options.mqKeyword
       }),
       questionService.getQuestions({
         answeredBy: userId,
         limit: ansLimit,
         page: 1,
         status: options.ansStatus,
-        category: options.ansCategories
+        category: options.ansCategories,
+        keyword: options.ansKeyword
       }),
+      // Favorites Tab Fetching
+      userFavoritesIds.length > 0 ? questionService.getQuestions({
+        ids: userFavoritesIds,
+        limit: favLimit,
+        page: 1,
+        status: options.favStatus,
+        category: options.favCategories,
+        keyword: options.favKeyword
+      }) : Promise.resolve({ questions: [], hasMore: false })
     ]);
 
 
@@ -61,15 +81,6 @@ async function fetchInitialData(
     const thankers = (await Promise.all(thankerIds.map(id => userService.getUserProfile(id))))
       .filter((u): u is NonNullable<typeof u> => u !== null);
 
-    // hasMore logic needs to optionally returned?
-    // Client calculates hasMore based on returned count usually.
-    // If returned count < limit, then hasMore is false.
-    // But getQuestions returns `hasMore` boolean in response structure?
-    // questionService.getQuestions returns `{ questions: [], hasMore: boolean } `.
-    // I should pass this through if possible, or Client infers it.
-    // Current HomeClient uses `dataJson.hasMore`.
-    // I should pass it.
-
     return {
       summary,
       userProfile,
@@ -78,6 +89,9 @@ async function fetchInitialData(
       myHasMore: myQuestionsResult.hasMore,
       answered: answeredResult.questions,
       ansHasMore: answeredResult.hasMore,
+      favorites: favoritesResult.questions,
+      favHasMore: favoritesResult.hasMore,
+      userFavoritesIds,
       thankers,
     };
   } catch (error) {
@@ -90,6 +104,9 @@ async function fetchInitialData(
       myHasMore: false,
       answered: [],
       ansHasMore: false,
+      favorites: [],
+      favHasMore: false,
+      userFavoritesIds: [],
       thankers: [],
     };
   }
@@ -111,13 +128,27 @@ export default async function HomePage({ searchParams }: Props) {
 
   // Parse Query Params
   const tab = typeof sp?.tab === 'string' ? sp.tab : 'my-questions';
+
+  console.log('[HomePage] SearchParams:', sp);
+  console.log('[HomePage] Resolved Tab:', tab);
+
   const mqPage = typeof sp?.mq_page === 'string' ? parseInt(sp.mq_page) || 1 : 1;
   const ansPage = typeof sp?.ans_page === 'string' ? parseInt(sp.ans_page) || 1 : 1;
+  const favPage = typeof sp?.fav_page === 'string' ? parseInt(sp.fav_page) || 1 : 1;
+
+  // Independent Keywords
+  const mqKeyword = typeof sp?.mq_kw === 'string' ? sp.mq_kw : undefined;
+  const ansKeyword = typeof sp?.ans_kw === 'string' ? sp.ans_kw : undefined;
+  const favKeyword = typeof sp?.fav_kw === 'string' ? sp.fav_kw : undefined;
 
   const mqStatus = parseArray(sp?.mq_status);
   const mqCategories = parseArray(sp?.mq_cats);
   const ansStatus = parseArray(sp?.ans_status);
   const ansCategories = parseArray(sp?.ans_cats);
+
+  // New Favorites Filters
+  const favStatus = parseArray(sp?.fav_status);
+  const favCategories = parseArray(sp?.fav_cats);
 
   // サーバー側で認証チェックとデータ取得
   const cookieStore = await cookies();
@@ -127,7 +158,20 @@ export default async function HomePage({ searchParams }: Props) {
 
   // サーバー側で初期データ取得
   const [initialData, categories, statuses] = await Promise.all([
-    fetchInitialData(userId, { mqPage, ansPage, mqStatus, mqCategories, ansStatus, ansCategories }),
+    fetchInitialData(userId, {
+      mqPage,
+      ansPage,
+      favPage,
+      mqStatus,
+      mqCategories,
+      mqKeyword,
+      ansStatus,
+      ansCategories,
+      ansKeyword,
+      favStatus,
+      favCategories,
+      favKeyword
+    }),
     masterService.getMasters('category'),
     masterService.getMasters('status')
   ]);
@@ -135,19 +179,32 @@ export default async function HomePage({ searchParams }: Props) {
   console.log('[HomePage] Fetched categories:', categories.length);
   console.log('[HomePage] Fetched statuses:', statuses.length);
 
-  const { summary, userRank, myQuestions, answered, userProfile, thankers, myHasMore, ansHasMore } = initialData;
+  const {
+    summary,
+    userRank,
+    myQuestions,
+    answered,
+    favorites,
+    userProfile,
+    thankers,
+    myHasMore,
+    ansHasMore,
+    favHasMore,
+    userFavoritesIds
+  } = initialData;
 
   // CookieよりFirestoreの最新プロフィール画像を優先
   const finalAvatarUrl = userProfile?.pictureUrl || userProfile?.avatar || avatarUrl;
 
   return (
     <HomeClient
-      initialData={{ myQuestions, answered }}
+      initialData={{ myQuestions, answered, favorites }}
       initialMeta={{
         'my-questions': { page: mqPage, hasMore: myHasMore },
-        'answered': { page: ansPage, hasMore: ansHasMore }
+        'answered': { page: ansPage, hasMore: ansHasMore },
+        'favorites': { page: favPage, hasMore: favHasMore }
       }}
-      initialTab={tab as 'my-questions' | 'answered'}
+      initialTab={tab as 'my-questions' | 'answered' | 'favorites'}
       summary={summary}
       userName={displayName}
       userId={userId}
@@ -156,7 +213,12 @@ export default async function HomePage({ searchParams }: Props) {
       initialCategories={categories}
       initialStatuses={statuses}
       thankers={thankers}
+      initialFavorites={userFavoritesIds}
+      initialFilters={{
+        'my-questions': { keyword: mqKeyword || '', status: mqStatus, categories: mqCategories },
+        'answered': { keyword: ansKeyword || '', status: ansStatus, categories: ansCategories },
+        'favorites': { keyword: favKeyword || '', status: favStatus, categories: favCategories }
+      }}
     />
   );
 }
-

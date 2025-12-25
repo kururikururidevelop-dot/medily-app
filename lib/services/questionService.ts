@@ -30,7 +30,7 @@ export interface Question {
     isPublic: boolean; // New
     genderFilter?: 'male' | 'female' | 'none'; // New
     ageGroups?: string[]; // New
-    status: 'matching' | 'waiting_for_answer' | 'answered' | 'closed' | 'matching_failed'; // New statuses
+    status: 'matching' | 'waiting_for_answer' | 'answered' | 'matching_failed'; // New statuses
     answerCount: number;
     createdAt: string;
     updatedAt: string;
@@ -62,6 +62,9 @@ export interface QuestionFilter {
     publicOnly?: boolean;
     limit?: number;
     page?: number;
+    keyword?: string; // New
+    ids?: string[]; // New: for favorites
+    excludeUserId?: string; // New: Hide specific user's questions
 }
 
 const formatDate = (date: any): string => {
@@ -116,54 +119,24 @@ export const questionService = {
 
         let allQuestions: Question[] = [];
 
-        if (filter.answeredBy) {
-            // Optimization: Collection Group Query for My Answers
-            // Index required: answers (collectionId) fields: userId ASC, answeredAt DESC
-            // Note: Removed orderBy to avoid requiring composite index during dev/demo.
-            // Sorting is done in memory.
-            const answersQuery = query(
-                collectionGroup(db, 'answers'),
-                where('userId', '==', filter.answeredBy)
-            );
+        // CASE 1: Fetch by Specific IDs (Favorites)
+        if (filter.ids && filter.ids.length > 0) {
+            // Firestore 'in' query limit is 30. For MVP/Demo we assume <30 or just fetch in batches?
+            // Safer to just Promise.all(getDoc) for accuracy and order independence, or query 'in'.
+            // Let's use getDocs with documentId in chunks if needed, but for simplicity: Promise.all
+            // This also allows us to respect the order of IDs if we want (though we sort later).
 
-            const answerSnap = await getDocs(answersQuery);
-
-            // In-memory sort (DESC)
-            const sortedDocs = [...answerSnap.docs].sort((a, b) => {
-                const tA = a.data().answeredAt?.toMillis() || a.data().createdAt?.toMillis() || 0;
-                const tB = b.data().answeredAt?.toMillis() || b.data().createdAt?.toMillis() || 0;
-                return tB - tA;
-            });
-
-            const questionIds = new Set<string>();
-            const orderedIds: string[] = [];
-
-            sortedDocs.forEach(doc => {
-                const pid = doc.ref.parent.parent?.id;
-                if (pid && !questionIds.has(pid)) {
-                    questionIds.add(pid);
-                    orderedIds.push(pid);
-                }
-            });
-
-            // Fetch questions
-            const docs = await Promise.all(orderedIds.map(id => getDoc(doc(db!, 'questions', id))));
-
+            const docs = await Promise.all(filter.ids.map(id => getDoc(doc(db!, 'questions', id))));
             allQuestions = docs
                 .map(d => {
                     if (!d.exists()) return null;
                     const data = d.data();
+                    let answerCount = data.answerCount ?? 0;
                     return {
                         id: d.id,
-                        userId: data.userId,
-                        title: data.title,
-                        description: data.description,
-                        region: data.region,
+                        ...data,
                         categories: data.categories || (data.category ? [data.category] : []),
-                        choices: data.choices || [],
-                        isPublic: data.isPublic ?? true,
-                        status: data.status,
-                        answerCount: data.answerCount ?? 0,
+                        answerCount,
                         createdAt: formatDate(data.createdAt),
                         updatedAt: formatDate(data.updatedAt),
                         postedAt: formatDate(data.postedAt || data.createdAt),
@@ -172,7 +145,56 @@ export const questionService = {
                 })
                 .filter(q => q !== null) as Question[];
 
+            // Sorting: Favorites tab: PostedAt DESC (as per requirement)
+            allQuestions.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+
+        } else if (filter.answeredBy) {
+            // CASE 2: Answered By
+            // ... (Existing Logic)
+            const answersQuery = query(
+                collectionGroup(db, 'answers'),
+                where('userId', '==', filter.answeredBy)
+            );
+            const answerSnap = await getDocs(answersQuery);
+            // ... (Existing sort & dedup)
+            const sortedDocs = [...answerSnap.docs].sort((a, b) => {
+                const tA = a.data().answeredAt?.toMillis() || a.data().createdAt?.toMillis() || 0;
+                const tB = b.data().answeredAt?.toMillis() || b.data().createdAt?.toMillis() || 0;
+                return tB - tA;
+            });
+            const questionIds = new Set<string>();
+            const orderedIds: string[] = [];
+            sortedDocs.forEach(doc => {
+                const pid = doc.ref.parent.parent?.id;
+                if (pid && !questionIds.has(pid)) {
+                    questionIds.add(pid);
+                    orderedIds.push(pid);
+                }
+            });
+            const docs = await Promise.all(orderedIds.map(id => getDoc(doc(db!, 'questions', id))));
+            allQuestions = docs.map(d => {
+                if (!d.exists()) return null;
+                const data = d.data();
+                return {
+                    id: d.id,
+                    userId: data.userId,
+                    title: data.title,
+                    description: data.description,
+                    region: data.region,
+                    categories: data.categories || (data.category ? [data.category] : []),
+                    choices: data.choices || [],
+                    isPublic: data.isPublic ?? true,
+                    status: data.status,
+                    answerCount: data.answerCount ?? 0,
+                    createdAt: formatDate(data.createdAt),
+                    updatedAt: formatDate(data.updatedAt),
+                    postedAt: formatDate(data.postedAt || data.createdAt),
+                    closedAt: formatDate(data.closedAt),
+                } as Question;
+            }).filter(Boolean) as Question[];
+
         } else {
+            // CASE 3: Normal Filter
             const questionsRef = collection(db, 'questions');
             const constraints: any[] = [];
 
@@ -188,12 +210,7 @@ export const questionService = {
             allQuestions = await Promise.all(
                 querySnapshot.docs.map(async (docSnap) => {
                     const data = docSnap.data();
-                    let answerCount = data.answerCount ?? 0;
-                    try {
-                        const countSnap = await getCountFromServer(collection(db!, 'questions', docSnap.id, 'answers'));
-                        answerCount = countSnap.data().count;
-                    } catch (e) { /* ignore */ }
-
+                    let answerCount = data.answerCount ?? 0; // Optimistic
                     return {
                         id: docSnap.id,
                         ...data,
@@ -206,12 +223,23 @@ export const questionService = {
                     } as Question;
                 })
             );
-
-            // Sort by postedAt desc for normal lists
             allQuestions.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
         }
 
         // Common In-Memory Filtering
+        if (filter.keyword) {
+            console.log(`[Service] Filtering by keyword: "${filter.keyword}"`);
+            const lowerKw = filter.keyword.toLowerCase();
+            const beforeCount = allQuestions.length;
+            allQuestions = allQuestions.filter(q =>
+                (q.title || '').toLowerCase().includes(lowerKw) ||
+                (q.description || '').toLowerCase().includes(lowerKw)
+            );
+            console.log(`[Service] Keyword filter result: ${beforeCount} -> ${allQuestions.length}`);
+        } else {
+            console.log('[Service] No keyword filter provided');
+        }
+
         if (filter.region && filter.region.length > 0) {
             const set = new Set(filter.region);
             allQuestions = allQuestions.filter(q => set.has(q.region));
@@ -223,6 +251,9 @@ export const questionService = {
         if (filter.status && filter.status.length > 0) {
             const set = new Set(filter.status);
             allQuestions = allQuestions.filter(q => q.status && set.has(q.status));
+        }
+        if (filter.excludeUserId) {
+            allQuestions = allQuestions.filter(q => q.userId !== filter.excludeUserId);
         }
 
         // Pagination
@@ -341,7 +372,7 @@ export const questionService = {
         const questionsRef = collection(db, 'questions');
         const nextQuery = query(
             questionsRef,
-            // where('status', '==', 'open'), // Status logic changed? User didn't specify filter for siblings. Keeps broad?
+            // where('status', '==', 'matching'), // Status logic changed? User didn't specify filter for siblings. Keeps broad?
             // Assuming siblings navigation is usually purely temporal.
             orderBy('postedAt', 'asc'), // postedAt is Timestamp in DB? Yes.
             // If data is old and has no postedAt, we might have issues.

@@ -144,12 +144,8 @@ export default function AnswerConfirmPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={handleBack} className="text-gray-600" disabled={isSubmitting}>
-            <Icon name="arrow_back" size={24} />
-          </button>
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
           <h1 className="text-2xl font-bold text-gray-800">回答記入確認</h1>
-          <div className="w-6" />
         </div>
       </header>
 
@@ -279,13 +275,7 @@ export default function AnswerConfirmPage() {
 
           {/* ボタン */}
           <div className="flex gap-4">
-            <button
-              onClick={handleBack}
-              disabled={isSubmitting}
-              className="flex-1 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 disabled:opacity-50"
-            >
-              戻る
-            </button>
+
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}

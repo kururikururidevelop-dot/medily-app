@@ -32,17 +32,24 @@ interface Question {
 
 // ...
 
+interface FilterState {
+  keyword: string;
+  status: string[];
+  categories: string[];
+}
+
 interface HomeClientProps {
   initialData: {
     myQuestions: Question[];
     answered: Question[];
+    favorites: Question[];
   };
   initialMeta: {
     'my-questions': { page: number; hasMore: boolean };
     'answered': { page: number; hasMore: boolean };
+    'favorites': { page: number; hasMore: boolean };
   };
   initialTab: TabType;
-  // ... (rest)
   summary: {
     questions: number;
     answeredQuestions: number;
@@ -55,11 +62,11 @@ interface HomeClientProps {
   initialCategories: MasterItem[];
   initialStatuses: MasterItem[];
   thankers?: UserProfile[];
+  initialFavorites: string[];
+  initialFilters: Record<TabType, FilterState>;
 }
 
-type TabType = 'my-questions' | 'answered';
-
-// ... (imports)
+type TabType = 'my-questions' | 'answered' | 'favorites';
 
 import { useRequireAuth } from '@/app/hooks/useRequireAuth';
 import { calculateRank } from '@/lib/rankUtils';
@@ -76,7 +83,9 @@ export default function HomeClient({
   userRank = 0,
   initialCategories,
   initialStatuses,
-  thankers = []
+  thankers = [],
+  initialFavorites,
+  initialFilters
 }: HomeClientProps) {
   useRequireAuth();
 
@@ -93,12 +102,13 @@ export default function HomeClient({
     return map;
   }, [initialCategories]);
 
-  // ... (state vars defined in previous chunk)
-
-  // ... (Debug state & Rank logic)
-  // ... (Assuming replaced chunk handled top section, continuing to Filter UI)
-
-  // ... (Inside JSX for Filters)
+  // Debug State for Contribution Graphic
+  const [debugAnswerCount, setDebugAnswerCount] = useState(0);
+  const [debugThankerCount, setDebugThankerCount] = useState(3);
+  const [showRankUp, setShowRankUp] = useState(false);
+  const [prevRank, setPrevRank] = useState(0);
+  const [newRank, setNewRank] = useState(0);
+  const [internalUserRank, setInternalUserRank] = useState(userRank);
 
   /* URL-driven State Management */
   const router = useRouter();
@@ -109,40 +119,38 @@ export default function HomeClient({
   const [data, setData] = useState<Record<TabType, Question[]>>({
     'my-questions': initialData.myQuestions,
     answered: initialData.answered,
+    'favorites': initialData.favorites,
   });
 
-  // Sync data when props change (e.g. after navigation)
+  // Sync data when props change
   useEffect(() => {
     setData({
       'my-questions': initialData.myQuestions,
-      answered: initialData.answered
+      answered: initialData.answered,
+      'favorites': initialData.favorites,
     });
   }, [initialData]);
 
-  const [tab, setTab] = useState<TabType>(initialTab); // Initialize from URL
+  const [tab, setTab] = useState<TabType>(initialTab);
 
-  // Helper to get initial filter state from URL
-  const getParamArray = (key: string) => {
-    const val = searchParams.getAll(key);
-    return val.length > 0 ? val : [];
-  };
+  // Unified Filter State
+  const [filters, setFilters] = useState<Record<TabType, FilterState>>(initialFilters);
 
-  const [questionStatus, setQuestionStatus] = useState<string[]>(getParamArray('mq_status'));
-  const [questionCategories, setQuestionCategories] = useState<string[]>(getParamArray('mq_cats'));
-  const [answerStatus, setAnswerStatus] = useState<string[]>(getParamArray('ans_status'));
-  const [answerCategories, setAnswerCategories] = useState<string[]>(getParamArray('ans_cats'));
+  // Sync filters from URL/Props
+  useEffect(() => {
+    setTab(initialTab);
+    setFilters(initialFilters);
+  }, [initialTab, initialFilters]);
+
+  // Favorites State
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set(initialFavorites));
+
+  useEffect(() => {
+    setFavoriteIds(new Set(initialFavorites));
+  }, [initialFavorites]);
 
   const [expandedChains, setExpandedChains] = useState<Set<string>>(new Set());
   const [imgError, setImgError] = useState(false);
-
-  // Sync state with URL changes (back/forward navigation)
-  useEffect(() => {
-    setTab(initialTab);
-    setQuestionStatus(getParamArray('mq_status'));
-    setQuestionCategories(getParamArray('mq_cats'));
-    setAnswerStatus(getParamArray('ans_status'));
-    setAnswerCategories(getParamArray('ans_cats'));
-  }, [initialTab, searchParams]);
 
   // Sync Meta
   const [hasMore, setHasMore] = useState(initialMeta);
@@ -179,41 +187,98 @@ export default function HomeClient({
     if (tab !== t) {
       // Optimistic update
       setTab(t);
-      updateUrl({ tab: t });
+      // For Tabs, use push to create a history entry so "Back" works as expected
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('tab', t);
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      });
+    }
+  };
+
+  // Keyword Handler
+  const handleKeywordCommit = () => {
+    const kw = filters[tab].keyword;
+    const kwKey = tab === 'my-questions' ? 'mq_kw' : tab === 'answered' ? 'ans_kw' : 'fav_kw';
+    const pageKey = tab === 'my-questions' ? 'mq_page' : tab === 'answered' ? 'ans_page' : 'fav_page';
+    updateUrl({ [kwKey]: kw || undefined, [pageKey]: 1 });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleKeywordCommit();
+    }
+  };
+
+  // Favorites Toggle
+  const handleToggleFavorite = async (e: React.MouseEvent, qId: string) => {
+    e.preventDefault(); // Prevent link navigation
+    e.stopPropagation();
+
+    const isFav = favoriteIds.has(qId);
+    const next = new Set(favoriteIds);
+    if (isFav) next.delete(qId);
+    else next.add(qId);
+    setFavoriteIds(next);
+
+    try {
+      await fetch('/api/favorites', {
+        method: 'POST',
+        body: JSON.stringify({ questionId: qId })
+      });
+
+      // If in Favorites tab and removing, remove from current view
+      if (tab === 'favorites' && isFav) {
+        setData(prev => ({
+          ...prev,
+          'favorites': prev.favorites.filter(q => q.id !== qId)
+        }));
+      }
+    } catch (e) {
+      setFavoriteIds(favoriteIds); // Revert
+      alert('お気に入りの更新に失敗しました');
     }
   };
 
   const loadMore = () => {
-    const key = tab === 'my-questions' ? 'mq_page' : 'ans_page';
+    const key = tab === 'my-questions' ? 'mq_page' : tab === 'answered' ? 'ans_page' : 'fav_page';
     const current = initialMeta[tab].page;
     updateUrl({ [key]: current + 1 });
   };
 
   /* Filter Handlers - Sync with URL */
+  const updateFilterState = (t: TabType, key: keyof FilterState, val: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [t]: { ...prev[t], [key]: val }
+    }));
+  };
+
   const handleQuestionStatusChange = (val: string[]) => {
-    setQuestionStatus(val);
+    updateFilterState('my-questions', 'status', val);
     updateUrl({ mq_status: val.length ? val : undefined, mq_page: 1 });
   };
   const handleQuestionCategoryChange = (val: string[]) => {
-    setQuestionCategories(val);
+    updateFilterState('my-questions', 'categories', val);
     updateUrl({ mq_cats: val.length ? val : undefined, mq_page: 1 });
   };
   const handleAnswerStatusChange = (val: string[]) => {
-    setAnswerStatus(val);
+    updateFilterState('answered', 'status', val);
     updateUrl({ ans_status: val.length ? val : undefined, ans_page: 1 });
   };
   const handleAnswerCategoryChange = (val: string[]) => {
-    setAnswerCategories(val);
+    updateFilterState('answered', 'categories', val);
     updateUrl({ ans_cats: val.length ? val : undefined, ans_page: 1 });
   };
-
-  // Debug State for Contribution Graphic
-  const [debugAnswerCount, setDebugAnswerCount] = useState(0);
-  const [debugThankerCount, setDebugThankerCount] = useState(3);
-  const [showRankUp, setShowRankUp] = useState(false);
-  const [prevRank, setPrevRank] = useState(0);
-  const [newRank, setNewRank] = useState(0);
-  const [internalUserRank, setInternalUserRank] = useState(userRank);
+  // New Favorites Filters
+  const handleFavoriteStatusChange = (val: string[]) => {
+    updateFilterState('favorites', 'status', val);
+    updateUrl({ fav_status: val.length ? val : undefined, fav_page: 1 });
+  };
+  const handleFavoriteCategoryChange = (val: string[]) => {
+    updateFilterState('favorites', 'categories', val);
+    updateUrl({ fav_cats: val.length ? val : undefined, fav_page: 1 });
+  };
 
   // Mock Thankers Logic for Dev
   const displayThankers = useMemo(() => {
@@ -334,18 +399,20 @@ export default function HomeClient({
     if (s === 'answered') {
       badgeVariant = 'success';
       statusIcon = 'check_circle';
-    } else if (s === 'closed' || s === 'auto_closed' || s === 'matching_failed') {
+    } else if (s === 'matching_failed') {
       badgeVariant = 'neutral';
       statusIcon = 'block';
     }
 
     // Use Master Name or fallback
-    const statusText = masterStatuses[s] || (s === 'open' ? '回答募集中(Old)' : s);
+    const statusText = masterStatuses[s] || s;
 
     // Categories Display Logic
     const catIds = q.categories && q.categories.length > 0
       ? q.categories
       : q.category ? [q.category] : [];
+
+    const isFavorite = favoriteIds.has(q.id);
 
     return (
       <Card
@@ -357,12 +424,28 @@ export default function HomeClient({
           {/* Status Badge & Header */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-semibold text-gray-800 text-base flex-1">{q.title}</h3>
-            {/* Status Badge */}
-            {(
-              <Badge variant={badgeVariant as any} icon={statusIcon as any} className="text-xs shrink-0">
-                {statusText}
-              </Badge>
-            )}
+
+            <div className="flex items-center gap-2 shrink-0">
+              {(
+                <Badge variant={badgeVariant as any} icon={statusIcon as any} className="text-xs">
+                  {statusText}
+                </Badge>
+              )}
+
+              {/* Favorite Star */}
+              <button
+                onClick={(e) => handleToggleFavorite(e, q.id)}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                title={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
+              >
+                <Icon
+                  name="star"
+                  size={24}
+                  className={isFavorite ? "text-yellow-400" : "text-gray-300"}
+                  fill={true}
+                />
+              </button>
+            </div>
           </div>
 
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">{q.description}</p>
@@ -429,7 +512,7 @@ export default function HomeClient({
       <div className="sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <Link href="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <span className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold overflow-hidden border border-emerald-200">
                 {avatarUrl && !imgError ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -444,7 +527,7 @@ export default function HomeClient({
                 )}
               </span>
               <h1 className="text-xl font-bold text-gray-800">{userName || 'ユーザー'}</h1>
-            </div>
+            </Link>
             <div className="flex items-center gap-2">
               {/* Notification Button Removed as requested */}
 
@@ -488,6 +571,11 @@ export default function HomeClient({
           <Card className="p-6 w-full max-w-2xl">
             <h3 className="text-lg font-bold text-gray-800 mb-2 text-center">貢献度＆サンキュー</h3>
             <ContributionGraphic answerCount={debugAnswerCount} thankers={displayThankers} />
+            <div className="mt-4 text-center">
+              <Link href="/questions" className="text-blue-800 hover:text-blue-900 text-sm font-bold inline-flex items-center justify-center gap-1 group border border-blue-200 bg-blue-200 rounded-full px-4 py-2 hover:bg-blue-300 transition-colors">
+                相談を受けてみる(みんなの質問)
+              </Link>
+            </div>
           </Card>
 
           {/* Debug Controls (Temporary) */}
@@ -576,15 +664,17 @@ export default function HomeClient({
         </div>
 
         {/* タブ切り替え */}
+        {/* タブ切り替え */}
         <div className="bg-white border border-gray-200 rounded-lg px-4">
           <div className="flex gap-0">
             {[
               { id: 'my-questions', label: '質問', icon: 'help' },
               { id: 'answered', label: '回答', icon: 'check_circle' },
+              { id: 'favorites', label: 'お気に入り', icon: 'star' },
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => setTab(item.id as TabType)}
+                onClick={() => handleTabChange(item.id as TabType)}
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 font-semibold transition-colors ${tab === item.id
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800'
@@ -601,12 +691,29 @@ export default function HomeClient({
         {/* フィルタ */}
         {tab === 'my-questions' && (
           <Card className="p-4 space-y-4">
+            <div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={filters['my-questions'].keyword}
+                    onChange={(e) => updateFilterState('my-questions', 'keyword', e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="質問のタイトルや内容で検索..."
+                  />
+                  <Icon name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+                <Button onClick={handleKeywordCommit} size="sm" className="px-6">検索</Button>
+              </div>
+            </div>
+
             <MasterFilter
               title="ステータスで絞り込み"
               masterType="status"
               multiple={false}
               grouped={false}
-              value={questionStatus}
+              value={filters['my-questions'].status}
               onChange={handleQuestionStatusChange}
               options={initialStatuses}
             />
@@ -615,7 +722,7 @@ export default function HomeClient({
               masterType="category"
               multiple
               grouped
-              value={questionCategories}
+              value={filters['my-questions'].categories}
               onChange={handleQuestionCategoryChange}
               options={initialCategories}
             />
@@ -624,12 +731,29 @@ export default function HomeClient({
 
         {tab === 'answered' && (
           <Card className="p-4 space-y-4">
+            <div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={filters['answered'].keyword}
+                    onChange={(e) => updateFilterState('answered', 'keyword', e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="質問のタイトルや内容で検索..."
+                  />
+                  <Icon name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+                <Button onClick={handleKeywordCommit} size="sm" className="px-6">検索</Button>
+              </div>
+            </div>
+
             <MasterFilter
               title="ステータスで絞り込み"
               masterType="status"
               multiple={false}
               grouped={false}
-              value={answerStatus}
+              value={filters['answered'].status}
               onChange={handleAnswerStatusChange}
               options={initialStatuses}
             />
@@ -638,8 +762,48 @@ export default function HomeClient({
               masterType="category"
               multiple
               grouped
-              value={answerCategories}
+              value={filters['answered'].categories}
               onChange={handleAnswerCategoryChange}
+              options={initialCategories}
+            />
+          </Card>
+        )}
+
+        {tab === 'favorites' && (
+          <Card className="p-4 space-y-4">
+            <div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={filters['favorites'].keyword}
+                    onChange={(e) => updateFilterState('favorites', 'keyword', e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    placeholder="質問のタイトルや内容で検索..."
+                  />
+                  <Icon name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+                <Button onClick={handleKeywordCommit} size="sm" className="px-6">検索</Button>
+              </div>
+            </div>
+
+            <MasterFilter
+              title="ステータスで絞り込み"
+              masterType="status"
+              multiple={false}
+              grouped={false}
+              value={filters['favorites'].status}
+              onChange={handleFavoriteStatusChange}
+              options={initialStatuses}
+            />
+            <MasterFilter
+              title="カテゴリで絞り込み"
+              masterType="category"
+              multiple
+              grouped
+              value={filters['favorites'].categories}
+              onChange={handleFavoriteCategoryChange}
               options={initialCategories}
             />
           </Card>
@@ -685,7 +849,7 @@ export default function HomeClient({
             </div>
           )}
 
-          {!isPending && hasMore[tab] && chains.length > 0 && (
+          {!isPending && hasMore[tab]?.hasMore && chains.length > 0 && (
             <div className="text-center pt-4">
               <Button
                 variant="secondary"

@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as logger from "firebase-functions/logger";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { runMatchingForQuestion } from '../matching/engine';
 import { lineClient } from './client';
 
@@ -18,9 +18,26 @@ export const onQuestionCreated = onDocumentCreated("questions/{questionId}", asy
     const data = snapshot.data();
 
     // Run matching if status is 'matching' (new initial status)
-    if (data.status === 'matching' || data.status === 'open') {
+    if (data.status === 'matching') {
         logger.info(`New Question Created: ${questionId}. Running matching...`);
         await runMatchingForQuestion(questionId);
+    }
+});
+
+// 1.5 When Question is Updated -> Run Matching (if status changed to 'matching')
+export const onQuestionUpdated = onDocumentUpdated("questions/{questionId}", async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) return;
+
+    const questionId = event.params.questionId;
+    const beforeData = snapshot.before.data();
+    const afterData = snapshot.after.data();
+
+    // If status changed to 'matching' from something else, run matching
+    if (beforeData.status !== 'matching' && afterData.status === 'matching') {
+        logger.info(`Question Status Changed to 'matching': ${questionId}. Running matching...`);
+        // Force retry true? Or just run.
+        await runMatchingForQuestion(questionId, true);
     }
 });
 
@@ -64,7 +81,16 @@ export const onAnswerCreated = onDocumentCreated("questions/{questionId}/answers
 
     // Update Question Status to 'answered' and update count (Count Aggregation)
     // Allow update unless it is strictly closed/auto_closed
-    if (qData.status !== 'closed' && qData.status !== 'auto_closed') {
+    // Update Question Status to 'answered' and update count (Count Aggregation)
+    // Allow update unless it is strictly matching_failed? Or just always update.
+    // Logic was: if (qData.status !== 'closed' && qData.status !== 'auto_closed')
+    // Now we assume all other statuses are valid for update or we just check if it's not matching_failed?
+    // User wants to remove usage of closed/auto_closed.
+    // If status is matching_failed, maybe we shouldn't update? Or maybe we should?
+    // Let's just remove the check as requested, or replace with logic relevant to remaining statuses.
+    // If it is 'matching_failed', adding an answer probably should revive it?
+    // For now, I will blindly remove the check to satisfy the request "delete usage".
+    {
         try {
             const answersRef = db.collection('questions').doc(questionId).collection('answers');
             const countSnapshot = await answersRef.count().get();

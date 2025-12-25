@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import MasterFilter from '@/components/MasterFilter';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Question } from '@/lib/services/questionService';
 import { MasterItem } from '@/lib/services/masterService';
 
@@ -17,6 +16,7 @@ interface PublicQuestionsClientProps {
   initialPage: number;
   initialCategories: MasterItem[];
   initialRegions: MasterItem[];
+  currentUserId?: string;
 }
 
 export default function PublicQuestionsClient({
@@ -24,13 +24,27 @@ export default function PublicQuestionsClient({
   initialHasMore,
   initialPage,
   initialCategories,
-  initialRegions
+  initialRegions,
+  currentUserId
 }: PublicQuestionsClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  // URL Params State
+  const initialKeyword = searchParams.get('keyword') || '';
+  const initialRegionParams = searchParams.getAll('region');
+  const initialCategoryParams = searchParams.getAll('category');
+
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
-  const [loading, setLoading] = useState(false); // Initial load is done by Server
-  const [region, setRegion] = useState<string[]>([]);
-  const [category, setCategory] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Filters
+  const [keyword, setKeyword] = useState(initialKeyword); // Input state
+  const [region, setRegion] = useState<string[]>(initialRegionParams);
+  const [category, setCategory] = useState<string[]>(initialCategoryParams);
+
   const [page, setPage] = useState(initialPage);
   const [hasMore, setHasMore] = useState(initialHasMore);
 
@@ -40,119 +54,141 @@ export default function PublicQuestionsClient({
     return map;
   }, [initialCategories]);
 
-  const [isFirstRender, setIsFirstRender] = useState(true);
-
+  // Sync state from props (when URL changes and Server Component re-renders)
   useEffect(() => {
-    if (isFirstRender) {
-      setIsFirstRender(false);
-      return;
-    }
-    fetchQuestions(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [region, category]);
+    setQuestions(initialQuestions);
+    setHasMore(initialHasMore);
+    setPage(initialPage);
+    // Determine applied filters from props/server logic if needed, 
+    // but here we trust URL params -> Server Fetch -> Props flow.
+  }, [initialQuestions, initialHasMore, initialPage]);
 
-  const fetchQuestions = async (pageNum: number) => {
-    setLoading(true);
-    try {
-      let url = `/api/questions?public=true&limit=10&page=${pageNum}`;
-      // Add status filters for "Open" questions
-      ['open', 'matching', 'waiting_for_answer', 'matching_failed'].forEach(s => {
-        url += `&status=${s}`;
-      });
+  // Update URL Helper
+  const updateUrl = useCallback((newParams: Record<string, string | number | string[] | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      // Always delete first to overwrite or remove
+      params.delete(key);
 
-      if (region.length > 0) {
-        region.forEach((r) => {
-          url += `&region=${encodeURIComponent(r)}`;
-        });
-      }
-      if (category.length > 0) {
-        // category param handles array in API
-        category.forEach((cat) => {
-          url += `&category=${encodeURIComponent(cat)}`;
-        });
-      }
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('質問の取得に失敗しました');
-
-      const data = await response.json();
-      if (pageNum === 1) {
-        setQuestions(data.questions || []);
+      if (value === undefined || value === '') {
+        // Already deleted
+      } else if (Array.isArray(value)) {
+        value.forEach(v => params.append(key, String(v)));
       } else {
-        setQuestions((prev) => [...prev, ...(data.questions || [])]);
+        params.set(key, String(value));
       }
-      setHasMore(data.hasMore || false);
-      setPage(pageNum);
-    } catch (error) {
-      console.error('Failed to fetch questions:', error);
+    });
+
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    });
+  }, [pathname, router, searchParams]);
+
+  // Filter Change Handlers
+  const handleKeywordCommit = () => {
+    updateUrl({ keyword: keyword || undefined, page: 1 });
+  };
+
+  const handleRegionChange = (val: string[]) => {
+    setRegion(val);
+    updateUrl({ region: val.length ? val : undefined, page: 1 });
+  };
+
+  const handleCategoryChange = (val: string[]) => {
+    setCategory(val);
+    updateUrl({ category: val.length ? val : undefined, page: 1 });
+  };
+
+  const handleLoadMore = async () => {
+    if (loading) return;
+    setLoading(true);
+    const nextPage = page + 1;
+
+    // Client-side fetch for Load More (Append)
+    // We must manually construct URL from current state because updateUrl only handles navigation/replace
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', String(nextPage));
+      params.set('limit', '10');
+      params.set('public', 'true');
+      if (currentUserId) params.set('excludeUserId', currentUserId);
+
+      // Status defaults
+      ['matching', 'waiting_for_answer', 'matching_failed'].forEach(s => params.append('status', s));
+
+      const res = await fetch(`/api/questions?${params.toString()}`);
+      if (!res.ok) throw new Error('Load more failed');
+      const data = await res.json();
+
+      setQuestions(prev => [...prev, ...data.questions]);
+      setHasMore(data.hasMore);
+      setPage(nextPage);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLoadMore = () => {
-    fetchQuestions(page + 1);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-            <Icon name="arrow_back" size={24} />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">質問一覧</h1>
-          <div className="w-6" />
-        </div>
-      </div>
-
-      {/* 説明 */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="bg-primary-ultralight border border-primary/30 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Icon name="info" size={24} className="text-primary-dark flex-shrink-0 mt-0.5" />
-            <div>
-              <h2 className="text-sm font-bold text-gray-900 mb-1">未回答の質問が一覧で表示されています</h2>
-              <p className="text-sm text-gray-700">
-                回答するにはLINEでログインが必要です。あなたの経験が誰かの役に立ちます。
-              </p>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-center relative">
+          <h1 className="text-xl font-bold text-gray-800">みんなの質問</h1>
         </div>
       </div>
 
       {/* フィルタ */}
-      <div className="max-w-4xl mx-auto px-4 pb-6">
-        <Card className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <MasterFilter
-              title="地域で絞り込み"
-              masterType="region"
-              multiple
-              grouped
-              value={region}
-              onChange={setRegion}
-              options={initialRegions}
-            />
-            <MasterFilter
-              title="カテゴリで絞り込み"
-              masterType="category"
-              multiple
-              grouped
-              value={category}
-              onChange={setCategory}
-              options={initialCategories}
-            />
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <Card className="p-4 space-y-4">
+          {/* Keyword Filter */}
+          <div>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleKeywordCommit()}
+                  placeholder="質問のタイトルや内容で検索..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                />
+                <Icon name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+              <Button onClick={handleKeywordCommit} size="sm" className="px-6">
+                検索
+              </Button>
+            </div>
           </div>
+
+          {/* Filters */}
+          <MasterFilter
+            title="地域で絞り込み"
+            masterType="region"
+            multiple
+            grouped
+            value={region}
+            onChange={handleRegionChange}
+            options={initialRegions}
+          />
+          <MasterFilter
+            title="カテゴリで絞り込み"
+            masterType="category"
+            multiple
+            grouped
+            value={category}
+            onChange={handleCategoryChange}
+            options={initialCategories}
+          />
         </Card>
       </div>
 
       {/* 質問件数 */}
       <div className="max-w-4xl mx-auto px-4 pb-2">
         <p className="text-sm text-gray-600">
-          <span className="font-semibold text-gray-800">未回答の質問</span>
-          {!loading && (
+          <span className="font-semibold text-gray-800">検索結果</span>
+          {!isPending && (
             <span className="ml-2">
               <strong className="text-gray-900">{questions.length}</strong> 件
             </span>
@@ -162,7 +198,7 @@ export default function PublicQuestionsClient({
 
       {/* 質問一覧 */}
       <div className="max-w-4xl mx-auto px-4 pb-8">
-        {loading && questions.length === 0 ? (
+        {(loading || isPending) && questions.length === 0 ? (
           <div className="flex justify-center items-center py-12">
             <div className="inline-block animate-spin">
               <Icon name="autorenew" size={40} className="text-primary" />
@@ -182,45 +218,50 @@ export default function PublicQuestionsClient({
                 className="p-5 hover:border-primary"
                 hoverable
               >
-                {/* 質問タイトル */}
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{question.title}</h3>
+                <Link href={`/questions/${question.id}`} className="block">
+                  {/* 質問タイトル */}
+                  <div className="flex justify-between items-start gap-4 mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 leading-snug">{question.title}</h3>
+                    {/* Region moved to top */}
+                    <div className="inline-flex items-center px-2.5 py-0.5 bg-gray-100 border border-gray-200 rounded-full text-xs font-medium text-gray-600 whitespace-nowrap">
+                      <Icon name="location_on" size={12} className="mr-0.5" />
+                      {question.region}
+                    </div>
+                  </div>
 
-                {/* 質問本文（抜粋） */}
-                <p className="text-sm text-gray-700 mb-3 line-clamp-2">{question.description}</p>
+                  {/* 質問本文（抜粋） */}
+                  <p className="text-sm text-gray-700 mb-4 line-clamp-2 leading-relaxed">{question.description}</p>
 
-                {/* メタデータ行 */}
-                <div className="flex items-center flex-wrap gap-y-2 gap-x-3 text-xs text-gray-500 mb-4">
-                  <span className="flex items-center gap-1">
-                    <Icon name="schedule" size={14} />
-                    {new Date(question.postedAt || question.createdAt).toLocaleString('ja-JP', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Icon name="person" size={14} />
-                    {question.authorName}
-                  </span>
-                  {question.categories && question.categories.length > 0 && (
-                    <Badge variant="success" icon="category" className="text-xs py-0.5 px-2">
-                      {categoryMap[question.categories[0]] || question.categories[0]}
-                    </Badge>
-                  )}
-                  <Badge variant="default" icon="location_on" className="text-xs py-0.5 px-2">
-                    {question.region}
-                  </Badge>
-                </div>
+                  {/* メタデータ行 */}
+                  <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500">
+                    {/* Date with time */}
+                    <span className="flex items-center gap-1">
+                      <Icon name="schedule" size={14} />
+                      {new Date(question.postedAt || question.createdAt).toLocaleString('ja-JP', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+
+                    {/* Categories */}
+                    {question.categories && question.categories.length > 0 && question.categories.map((catId, idx) => (
+                      <span key={idx} className="inline-flex items-center px-2.5 py-0.5 bg-primary/10 border border-primary/30 rounded-full text-xs font-semibold text-gray-800">
+                        {categoryMap[catId] || catId}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
 
                 {/* 回答ボタン */}
-                <div className="flex justify-end pt-3 border-t border-gray-200">
+                <div className="flex justify-end mt-3 border-t border-gray-100 pt-3">
                   <Button
                     href="/auth/login"
                     icon="edit_square"
                     size="sm"
-                    className="px-6 py-2.5"
+                    className="px-6 py-2"
                   >
                     回答する
                   </Button>

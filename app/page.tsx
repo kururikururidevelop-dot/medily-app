@@ -12,7 +12,7 @@ async function fetchPublicQuestions() {
   try {
     const q = query(
       collection(db, 'questions'),
-      where('status', '==', 'open'),
+      where('status', 'in', ['matching', 'waiting_for_answer', 'matching_failed']),
       // where('public', '==', true), // Note: Based on API logic, maybe we need this? 
       // API route checks: if (publicOnly) constraints.push(where('public', '==', true));
       // In page.tsx call was: public=true. So yes.
@@ -143,10 +143,10 @@ export default function Home() {
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button href="/auth/login" size="lg" className="w-64 px-8 py-4 text-lg justify-center">
-              相談してみる
+              相談をしてみる
             </Button>
             <Button href="/questions" size="lg" className="w-64 px-8 py-4 text-lg justify-center">
-              経験をシェアする
+              相談を受けてみる
             </Button>
           </div>
         </div>

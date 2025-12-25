@@ -7,7 +7,9 @@ import {
     query,
     where,
     getCountFromServer,
-    collectionGroup
+    collectionGroup,
+    getDocs,
+    deleteDoc
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -107,5 +109,29 @@ export const userService = {
             answeredQuestions: answeredQuestionsSnap.data().count,
             answers: answersSnap.data().count,
         };
+    },
+
+    async getFavoriteQuestionIds(userId: string): Promise<string[]> {
+        if (!db) throw new Error('Firebase is not configured');
+        const favRef = collection(db, 'users', userId, 'favorites');
+        const snap = await getDocs(favRef);
+        return snap.docs.map(d => d.id);
+    },
+
+    async toggleFavorite(userId: string, questionId: string): Promise<boolean> {
+        if (!db) throw new Error('Firebase is not configured');
+        const favRef = doc(db, 'users', userId, 'favorites', questionId);
+        const snap = await getDoc(favRef);
+
+        if (snap.exists()) {
+            await deleteDoc(favRef);
+            return false; // Removed
+        } else {
+            await setDoc(favRef, {
+                questionId,
+                addedAt: new Date()
+            });
+            return true; // Added
+        }
     }
 };

@@ -45,7 +45,7 @@ export async function runMatchingForQuestion(questionId: string, isRetry = false
     // Skip if not 'matching' status (or 'open' for legacy)
     // Actually we should only run if 'matching' or 'open'.
     // If it's already 'waiting_for_answer', 'answered', 'closed', 'matching_failed' (without retry), skip.
-    if (['waiting_for_answer', 'answered', 'closed', 'auto_closed'].includes(question.status)) {
+    if (['waiting_for_answer', 'answered', 'matching_failed'].includes(question.status)) {
         logger.info(`Question ${questionId} is already ${question.status}. Skipping.`);
         return;
     }

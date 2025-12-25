@@ -114,18 +114,35 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const filter: QuestionFilter = {
+    const limitParam = parseInt(searchParams.get('limit') || '10', 10);
+    const pageParam = parseInt(searchParams.get('page') || '1', 10);
+    const regions = searchParams.getAll('region');
+    const categories = searchParams.getAll('category');
+    const statuses = searchParams.getAll('status');
+    const keyword = searchParams.get('keyword') || undefined;
+    const excludeUserId = searchParams.get('excludeUserId') || undefined;
+
+    console.log('[API] GET /questions params:', {
+      limit: limitParam,
+      page: pageParam,
+      keyword,
+      excludeUserId,
+      regions,
+      categories
+    });
+
+    const result = await questionService.getQuestions({
       userId,
       answeredBy: searchParams.get('answeredBy') || undefined,
-      region: searchParams.getAll('region').filter(Boolean),
-      category: searchParams.getAll('category').filter(Boolean),
-      status: searchParams.getAll('status').filter(Boolean),
       publicOnly,
-      limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
-      page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
-    };
-
-    const result = await questionService.getQuestions(filter);
+      limit: limitParam,
+      page: pageParam,
+      region: regions.length > 0 ? regions : undefined,
+      category: categories.length > 0 ? categories : undefined,
+      status: statuses.length > 0 ? statuses : undefined,
+      keyword,
+      excludeUserId,
+    });
 
     return NextResponse.json(result);
   } catch (error) {
