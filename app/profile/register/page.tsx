@@ -202,7 +202,7 @@ export default function ProfileRegisterPage() {
               </div>
             )}
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">初回プロフィール登録</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">初回プロフィール登録</h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm">
             Medilyを始めるために、あなたの基本情報を教えてください。
           </p>

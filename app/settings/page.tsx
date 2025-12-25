@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function SettingsServerPage() {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('userId')?.value || 'dev-mock-user';
+    const userId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
 
     // Fetch profile to get notification settings
     const profile = await userService.getUserProfile(userId);

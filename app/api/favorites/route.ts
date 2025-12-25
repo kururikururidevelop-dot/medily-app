@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
         }
 
         const cookieStore = await cookies();
-        const userId = cookieStore.get('userId')?.value || 'dev-mock-user';
+        const userId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

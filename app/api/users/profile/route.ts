@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
       medicalBackground,
       avatar,
       notificationConsent,
+      gender,
+      birthYear,
     } = body;
 
     // Validation: userId is mandatory.
@@ -51,6 +53,8 @@ export async function POST(request: NextRequest) {
     }
     if (medicalBackground !== undefined) updateData.medicalBackground = medicalBackground;
     if (avatar !== undefined) updateData.avatar = avatar;
+    if (gender !== undefined) updateData.gender = gender;
+    if (birthYear !== undefined) updateData.birthYear = birthYear;
     if (typeof notificationConsent === 'boolean') updateData.notificationConsent = notificationConsent;
 
     // Mark profile as completed

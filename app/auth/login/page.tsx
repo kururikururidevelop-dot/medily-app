@@ -71,7 +71,7 @@ export default function LoginPage() {
               <Icon name="medical_services" size={40} className="text-primary" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             {isLoginMode ? 'おかえりなさい！' : 'LINE連携で始めよう'}
           </h1>
           {!isLoginMode ? (

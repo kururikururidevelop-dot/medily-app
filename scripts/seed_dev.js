@@ -19,6 +19,8 @@ const devUsers = [
 
     categories: ['内科一般', '皮膚科', '小児科'],
     medicalBackground: '看護師（経験3年）',
+    gender: 'female',
+    birthYear: '1990',
     avatar: '',
     pictureUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Felix',
     notificationConsent: true,

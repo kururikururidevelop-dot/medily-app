@@ -37,7 +37,7 @@ export default async function QuestionDetailPage({ params }: Props) {
   // 3. Others see nothing (or public? Requirements say "Login user's answered data only")
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
-  const currentUserId = cookieStore.get('userId')?.value || 'dev-mock-user';
+  const currentUserId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
 
   console.log('[QuestionDetail] CurrentUser:', currentUserId);
   console.log('[QuestionDetail] QuestionOwner:', data.question.userId);

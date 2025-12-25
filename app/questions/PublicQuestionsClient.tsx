@@ -223,7 +223,7 @@ export default function PublicQuestionsClient({
                   <div className="flex justify-between items-start gap-4 mb-2">
                     <h3 className="text-lg font-bold text-gray-900 leading-snug">{question.title}</h3>
                     {/* Region moved to top */}
-                    <div className="inline-flex items-center px-2.5 py-0.5 bg-gray-100 border border-gray-200 rounded-full text-xs font-medium text-gray-600 whitespace-nowrap">
+                    <div className="inline-flex items-center px-2.5 py-0.5 bg-gray-100 border border-gray-200 rounded-full text-xs font-semibold text-gray-600 whitespace-nowrap">
                       <Icon name="location_on" size={12} className="mr-0.5" />
                       {question.region}
                     </div>
@@ -305,7 +305,7 @@ export default function PublicQuestionsClient({
                 プライバシーポリシー
               </Link>
             </div>
-            <p className="text-gray-500">© 2025 Medily. All rights reserved.</p>
+            <p className="text-gray-500">© 2025 kururikururi. All rights reserved.</p>
           </div>
         </div>
       </div>

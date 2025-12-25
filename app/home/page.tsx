@@ -152,7 +152,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   // サーバー側で認証チェックとデータ取得
   const cookieStore = await cookies();
-  const userId = cookieStore.get('userId')?.value || 'dev-mock-user';
+  const userId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
   const displayName = cookieStore.get('displayName')?.value || 'デモユーザー';
   const avatarUrl = cookieStore.get('avatarUrl')?.value;
 

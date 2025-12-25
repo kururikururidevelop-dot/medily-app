@@ -71,6 +71,7 @@ interface ProfileData {
   birthYear?: string;
   categories: string[];
   notificationConsent: boolean;
+  avatarUrl?: string; // Added avatarUrl
 }
 
 export default function ProfileEditPage() {
@@ -86,8 +87,11 @@ export default function ProfileEditPage() {
     birthYear: '',
     categories: [],
     notificationConsent: false,
+    avatarUrl: '',
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [imgError, setImgError] = useState(false); // Added for image error handling
+
   const grouped = categories.reduce<Record<string, Category[]>>((acc, c) => {
     const key = c.group || 'その他';
     acc[key] = acc[key] || [];
@@ -105,7 +109,7 @@ export default function ProfileEditPage() {
         const user = auth?.currentUser;
 
         // Dev mock fallback or actual user
-        let effectiveUserId = 'dev-mock-user';
+        let effectiveUserId = process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '';
         let token = '';
 
         if (user) {
@@ -115,12 +119,6 @@ export default function ProfileEditPage() {
           // If no user in PROD, assume requireAuth handles it, but here we might fail fetch
           const stored = localStorage.getItem('userId');
           if (stored && stored !== 'undefined') effectiveUserId = stored;
-          // Note: if backend enforces auth, this will fail without token. 
-          // Development mode might bypass if we add allowDev logic? 
-          // But backend now strictly checks token.
-          // If allowDev is true in backend, fine. 
-          // But current backend enforce token unless we add dev bypass in backend-auth.
-          // Assume dev uses real auth emulator user?
         }
 
         const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -143,6 +141,7 @@ export default function ProfileEditPage() {
             birthYear: data.user.birthYear || '',
             categories: data.user.categories || [],
             notificationConsent: data.user.notificationConsent === true,
+            avatarUrl: data.user.pictureUrl || '', // Map pictureUrl to avatarUrl
           });
         }
       } catch (err) {
@@ -196,24 +195,45 @@ export default function ProfileEditPage() {
     setSaving(true);
     try {
       const { auth } = await import('@/lib/firebase');
+      await auth?.authStateReady(); // Wait for auth state
+
       const user = auth?.currentUser;
-      if (!user) throw new Error('認証されていません');
-      const token = await user.getIdToken();
+      let effectiveUserId = '';
+      let token = '';
+
+      if (user) {
+        effectiveUserId = user.uid;
+        token = await user.getIdToken();
+      } else {
+        // Fallback for dev demo user
+        const storedUserId = localStorage.getItem('userId');
+        if (process.env.NODE_ENV === 'development' && storedUserId === 'dev-mock-user') {
+          effectiveUserId = storedUserId;
+          // No token needed for dev-mock-user as per verifyAuth
+        } else {
+          throw new Error('認証されていません');
+        }
+      }
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
       const response = await fetch('/api/users/profile', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify({
-          userId: user.uid,
+          userId: effectiveUserId,
           displayName: formData.displayName,
           region: formData.region,
-          gender: formData.gender,
+          gender: formData.gender === 'other' ? '' : formData.gender,
           birthYear: formData.birthYear,
           categories: formData.categories,
           notificationConsent: formData.notificationConsent,
+          avatar: formData.avatarUrl,
         }),
       });
 
@@ -243,15 +263,34 @@ export default function ProfileEditPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
-          <h1 className="text-2xl font-bold text-gray-800">プロフィール編集</h1>
-        </div>
-      </div>
-
       {/* メインコンテンツ */}
       <div className="max-w-screen-sm mx-auto px-6 py-8 w-full">
+        <div className="text-center mb-8">
+          {/* アバター */}
+          <div className="flex justify-center mb-4">
+            {formData.avatarUrl && !imgError ? (
+              <div className="w-20 h-20 rounded-full border-2 border-white shadow-md overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={formData.avatarUrl}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={() => setImgError(true)}
+                />
+              </div>
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center shadow-sm border border-gray-200">
+                <Icon name="account_circle" size={48} className="text-gray-400" />
+              </div>
+            )}
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">プロフィール編集</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">
+            プロフィール編集後に保存してください。<br />
+            （プロフィール画像の編集はLINEで行ってください）
+          </p>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-700">{error}</p>
@@ -420,18 +459,18 @@ export default function ProfileEditPage() {
           </div>
 
           {/* ボタン */}
-          <div className="flex gap-3 justify-end mt-6">
+          <div className="flex gap-4 pt-2">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-colors"
+              className="flex-1 py-3 border border-gray-300 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              disabled={saving}
-              className="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={saving || !formData.notificationConsent}
+              className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {saving ? '保存中...' : '保存'}
             </button>

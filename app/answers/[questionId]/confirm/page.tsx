@@ -145,7 +145,7 @@ export default function AnswerConfirmPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
-          <h1 className="text-2xl font-bold text-gray-800">回答記入確認</h1>
+          <h1 className="text-xl font-bold text-gray-800">回答記入確認</h1>
         </div>
       </header>
 
