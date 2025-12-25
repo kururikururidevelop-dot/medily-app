@@ -46,19 +46,31 @@ export default function TermsPage() {
               <li><strong>許可のない営利目的の宣伝・勧誘行為（サプリメントや特定商品の販売など）</strong></li>
               <li><strong>特定の医療機関、医師、個人に対する誹謗中傷</strong></li>
             </ul>
+            <p className="text-gray-700 leading-relaxed mt-4">
+              運営者は、ユーザーの投稿が禁止事項に該当すると判断した場合、事前の通知なく当該投稿を削除し、または当該ユーザーによる本サービスの利用を制限・停止できるものとします。
+            </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-4">第4条（本サービスの停止等）</h2>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed mb-2">
               運営者は、以下のいずれかに該当する場合には、ユーザーに事前に通知することなく、本サービスの全部または一部の提供を停止または中断することができるものとします。
             </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li>本サービスにかかるコンピュータシステムの保守点検または更新を行う場合</li>
+              <li>地震、落雷、火災、停電または天災などの不可抗力により、本サービスの提供が困難となった場合</li>
+              <li>コンピュータまたは通信回線等が事故により停止した場合</li>
+              <li>その他、運営者が本サービスの提供が困難と判断した場合</li>
+            </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-4">第5条（免責事項）</h2>
             <p className="text-gray-700 leading-relaxed">
               運営者は、本サービスに関して、ユーザーと他のユーザーまたは第三者との間において生じた取引、連絡または紛争等について一切責任を負いません。
+            </p>
+            <p className="text-gray-700 leading-relaxed mt-2">
+              LINE株式会社が提供するプラットフォームの不具合や仕様変更等に起因して生じた損害について、運営者は一切の責任を負いません。
             </p>
           </section>
 
@@ -89,11 +101,7 @@ export default function TermsPage() {
           </section>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link href="/" className="text-primary hover:underline">
-            ホームへ戻る
-          </Link>
-        </div>
+
       </div>
     </div>
   );

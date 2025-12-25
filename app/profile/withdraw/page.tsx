@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { getAuthenticatedUser, getAuthHeaders } from '@/lib/client-auth';
 
 export default function WithdrawPage() {
   const router = useRouter();
@@ -20,15 +21,12 @@ export default function WithdrawPage() {
 
     setLoading(true);
     try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        router.push('/auth/login');
-        return;
-      }
+      const { userId } = await getAuthenticatedUser();
+      const headers = await getAuthHeaders();
 
       const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ reason }),
       });
 

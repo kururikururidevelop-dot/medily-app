@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '@/lib/services/userService';
-import { cookies } from 'next/headers';
+import { verifyAuth } from '@/lib/backend-auth';
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,11 +9,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing questionId' }, { status: 400 });
         }
 
-        const cookieStore = await cookies();
-        const userId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
-
+        const authResult = await verifyAuth(req);
+        if (authResult.error) {
+            return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+        }
+        const userId = authResult.uid;
         if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized: No UID' }, { status: 401 });
         }
 
         const isAdded = await userService.toggleFavorite(userId, questionId);

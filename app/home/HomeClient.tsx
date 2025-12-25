@@ -71,6 +71,7 @@ type TabType = 'my-questions' | 'answered' | 'favorites';
 import { useRequireAuth } from '@/app/hooks/useRequireAuth';
 import { calculateRank } from '@/lib/rankUtils';
 import { updateUserRank } from '@/app/actions/user';
+import { DEV_MOCK_USER } from '@/lib/auth-constants';
 
 export default function HomeClient({
   initialData,
@@ -579,7 +580,7 @@ export default function HomeClient({
           </Card>
 
           {/* Debug Controls (Temporary) */}
-          {process.env.NODE_ENV === 'development' && userId === 'dev-mock-user' && (
+          {process.env.NODE_ENV === 'development' && userId === DEV_MOCK_USER && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 flex flex-wrap gap-6 items-center shadow-sm">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-500">回答数 (Level)</span>

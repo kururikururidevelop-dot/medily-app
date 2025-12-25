@@ -1,6 +1,7 @@
 
 import { NextRequest } from 'next/server';
 import { adminAuth } from '@/lib/firebase-admin';
+import { DEV_MOCK_USER } from '@/lib/auth-constants';
 
 export interface AuthResult {
     error?: string;
@@ -19,8 +20,8 @@ export async function verifyAuth(request: NextRequest, targetUserId?: string): P
     // Development Bypass for mock user
     if (process.env.NODE_ENV === 'development') {
         // If the target user is the dev mock user, allow without token
-        if (targetUserId === 'dev-mock-user') {
-            return { uid: 'dev-mock-user' };
+        if (targetUserId === DEV_MOCK_USER) {
+            return { uid: DEV_MOCK_USER };
         }
     }
 

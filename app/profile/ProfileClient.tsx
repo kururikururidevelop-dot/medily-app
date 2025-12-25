@@ -219,7 +219,7 @@ export default function ProfilePage({ initialProfile }: ProfileClientProps) {
         <div className="mt-8">
           <button
             onClick={handleLogout}
-            className="w-full px-6 py-4 bg-white border border-red-100 text-red-600 hover:bg-red-50 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+            className="w-full px-6 py-4 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
           >
             <Icon name="logout" size={20} />
             ログアウト
@@ -237,7 +237,7 @@ export default function ProfilePage({ initialProfile }: ProfileClientProps) {
             プライバシーポリシー
           </Link>
         </div>
-        <p className="text-xs text-gray-400">© 2025 Medily. All rights reserved.</p>
+        <p className="text-xs text-gray-400">© 2025 kururikururi. All rights reserved.</p>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ const PREFECTURES = [
 ];
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRequireAuth } from '@/app/hooks/useRequireAuth';
+import { getAuthenticatedUser, getAuthHeaders } from '@/lib/client-auth';
 import Icon from '@/components/Icon';
 import MasterFilter from '@/components/MasterFilter';
 // TemplateSelect は仕様変更により未使用
@@ -105,21 +106,8 @@ function QuestionPostContent() {
 
   const fetchProfileDefaults = async () => {
     try {
-      const { auth } = await import('@/lib/firebase');
-      await auth?.authStateReady();
-      const user = auth?.currentUser;
-
-      let userId = 'dev-mock-user';
-      let token = '';
-      if (user) {
-        userId = user.uid;
-        token = await user.getIdToken();
-      } else {
-        const stored = localStorage.getItem('userId');
-        if (stored) userId = stored;
-      }
-
-      const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+      const { userId } = await getAuthenticatedUser();
+      const headers = await getAuthHeaders();
 
       const res = await fetch(`/api/users/profile?userId=${userId}`, { headers });
       if (!res.ok) return;
@@ -142,15 +130,7 @@ function QuestionPostContent() {
   const fetchParentQuestion = async (questionId: string) => {
     setLoading(true);
     try {
-      const { auth } = await import('@/lib/firebase');
-      await auth?.authStateReady();
-      const user = auth?.currentUser;
-
-      const headers: HeadersInit = {};
-      if (user) {
-        const token = await user.getIdToken();
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      const headers = await getAuthHeaders();
 
       const res = await fetch(`/api/questions/${questionId}`, { headers });
       if (res.ok) {

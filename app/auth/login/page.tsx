@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Icon from '@/components/Icon';
+import { DEV_MOCK_USER, DEV_MOCK_TOKEN, DEV_DISPLAY_NAME } from '@/lib/auth-constants';
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -31,9 +32,9 @@ export default function LoginPage() {
         }
 
         const data = await response.json();
-        const token = data.token || 'dev-mock-token';
-        const userId = data.userId || data.user?.lineUserId || 'dev-mock-user';
-        const displayName = data.displayName || data.user?.displayName || 'デモユーザー';
+        const token = data.token || DEV_MOCK_TOKEN;
+        const userId = data.userId || data.user?.lineUserId || DEV_MOCK_USER;
+        const displayName = data.displayName || data.user?.displayName || DEV_DISPLAY_NAME;
 
         localStorage.setItem('token', token);
         localStorage.setItem('userId', userId);

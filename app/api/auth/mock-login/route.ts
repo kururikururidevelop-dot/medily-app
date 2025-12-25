@@ -4,13 +4,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { DEV_MOCK_USER, DEV_MOCK_TOKEN } from '@/lib/auth-constants';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const displayName = body.displayName || 'デモユーザー';
-    const mockLineUserId = 'dev-mock-user';
-    const mockToken = 'dev-mock-token';
+    const mockLineUserId = DEV_MOCK_USER;
+    const mockToken = DEV_MOCK_TOKEN;
+
+    if (process.env.NODE_ENV !== 'development') {
+      return NextResponse.json({ error: 'Not Found' }, { status: 404 });
+    }
 
     if (!db) {
       return NextResponse.json(

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { DEV_MOCK_USER, DEV_MOCK_TOKEN, DEV_DISPLAY_NAME } from '@/lib/auth-constants';
 
 interface UseRequireAuthOptions {
   allowDev?: boolean;
@@ -22,9 +23,9 @@ export function useRequireAuth(options: UseRequireAuthOptions = {}) {
     // 開発環境ではダミーユーザーを自動ログイン状態にする
     if (allowDev && process.env.NODE_ENV === 'development') {
       const devToken = localStorage.getItem('token');
-      if (!devToken) localStorage.setItem('token', 'dev-mock-token');
-      if (!localStorage.getItem('userId')) localStorage.setItem('userId', 'dev-mock-user');
-      if (!localStorage.getItem('displayName')) localStorage.setItem('displayName', 'デモユーザー');
+      if (!devToken) localStorage.setItem('token', DEV_MOCK_TOKEN);
+      if (!localStorage.getItem('userId')) localStorage.setItem('userId', DEV_MOCK_USER);
+      if (!localStorage.getItem('displayName')) localStorage.setItem('displayName', DEV_DISPLAY_NAME);
       return;
     }
 

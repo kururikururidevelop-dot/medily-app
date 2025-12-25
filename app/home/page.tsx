@@ -1,4 +1,5 @@
 
+import { getServerAuthUser } from '@/lib/server-auth';
 import { cookies } from 'next/headers';
 import HomeClient from './HomeClient';
 import { userService } from '@/lib/services/userService';
@@ -150,9 +151,8 @@ export default async function HomePage({ searchParams }: Props) {
   const favStatus = parseArray(sp?.fav_status);
   const favCategories = parseArray(sp?.fav_cats);
 
-  // サーバー側で認証チェックとデータ取得
+  const { userId } = await getServerAuthUser();
   const cookieStore = await cookies();
-  const userId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
   const displayName = cookieStore.get('displayName')?.value || 'デモユーザー';
   const avatarUrl = cookieStore.get('avatarUrl')?.value;
 

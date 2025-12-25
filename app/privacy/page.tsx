@@ -26,9 +26,12 @@ export default function PrivacyPage() {
               <li>地域情報</li>
               <li>生まれ年（任意）</li>
               <li>性別（任意）</li>
-              <li>メールアドレスまたはLINE連携情報</li>
+              <li>LINE連携情報</li>
               <li><strong>機微な個人情報（ユーザーが投稿等の形式で自ら提供する病歴、身体状況、体験談など）</strong></li>
             </ul>
+            <p className="text-gray-700 leading-relaxed mt-4 mb-2">
+              本サービスはメッセージの転送をシステムが行うことで、ユーザー間の直接の連絡先交換を介さずにコミュニケーションを実現します。ただし、投稿内容自体に個人情報を含めた場合は、相手方に伝わることを承知の上で利用するものとします。
+            </p>
             <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-gray-800">
               <div className="flex items-start gap-3">
                 <span className="text-yellow-600 mt-0.5">
@@ -60,8 +63,12 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-4">3. 個人情報の第三者提供</h2>
             <p className="text-gray-700 leading-relaxed">
-              当サービスは、法令に基づく場合を除き、ユーザーの同意なく個人情報を第三者に提供することはありません。
+              当サービスは、ユーザーの同意なく個人情報を第三者に提供することはありません。ただし、以下の場合は例外とします。
             </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-2">
+              <li>法令に基づく場合</li>
+              <li>利用目的の達成に必要な範囲内で、個人情報の取り扱いを業務委託先に委託する場合（AIフィルタリング等の外部API利用を含む）</li>
+            </ul>
           </section>
 
           <section>
@@ -92,11 +99,7 @@ export default function PrivacyPage() {
           </section>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link href="/" className="text-primary hover:underline">
-            ホームへ戻る
-          </Link>
-        </div>
+
       </div>
     </div>
   );

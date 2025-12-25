@@ -1,4 +1,5 @@
 import { questionService } from '@/lib/services/questionService';
+import { getServerAuthUser } from '@/lib/server-auth';
 import QuestionDetailClient from './QuestionDetailClient';
 import { notFound } from 'next/navigation';
 import { masterService } from '@/lib/services/masterService';
@@ -35,9 +36,8 @@ export default async function QuestionDetailPage({ params }: Props) {
   // 1. Question Owner sees ALL answers.
   // 2. Answerer sees ONLY their own answers.
   // 3. Others see nothing (or public? Requirements say "Login user's answered data only")
-  const { cookies } = await import('next/headers');
-  const cookieStore = await cookies();
-  const currentUserId = cookieStore.get('userId')?.value || (process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '');
+
+  const { userId: currentUserId } = await getServerAuthUser();
 
   console.log('[QuestionDetail] CurrentUser:', currentUserId);
   console.log('[QuestionDetail] QuestionOwner:', data.question.userId);

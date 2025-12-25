@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Icon from '@/components/Icon';
+
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { getAuthenticatedUser, getAuthHeaders } from '@/lib/client-auth';
 
 const PREFECTURES = [
   '北海道',
@@ -104,28 +106,12 @@ export default function ProfileEditPage() {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        const { auth } = await import('@/lib/firebase');
-        await auth?.authStateReady();
-        const user = auth?.currentUser;
-
-        // Dev mock fallback or actual user
-        let effectiveUserId = process.env.NODE_ENV === 'development' ? 'dev-mock-user' : '';
-        let token = '';
-
-        if (user) {
-          effectiveUserId = user.uid;
-          token = await user.getIdToken();
-        } else {
-          // If no user in PROD, assume requireAuth handles it, but here we might fail fetch
-          const stored = localStorage.getItem('userId');
-          if (stored && stored !== 'undefined') effectiveUserId = stored;
-        }
-
+        const { userId, token } = await getAuthenticatedUser();
         const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
 
         const [catRes, profRes] = await Promise.all([
           fetch('/api/system/categories'),
-          fetch(`/api/users/profile?userId=${effectiveUserId}`, { headers }),
+          fetch(`/api/users/profile?userId=${userId}`, { headers }),
         ]);
 
         const catData = await catRes.json();
@@ -194,39 +180,14 @@ export default function ProfileEditPage() {
 
     setSaving(true);
     try {
-      const { auth } = await import('@/lib/firebase');
-      await auth?.authStateReady(); // Wait for auth state
-
-      const user = auth?.currentUser;
-      let effectiveUserId = '';
-      let token = '';
-
-      if (user) {
-        effectiveUserId = user.uid;
-        token = await user.getIdToken();
-      } else {
-        // Fallback for dev demo user
-        const storedUserId = localStorage.getItem('userId');
-        if (process.env.NODE_ENV === 'development' && storedUserId === 'dev-mock-user') {
-          effectiveUserId = storedUserId;
-          // No token needed for dev-mock-user as per verifyAuth
-        } else {
-          throw new Error('認証されていません');
-        }
-      }
-
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      const { userId } = await getAuthenticatedUser();
+      const headers = await getAuthHeaders();
 
       const response = await fetch('/api/users/profile', {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          userId: effectiveUserId,
+          userId,
           displayName: formData.displayName,
           region: formData.region,
           gender: formData.gender === 'other' ? '' : formData.gender,
